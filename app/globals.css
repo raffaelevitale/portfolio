@@ -3,11 +3,19 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --accent: #3b82f6;
+  --accent-foreground: #ffffff;
+  --muted: #f3f4f6;
+  --muted-foreground: #6b7280;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -16,11 +24,97 @@
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+    --accent: #3b82f6;
+    --accent-foreground: #ffffff;
+    --muted: #1f2937;
+    --muted-foreground: #9ca3af;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom scrollbar for a more modern look */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--background);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--foreground);
+  opacity: 0.2;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  opacity: 0.4;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection styling */
+::selection {
+  background-color: var(--foreground);
+  color: var(--background);
+}
+
+/* Modern visual enhancements */
+.aurora {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(600px 400px at 80% 20%, color-mix(in oklch, var(--accent) 50%, transparent) 0, transparent 60%),
+    radial-gradient(600px 400px at 20% 80%, color-mix(in oklch, #10b981 45%, transparent) 0, transparent 60%),
+    radial-gradient(800px 500px at 10% 10%, color-mix(in oklch, #f43f5e 35%, transparent) 0, transparent 60%);
+  filter: blur(40px) saturate(120%);
+  opacity: .7;
+  animation: auroraMove 24s ease-in-out infinite alternate;
+}
+
+@keyframes auroraMove {
+  0% { background-position: 0% 0%, 100% 100%, 50% 50%; transform: translateY(0); }
+  100% { background-position: 100% 0%, 0% 100%, 50% 80%; transform: translateY(-2%); }
+}
+
+/* Shared keyframes for animated gradients */
+@keyframes bg-move {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+
+/* Entrance animation: fade-up */
+@keyframes fadeUp {
+  0% { opacity: 0; transform: translateY(12px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.fade-up {
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: fadeUp .7s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+
+/* Scroll reveal utility */
+.reveal {
+  opacity: 0;
+  transform: translateY(12px);
+  will-change: transform, opacity;
+  transition: transform .7s cubic-bezier(0.16,1,0.3,1), opacity .7s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.inview {
+  opacity: 1;
+  transform: translateY(0);
 }
