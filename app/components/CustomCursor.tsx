@@ -4,62 +4,89 @@ import { useEffect, useState } from 'react';
 
 export default function CustomCursor() {
   const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [isPointer, setIsPointer] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
+  const [isHovering, setIsHovering] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const updateCursor = (e: MouseEvent) => {
-      setPosition({ x: e.clientX, y: e.clientY });
-
-      const target = e.target as HTMLElement;
-      const isClickable = 
-        target.tagName === 'A' || 
-        target.tagName === 'BUTTON' || 
-        target.closest('a') || 
-        target.closest('button') ||
-        target.classList.contains('magnetic');
-      
-      setIsPointer(!!isClickable);
+    // Check if mobile/touch device
+    const checkMobile = () => {
+      setIsMobile(
+        'ontouchstart' in window ||
+        navigator.maxTouchPoints > 0 ||
+        window.innerWidth < 768
+      );
     };
 
-    const handleMouseEnter = () => setIsVisible(true);
-    const handleMouseLeave = () => setIsVisible(false);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
 
-    window.addEventListener('mousemove', updateCursor);
-    document.addEventListener('mouseenter', handleMouseEnter);
-    document.addEventListener('mouseleave', handleMouseLeave);
+    const updatePosition = (e: MouseEvent) => {
+      setPosition({ x: e.clientX, y: e.clientY });
+      setIsVisible(true);
+    };
+
+    const handleMouseEnter = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'A' ||
+        target.tagName === 'BUTTON' ||
+        target.closest('a') ||
+        target.closest('button') ||
+        target.classList.contains('magnetic')
+      ) {
+        setIsHovering(true);
+      }
+    };
+
+    const handleMouseLeave = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (
+        target.tagName === 'A' ||
+        target.tagName === 'BUTTON' ||
+        target.closest('a') ||
+        target.closest('button') ||
+        target.classList.contains('magnetic')
+      ) {
+        setIsHovering(false);
+      }
+    };
+
+    document.addEventListener('mousemove', updatePosition);
+    document.addEventListener('mouseenter', handleMouseEnter, true);
+    document.addEventListener('mouseleave', handleMouseLeave, true);
 
     return () => {
-      window.removeEventListener('mousemove', updateCursor);
-      document.removeEventListener('mouseenter', handleMouseEnter);
-      document.removeEventListener('mouseleave', handleMouseLeave);
+      document.removeEventListener('mousemove', updatePosition);
+      document.removeEventListener('mouseenter', handleMouseEnter, true);
+      document.removeEventListener('mouseleave', handleMouseLeave, true);
+      window.removeEventListener('resize', checkMobile);
     };
   }, []);
 
-  if (!isVisible) return null;
+  // Don't render on mobile or if not visible
+  if (!isVisible || isMobile) return null;
 
   return (
     <>
-      {/* Outer glow */}
+      {/* Cursor dot */}
+      <div
+        className="custom-cursor-dot"
+        style={{
+          left: `${position.x}px`,
+          top: `${position.y}px`,
+          width: isHovering ? '4px' : '10px',
+          height: isHovering ? '4px' : '10px',
+        }}
+      />
+      {/* Cursor ring */}
       <div
         className="custom-cursor-ring"
         style={{
           left: `${position.x}px`,
           top: `${position.y}px`,
-          transform: 'translate(-50%, -50%)',
-          width: isPointer ? '60px' : '40px',
-          height: isPointer ? '60px' : '40px',
-        }}
-      />
-      {/* Inner dot */}
-      <div
-        className="custom-cursor"
-        style={{
-          left: `${position.x}px`,
-          top: `${position.y}px`,
-          transform: 'translate(-50%, -50%)',
-          width: isPointer ? '4px' : '10px',
-          height: isPointer ? '4px' : '10px',
+          width: isHovering ? '60px' : '40px',
+          height: isHovering ? '60px' : '40px',
         }}
       />
     </>

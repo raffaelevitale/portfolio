@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import Navigation from "./components/Navigation";
 import ScrollReveal from "./components/ScrollReveal";
@@ -48,6 +49,7 @@ export default function RootLayout({
         <div className="pt-16 relative">
           {children}
         </div>
+        <SpeedInsights />
       </body>
     </html>
   );
