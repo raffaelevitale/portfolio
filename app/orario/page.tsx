@@ -75,7 +75,7 @@ export default function OrarioPage() {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentTime(new Date());
-    }, 15000);
+    }, 60000);
     return () => clearInterval(timer);
   }, []);
 

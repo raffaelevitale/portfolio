@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import Script from "next/script";
 import "./globals.css";
 import ConditionalNavigation from "./components/ConditionalNavigation";
 import ConditionalPadding from "./components/ConditionalPadding";
@@ -78,11 +79,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         data-cursor="disabled"
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <Script id="theme-init" strategy="beforeInteractive">{`
+          try {
+            const stored = localStorage.getItem('orario-theme-storage');
+            let theme = 'system';
+            if (stored) { try { theme = JSON.parse(stored).state.theme || 'system'; } catch {}
+            }
+            const root = document.documentElement;
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const isDark = theme === 'dark' || (theme === 'system' && prefersDark);
+            if (isDark) root.classList.add('dark'); else root.classList.remove('dark');
+          } catch {}
+        `}</Script>
         {/* Client-only enhancements (dynamic with ssr:false) */}
         <ClientEnhancements />
         {/* Decorative global background */}

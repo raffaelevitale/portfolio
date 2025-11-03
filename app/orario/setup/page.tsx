@@ -15,7 +15,7 @@ type Mode = 'student' | 'teacher';
 
 export default function SetupPage() {
   const router = useRouter();
-  const { setSchedule, setUserMode, completeSetup } = useScheduleStore();
+  const { setSchedule, setUserMode, completeSetup, resetToSample } = useScheduleStore();
 
   const [mode, setMode] = useState<Mode | null>(null);
   const [classes, setClasses] = useState<string[]>([]);
@@ -72,6 +72,20 @@ export default function SetupPage() {
     }
   };
 
+  const handleUseSample = () => {
+    if (loading) return;
+    setLoading(true);
+    try {
+      resetToSample();
+      // Allinea lo stato utente come studente demo
+      setUserMode('student', 'Demo Class');
+      completeSetup();
+      router.push('/orario');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const filteredList =
     mode === 'student'
       ? classes.filter((c) => c.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -114,6 +128,15 @@ export default function SetupPage() {
               >
                 <span className="text-2xl">👨‍🏫</span>
                 <span>Docente</span>
+              </button>
+
+              {/* Pulsante rapido per usare i dati di esempio (studenti) */}
+              <button
+                onClick={handleUseSample}
+                className="w-full mt-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 font-medium py-3 px-4 rounded-lg transition-colors text-sm"
+                aria-label="Usa dati di esempio per studenti"
+              >
+                Usa dati di esempio (studenti)
               </button>
             </div>
           )}
@@ -182,6 +205,17 @@ export default function SetupPage() {
               >
                 {loading ? 'Caricamento...' : 'Continua'}
               </button>
+
+              {/* Piccolo pulsante aggiuntivo per usare i dati di esempio quando è selezionata la modalità studente */}
+              {mode === 'student' && (
+                <button
+                  onClick={handleUseSample}
+                  disabled={loading}
+                  className="w-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100 font-medium py-2.5 px-4 rounded-lg transition-colors text-sm"
+                >
+                  Usa dati di esempio
+                </button>
+              )}
             </motion.div>
           )}
         </div>

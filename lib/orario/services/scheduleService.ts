@@ -69,6 +69,16 @@ export async function loadTeacherNames(): Promise<string[]> {
   }
 }
 
+function normalizeSubject(subject: string): string {
+  const map: Record<string, string> = {
+    'Lingua inglese': 'Inglese',
+    'Lingua Italiana': 'Italiano',
+    'Scienze motorie e sportive': 'Scienze motorie',
+    'Scienze Motorie e Sportive': 'Scienze motorie',
+  };
+  return map[subject] ?? subject;
+}
+
 export async function loadClassSchedule(className: string): Promise<Lesson[]> {
   try {
     const response = await fetch('/orario/orario_studenti.json');
@@ -78,17 +88,16 @@ export async function loadClassSchedule(className: string): Promise<Lesson[]> {
     if (!lessons) return [];
 
     return lessons
-      .filter((lesson) => lesson.subject !== 'INTERVALLO')
       .map((lesson, index) => ({
         id: `${lesson.class}-${lesson.dayOfWeek}-${index}`,
-        subject: lesson.subject,
-        teacher: lesson.teacher,
-        classroom: lesson.classroom,
+        subject: lesson.subject === 'INTERVALLO' ? 'Intervallo' : normalizeSubject(lesson.subject),
+        teacher: lesson.subject === 'INTERVALLO' ? '' : lesson.teacher,
+        classroom: lesson.subject === 'INTERVALLO' ? 'Corridoio / Bar' : lesson.classroom,
         dayOfWeek: lesson.dayOfWeek,
         startTime: lesson.startTime,
         endTime: lesson.endTime,
-        color: lesson.color,
-        isBreak: false,
+        color: lesson.subject === 'INTERVALLO' ? '#bdbdbd' : lesson.color,
+        isBreak: lesson.subject === 'INTERVALLO',
       }));
   } catch (error) {
     console.error('Error loading class schedule:', error);

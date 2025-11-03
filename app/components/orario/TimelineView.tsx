@@ -2,6 +2,7 @@
 
 import { Lesson } from '@/lib/orario/models/lesson';
 import { motion } from 'framer-motion';
+import React, { useEffect, useMemo, useState } from 'react';
 import {
   parseTime,
   getCurrentTimeInMinutes,
@@ -20,7 +21,21 @@ function getHeight(lesson: Lesson): number {
 }
 
 export function TimelineView({ lessons, isToday }: TimelineViewProps) {
-  const currentMinutes = isToday ? getCurrentTimeInMinutes() : 0;
+  const [currentMinutes, setCurrentMinutes] = useState<number>(0);
+  const [currentTimeStr, setCurrentTimeStr] = useState<string>('');
+
+  useEffect(() => {
+    if (!isToday) return;
+    const update = () => {
+      setCurrentMinutes(getCurrentTimeInMinutes());
+      setCurrentTimeStr(
+        new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' })
+      );
+    };
+    update();
+    const id = setInterval(update, 60000);
+    return () => clearInterval(id);
+  }, [isToday]);
 
   if (lessons.length === 0) {
     return (
@@ -58,11 +73,8 @@ export function TimelineView({ lessons, isToday }: TimelineViewProps) {
           >
             <div className="w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white shadow-lg animate-pulse ml-2 sm:ml-2.5" />
             <div className="h-0.5 flex-1 bg-gradient-to-r from-red-500 to-transparent" />
-            <span className="text-[10px] sm:text-xs font-semibold text-red-500 ml-2">
-              {new Date().toLocaleTimeString('it-IT', {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
+            <span className="text-[10px] sm:text-xs font-semibold text-red-500 ml-2" suppressHydrationWarning>
+              {currentTimeStr}
             </span>
           </motion.div>
         )}
