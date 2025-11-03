@@ -2,66 +2,169 @@
 
 import { useEffect } from 'react';
 
+type CleanupFn = () => void;
+
 export default function SmoothScroll() {
   useEffect(() => {
-    // Smooth scroll behavior
-    document.documentElement.style.scrollBehavior = 'smooth';
+    if (typeof window === 'undefined') return;
 
-    // Parallax effect on scroll
-    const handleScroll = () => {
-      const scrolled = window.scrollY;
-      
-      // Parallax elements
-      const parallaxElements = document.querySelectorAll('[data-parallax]');
-      parallaxElements.forEach((el) => {
-        const speed = parseFloat(el.getAttribute('data-parallax') || '0.5');
-        const yPos = -(scrolled * speed);
-        (el as HTMLElement).style.transform = `translate3d(0, ${yPos}px, 0)`;
-      });
+    const root = document.documentElement;
+    const originalScrollBehavior = root.style.scrollBehavior;
+    const motionQuery = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+    const pointerQuery = window.matchMedia?.('(pointer: fine)');
 
-      // Reveal elements on scroll
-      const revealElements = document.querySelectorAll('.reveal:not(.revealed)');
-      revealElements.forEach((el, index) => {
-        const rect = el.getBoundingClientRect();
-        const isVisible = rect.top < window.innerHeight * 0.85;
-        
-        if (isVisible) {
-          // Add stagger delay based on index
-          setTimeout(() => {
-            el.classList.add('revealed');
-          }, index * 100); // 100ms delay between each element
-        }
-      });
+    const applyScrollBehavior = () => {
+      if (motionQuery?.matches) {
+        root.style.scrollBehavior = originalScrollBehavior;
+      } else {
+        root.style.scrollBehavior = 'smooth';
+      }
     };
 
-    // Magnetic hover effect
-    const magneticElements = document.querySelectorAll('.magnetic');
-    
-    magneticElements.forEach((el) => {
-      const element = el as HTMLElement;
-      
-      const handleMouseMove = (e: MouseEvent) => {
-        const rect = element.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        
-        const strength = 0.3;
-        element.style.transform = `translate(${x * strength}px, ${y * strength}px)`;
-      };
-      
-      const handleMouseLeave = () => {
-        element.style.transform = 'translate(0, 0)';
-      };
-      
-      element.addEventListener('mousemove', handleMouseMove);
-      element.addEventListener('mouseleave', handleMouseLeave);
-    });
+    applyScrollBehavior();
 
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial call
+    let parallaxCleanup: CleanupFn | undefined;
+    let magneticCleanup: CleanupFn | undefined;
+
+    const cleanupParallax = () => {
+      parallaxCleanup?.();
+      parallaxCleanup = undefined;
+    };
+
+    const cleanupMagnetic = () => {
+      magneticCleanup?.();
+      magneticCleanup = undefined;
+    };
+
+    const setupParallax = () => {
+      cleanupParallax();
+
+      if (motionQuery?.matches || !pointerQuery?.matches) return;
+
+      const elements = Array.from(
+        document.querySelectorAll<HTMLElement>('[data-parallax]')
+      );
+
+      if (elements.length === 0) return;
+
+      const handleScroll = () => {
+        const scrolled = window.scrollY;
+
+        elements.forEach((element) => {
+          const speed = Number.parseFloat(element.getAttribute('data-parallax') ?? '0.5');
+          const yPos = -(scrolled * speed);
+          element.style.transform = `translate3d(0, ${yPos}px, 0)`;
+        });
+      };
+
+      window.addEventListener('scroll', handleScroll, { passive: true });
+      handleScroll();
+
+      parallaxCleanup = () => {
+        window.removeEventListener('scroll', handleScroll);
+        elements.forEach((element) => {
+          element.style.transform = '';
+        });
+      };
+    };
+
+    const setupMagnetic = () => {
+      cleanupMagnetic();
+
+      if (motionQuery?.matches || !pointerQuery?.matches) return;
+
+      const elements = Array.from(document.querySelectorAll<HTMLElement>('.magnetic'));
+      if (elements.length === 0) return;
+
+      const cleanups = elements.map((element) => {
+        const strength = Number.parseFloat(element.dataset.magneticStrength ?? '0.3');
+
+        const handleMouseMove = (event: MouseEvent) => {
+          const rect = element.getBoundingClientRect();
+          const x = event.clientX - rect.left - rect.width / 2;
+          const y = event.clientY - rect.top - rect.height / 2;
+
+          element.style.transform = `translate(${x * strength}px, ${y * strength}px)`;
+        };
+
+        const handleMouseLeave = () => {
+          element.style.transform = '';
+        };
+
+        element.addEventListener('mousemove', handleMouseMove, { passive: true });
+        element.addEventListener('mouseleave', handleMouseLeave);
+
+        return () => {
+          element.removeEventListener('mousemove', handleMouseMove);
+          element.removeEventListener('mouseleave', handleMouseLeave);
+          element.style.transform = '';
+        };
+      });
+
+      magneticCleanup = () => {
+        cleanups.forEach((cleanup) => cleanup());
+      };
+    };
+
+    setupParallax();
+    setupMagnetic();
+
+    const handleMotionChange = () => {
+      applyScrollBehavior();
+      cleanupParallax();
+      cleanupMagnetic();
+      if (!motionQuery?.matches) {
+        setupParallax();
+        setupMagnetic();
+      }
+    };
+
+    const handlePointerChange = () => {
+      cleanupParallax();
+      cleanupMagnetic();
+
+      if (pointerQuery?.matches && !motionQuery?.matches) {
+        setupParallax();
+        setupMagnetic();
+      }
+    };
+
+    if (motionQuery) {
+      if (typeof motionQuery.addEventListener === 'function') {
+        motionQuery.addEventListener('change', handleMotionChange);
+      } else if (typeof motionQuery.addListener === 'function') {
+        motionQuery.addListener(handleMotionChange);
+      }
+    }
+
+    if (pointerQuery) {
+      if (typeof pointerQuery.addEventListener === 'function') {
+        pointerQuery.addEventListener('change', handlePointerChange);
+      } else if (typeof pointerQuery.addListener === 'function') {
+        pointerQuery.addListener(handlePointerChange);
+      }
+    }
 
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      cleanupParallax();
+      cleanupMagnetic();
+      root.style.scrollBehavior = originalScrollBehavior;
+
+      if (motionQuery) {
+        if (typeof motionQuery.removeEventListener === 'function') {
+          motionQuery.removeEventListener('change', handleMotionChange);
+        } else if (typeof motionQuery.removeListener === 'function') {
+          motionQuery.removeListener(handleMotionChange);
+        }
+      }
+
+      if (pointerQuery) {
+        if (typeof pointerQuery.removeEventListener === 'function') {
+          pointerQuery.removeEventListener('change', handlePointerChange);
+        } else if (typeof pointerQuery.removeListener === 'function') {
+          pointerQuery.removeListener(handlePointerChange);
+        }
+      }
     };
   }, []);
 

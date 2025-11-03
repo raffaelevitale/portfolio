@@ -2,25 +2,74 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
-import Navigation from "./components/Navigation";
-import ScrollReveal from "./components/ScrollReveal";
+import ConditionalNavigation from "./components/ConditionalNavigation";
+import ConditionalPadding from "./components/ConditionalPadding";
 import ScrollProgress from "./components/ScrollProgress";
-import CustomCursor from "./components/CustomCursor";
-import SmoothScroll from "./components/SmoothScroll";
+import ClientEnhancements from "./components/ClientEnhancements";
+
+const fallbackSiteUrl = "https://raffaelevitale.com";
+const siteUrl = (() => {
+  const envUrl = process.env.NEXT_PUBLIC_SITE_URL;
+  if (envUrl && /^https?:\/\//.test(envUrl)) {
+    return envUrl;
+  }
+  return fallbackSiteUrl;
+})();
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
+  preload: true,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Design & Photography Portfolio",
-  description: "A modern portfolio showcasing graphic design, poster art, and photography work",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Raffaele Vitale — Design & Photography",
+    template: "%s · Raffaele Vitale",
+  },
+  description:
+    "A modern portfolio from Raffaele Vitale showcasing multidisciplinary design, brand systems, and photography projects.",
+  keywords: [
+    "Raffaele Vitale",
+    "design portfolio",
+    "graphic design",
+    "brand identity",
+    "photography",
+    "creative developer",
+  ],
+  authors: [{ name: "Raffaele Vitale", url: "https://www.linkedin.com/in/vitaleraffaele/" }],
+  creator: "Raffaele Vitale",
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Raffaele Vitale — Design & Photography",
+    description:
+      "Explore selected graphic design, branding, and photography work by Raffaele Vitale.",
+    url: siteUrl,
+    siteName: "Raffaele Vitale Portfolio",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Raffaele Vitale — Design & Photography",
+    description:
+      "Selected projects spanning design systems, posters, UI, and photography by Raffaele Vitale.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+  category: "portfolio",
 };
 
 export default function RootLayout({
@@ -31,10 +80,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
+        data-cursor="disabled"
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <CustomCursor />
-        <SmoothScroll />
+        {/* Client-only enhancements (dynamic with ssr:false) */}
+        <ClientEnhancements />
         {/* Decorative global background */}
         <div className="fixed inset-0 -z-10 pointer-events-none [mask-image:radial-gradient(80%_80%_at_50%_40%,_black,_transparent)]">
           <div className="aurora" aria-hidden="true"></div>
@@ -44,11 +94,10 @@ export default function RootLayout({
           ></div>
         </div>
         <ScrollProgress />
-        <Navigation />
-        <ScrollReveal />
-        <div className="pt-16 relative">
+        <ConditionalNavigation />
+        <ConditionalPadding>
           {children}
-        </div>
+        </ConditionalPadding>
         <SpeedInsights />
       </body>
     </html>

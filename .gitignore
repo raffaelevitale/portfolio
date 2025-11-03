@@ -26,6 +26,9 @@
 *.pem
 WARP.md
 ANALISI_PROGETTO.md
+.github
+.idea
+.claude
 
 # debug
 npm-debug.log*
@@ -42,3 +45,8 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+/.github/
+/.idea/
+/qodana.yaml
+/ORARIO_COMPLETE.md
+/ORARIO_INTEGRATION.md
