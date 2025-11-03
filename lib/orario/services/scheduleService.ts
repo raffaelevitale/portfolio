@@ -1,4 +1,5 @@
 import { Lesson } from '@/lib/orario/models/lesson';
+import { sampleTeacherNames, sampleTeacherSchedules } from '@/lib/orario/data/sampleSchedule';
 
 interface ClassScheduleData {
   metadata: {
@@ -59,12 +60,11 @@ export async function loadClassNames(): Promise<string[]> {
 }
 
 export async function loadTeacherNames(): Promise<string[]> {
+  // Usa i dati di esempio locali per i docenti
   try {
-    const response = await fetch('/orario/orario_docenti.json');
-    const data: TeacherScheduleData = await response.json();
-    return Object.keys(data.schedule).sort();
+    return [...sampleTeacherNames];
   } catch (error) {
-    console.error('Error loading teacher names:', error);
+    console.error('Error loading teacher names (sample):', error);
     return [];
   }
 }
@@ -115,43 +115,16 @@ const dayMap: { [key: string]: number } = {
 };
 
 export async function loadTeacherSchedule(teacherName: string): Promise<Lesson[]> {
+  // Usa il sample interno come sorgente dati per i docenti
   try {
-    const response = await fetch('/orario/orario_docenti.json');
-    const data: TeacherScheduleData = await response.json();
-    const teacher = data.schedule[teacherName];
-
-    if (!teacher) return [];
-
-    const lessons: Lesson[] = [];
-
-    Object.entries(teacher.orario).forEach(([dayName, dayLessons]) => {
-      const dayOfWeek = dayMap[dayName];
-      if (!dayOfWeek) return;
-
-      dayLessons.forEach((lesson, index) => {
-        if (!lesson.materia || lesson.materia.trim() === '') return;
-
-        const [startTime, endTime] = lesson.ora.split('-');
-        lessons.push({
-          id: `${teacher.docente}-${dayOfWeek}-${index}`,
-          subject: lesson.materia,
-          teacher: teacher.docente,
-          classroom: lesson.aula,
-          dayOfWeek: dayOfWeek,
-          startTime: startTime,
-          endTime: endTime,
-          color: lesson.color,
-          isBreak: false,
-        });
-      });
-    });
-
-    return lessons.sort((a, b) => {
+    const lessons = sampleTeacherSchedules[teacherName] || [];
+    // Ritorna una copia ordinata per sicurezza
+    return [...lessons].sort((a, b) => {
       if (a.dayOfWeek !== b.dayOfWeek) return a.dayOfWeek - b.dayOfWeek;
       return a.startTime.localeCompare(b.startTime);
     });
   } catch (error) {
-    console.error('Error loading teacher schedule:', error);
+    console.error('Error loading teacher schedule (sample):', error);
     return [];
   }
 }

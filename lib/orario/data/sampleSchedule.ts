@@ -409,3 +409,34 @@ export const sampleSchedule: Lesson[] = [
     color: '#26a69a',
   },
 ];
+
+// ===== Sample Docenti =====
+// Docenti supportati come sample
+export const sampleTeacherNames: string[] = [
+  'FEA D.',
+  'MAGGIORE G.',
+];
+
+// Helper: normalizza l'oggetto Lesson per un docente specifico
+function mapLessonForTeacher(lesson: Lesson, teacherName: string): Lesson {
+  return {
+    ...lesson,
+    // Forza il nome docente principale per coerenza UI, mantenendo soggetto/orario/aula
+    teacher: teacherName,
+    // Crea un id stabile e unico anche quando filtrato per docente
+    id: `${teacherName.replace(/\s|\./g, '')}-${lesson.dayOfWeek}-${lesson.startTime}-${lesson.endTime}`,
+  };
+}
+
+// Crea una mappa nomeDocente -> lezioni filtrate dal sampleSchedule
+export const sampleTeacherSchedules: Record<string, Lesson[]> = {
+  'FEA D.': sampleSchedule
+    .filter((l) => /\bFEA\b/i.test(l.teacher))
+    .map((l) => mapLessonForTeacher(l, 'FEA D.'))
+    // Ordina prima per giorno, poi per ora
+    .sort((a, b) => (a.dayOfWeek - b.dayOfWeek) || a.startTime.localeCompare(b.startTime)),
+  'MAGGIORE G.': sampleSchedule
+    .filter((l) => /MAGGIORE/i.test(l.teacher))
+    .map((l) => mapLessonForTeacher(l, 'MAGGIORE G.'))
+    .sort((a, b) => (a.dayOfWeek - b.dayOfWeek) || a.startTime.localeCompare(b.startTime)),
+};
