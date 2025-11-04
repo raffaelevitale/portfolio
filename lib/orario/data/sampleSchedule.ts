@@ -415,6 +415,7 @@ export const sampleSchedule: Lesson[] = [
 export const sampleTeacherNames: string[] = [
   'FEA D.',
   'MAGGIORE G.',
+    'CANONICO T.',
 ];
 
 // Helper: normalizza l'oggetto Lesson per un docente specifico
@@ -438,5 +439,10 @@ export const sampleTeacherSchedules: Record<string, Lesson[]> = {
   'MAGGIORE G.': sampleSchedule
     .filter((l) => /MAGGIORE/i.test(l.teacher))
     .map((l) => mapLessonForTeacher(l, 'MAGGIORE G.'))
+    .sort((a, b) => (a.dayOfWeek - b.dayOfWeek) || a.startTime.localeCompare(b.startTime)),
+
+    'CANONICO T.': sampleSchedule
+    .filter((l) => /CANONICO/i.test(l.teacher))
+    .map((l) => mapLessonForTeacher(l, 'CANONICO T.'))
     .sort((a, b) => (a.dayOfWeek - b.dayOfWeek) || a.startTime.localeCompare(b.startTime)),
 };

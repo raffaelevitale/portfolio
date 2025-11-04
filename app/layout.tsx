@@ -34,17 +34,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Raffaele Vitale — Design & Photography",
+    default: "Raffaele Vitale — Designer & Developer",
     template: "%s · Raffaele Vitale",
   },
   description:
-    "A modern portfolio from Raffaele Vitale showcasing multidisciplinary design, brand systems, and photography projects.",
+    "Il portfolio moderno di Raffaele Vitale: design di interfacce, sistemi visivi e sviluppo front-end.",
   keywords: [
     "Raffaele Vitale",
     "design portfolio",
-    "graphic design",
+    "designer",
+    "developer",
     "brand identity",
-    "photography",
+    "UI/UX",
     "creative developer",
   ],
   authors: [{ name: "Raffaele Vitale", url: "https://www.linkedin.com/in/vitaleraffaele/" }],
@@ -53,19 +54,19 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Raffaele Vitale — Design & Photography",
+    title: "Raffaele Vitale — Designer & Developer",
     description:
-      "Explore selected graphic design, branding, and photography work by Raffaele Vitale.",
+      "Selezione di progetti tra sistemi di design, brand e interfacce, a cura di Raffaele Vitale.",
     url: siteUrl,
     siteName: "Raffaele Vitale Portfolio",
-    locale: "en_US",
+    locale: "it_IT",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Raffaele Vitale — Design & Photography",
+    title: "Raffaele Vitale — Designer & Developer",
     description:
-      "Selected projects spanning design systems, posters, UI, and photography by Raffaele Vitale.",
+      "Interfacce pulite, sistemi visivi e sviluppo front-end con Next.js/TypeScript.",
   },
   robots: {
     index: true,
@@ -80,7 +81,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="it" suppressHydrationWarning>
       <body
         data-cursor="disabled"
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
