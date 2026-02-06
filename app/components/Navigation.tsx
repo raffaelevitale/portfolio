@@ -44,11 +44,10 @@ export default function Navigation() {
   const navLink = (key: string) => baseLink + (section === key ? active : '');
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled 
-        ? 'bg-background/80 backdrop-blur-xl border-b border-foreground/10 shadow-lg' 
-        : 'bg-background/60 backdrop-blur-md border-b border-foreground/5'
-    }`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
+      ? 'bg-background/80 backdrop-blur-xl border-b border-foreground/10 shadow-lg'
+      : 'bg-background/60 backdrop-blur-md border-b border-foreground/5'
+      }`}>
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex justify-between items-center">
           <Link href="/" className="group relative text-xl font-bold tracking-tighter">
@@ -107,19 +106,18 @@ export default function Navigation() {
 
       {/* Backdrop for mobile menu */}
       {isMenuOpen && (
-        <div 
-          className="md:hidden fixed inset-0 top-[73px] bg-background/80 backdrop-blur-md z-40 animate-in fade-in duration-200" 
-          onClick={() => setIsMenuOpen(false)} 
-          aria-hidden 
+        <div
+          className="md:hidden fixed inset-0 bg-black/20 backdrop-blur-sm z-40 animate-in fade-in duration-300"
+          onClick={() => setIsMenuOpen(false)}
+          aria-hidden="true"
         />
       )}
 
       {/* Mobile menu */}
       <div
         id="mobile-menu"
-        className={`md:hidden absolute top-full left-0 right-0 border-b border-foreground/10 transition-all duration-300 origin-top z-50 ${
-          isMenuOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0 pointer-events-none'
-        }`}
+        className={`md:hidden absolute top-full left-0 right-0 border-b border-foreground/10 transition-all duration-300 origin-top z-50 ${isMenuOpen ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0 pointer-events-none'
+          }`}
       >
         <div className="bg-background/95 backdrop-blur-xl">
           <div className="flex flex-col p-6 space-y-2">

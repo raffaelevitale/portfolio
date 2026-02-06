@@ -6,8 +6,8 @@ import Navigation from './Navigation';
 export default function ConditionalNavigation() {
   const pathname = usePathname();
 
-  // Hide navigation on /orario and its sub-routes
-  if (pathname?.startsWith('/orario')) {
+  // Hide navigation on homepage and /orario routes
+  if (pathname === '/' || pathname?.startsWith('/orario')) {
     return null;
   }
 

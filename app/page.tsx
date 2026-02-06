@@ -1,411 +1,557 @@
-import Link from "next/link";
-import BackToTopButton from "./components/BackToTopButton";
+"use client";
+
+import { useState, useRef } from "react";
+import { motion, useScroll, useTransform } from "framer-motion";
+import Image from "next/image";
 
 export default function Home() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll();
+  const rotate = useTransform(scrollYProgress, [0, 1], [0, 8]);
+
+  // Mixed color palette
+  const colors = ["#FF4D4D", "#4ECDC4", "#FFE66D", "#A855F7", "#FF6B6B", "#06B6D4", "#EC4899", "#10B981"];
+
   return (
-    <main className="min-h-screen">
+    <main ref={containerRef} className="bg-[#FAFAFA] text-[#1a1a1a] overflow-hidden">
+      {/* Subtle grain texture */}
+      <div
+        className="fixed inset-0 pointer-events-none opacity-[0.02] z-40"
+        style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
+        }}
+      />
+
       {/* Hero Section */}
-      <section id="home" className="relative min-h-screen flex items-center justify-center px-6 overflow-hidden">
-        {/* Ambient background orbs - Reduced opacity */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl float-slow"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-secondary/5 rounded-full blur-3xl float-medium"></div>
-        </div>
+      <section id="home" className="min-h-screen relative px-6 py-32 flex items-center">
+        {/* Background accent shapes */}
+        <motion.div
+          className="absolute top-20 right-0 w-[40vw] h-[50vh] rounded-l-[100px] opacity-10"
+          style={{ backgroundColor: "#FF4D4D", rotate }}
+        />
+        <motion.div
+          className="absolute bottom-10 left-10 w-[25vw] h-[30vh] rounded-[50px] opacity-10"
+          style={{ backgroundColor: "#4ECDC4", rotate: useTransform(rotate, r => -r) }}
+        />
 
-        {/* Hero content */}
-        <div className="relative max-w-5xl mx-auto text-center">
-          <div className="reveal mb-6">
-            <span className="badge-minimal">
-              <span className="dot-indicator"></span>
-              Disponibile per collaborazioni
-            </span>
+        <div className="max-w-7xl mx-auto w-full relative">
+          <div className="grid grid-cols-12 gap-6">
+            {/* Main kinetic title */}
+            <motion.div
+              className="col-span-12 lg:col-span-8 relative z-10"
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <div className="mb-8">
+                <KineticTextInline text="CREATIVE DEVELOPER" colors={colors} />
+              </div>
+
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5 }}
+                className="text-xl lg:text-2xl text-[#1a1a1a]/70 max-w-xl leading-relaxed"
+              >
+                Progetto interfacce pulite, sistemi visivi e prodotti digitali curando ogni dettaglio.
+              </motion.p>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.7 }}
+                className="flex flex-wrap gap-4 mt-10"
+              >
+                <motion.a
+                  href="#work"
+                  whileHover={{ scale: 1.05, rotate: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-4 rounded-full font-bold text-white bg-gradient-to-r from-[#FF4D4D] to-[#EC4899]"
+                >
+                  Guarda i progetti
+                </motion.a>
+                <motion.a
+                  href="/Profile.pdf"
+                  download
+                  whileHover={{ scale: 1.05, rotate: 2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-4 rounded-full font-bold border-2 border-[#1a1a1a]/20 hover:border-[#4ECDC4] hover:text-[#4ECDC4] transition-colors"
+                >
+                  Scarica CV
+                </motion.a>
+              </motion.div>
+            </motion.div>
+
+            {/* Floating info card with photo */}
+            <motion.div
+              className="col-span-12 lg:col-span-4 flex items-start lg:items-center justify-start lg:justify-end"
+              initial={{ opacity: 0, y: 50, rotate: 5 }}
+              animate={{ opacity: 1, y: 0, rotate: 5 }}
+              transition={{ delay: 0.4, duration: 0.8 }}
+            >
+              <motion.div
+                whileHover={{ rotate: 0, scale: 1.02 }}
+                className="bg-[#1a1a1a] text-white p-8 rounded-3xl -mt-8 lg:mt-0 lg:-ml-20 max-w-sm shadow-2xl"
+              >
+                <motion.div
+                  className="relative w-20 h-20 mb-4 rounded-2xl overflow-hidden"
+                  whileHover={{ scale: 1.05, rotate: -3 }}
+                >
+                  <Image
+                    src="/IMG_1870.PNG"
+                    alt="Raffaele Vitale"
+                    fill
+                    className="object-cover"
+                  />
+                </motion.div>
+                <motion.span
+                  className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold mb-4 bg-gradient-to-r from-[#4ECDC4]/20 to-[#06B6D4]/20 text-[#4ECDC4]"
+                >
+                  <motion.span
+                    animate={{ scale: [1, 1.3, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
+                    className="w-2 h-2 rounded-full bg-[#4ECDC4]"
+                  />
+                  DISPONIBILE 2026
+                </motion.span>
+                <p className="text-white/80 leading-relaxed">
+                  Designer & Developer con passione per tipografia e interazioni inaspettate.
+                </p>
+              </motion.div>
+            </motion.div>
           </div>
 
-          <h1 className="reveal text-huge mb-8">
-            Creative
-            <br />
-            <span className="bg-gradient-to-r from-accent via-accent-secondary to-accent-tertiary bg-clip-text text-transparent">
-              Designer & Developer
-            </span>
-          </h1>
-
-          <p className="reveal text-xl md:text-2xl text-foreground/80 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Progetto interfacce pulite, sistemi visivi e prodotti digitali curando dettagli, performance e accessibilità.
-          </p>
-
-          {/* Primary CTAs */}
-          <div className="reveal flex flex-wrap justify-center gap-4">
-            <a
-              href="#work"
-              className="magnetic inline-flex items-center gap-3 px-10 py-5 bg-accent text-accent-foreground rounded-full font-semibold text-lg hover:scale-105 hover:shadow-lg hover:shadow-accent/30 transition-all"
-            >
-              Guarda i progetti
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </a>
-            <a
-              href="/Profile.pdf"
-              download
-              className="magnetic inline-flex items-center gap-3 px-10 py-5 border-2 border-foreground/20 rounded-full font-semibold text-lg hover:border-accent hover:text-accent transition-all"
-            >
-              Scarica CV
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M7.5 12l4.5 4.5m0 0l4.5-4.5M12 16.5V3" />
-              </svg>
-            </a>
-          </div>
+          {/* Decorative elements */}
+          <motion.div
+            className="absolute top-10 right-1/4 w-16 h-16 rounded-full border-2 opacity-30 hidden lg:block"
+            style={{ borderColor: "#A855F7" }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          />
+          <motion.div
+            className="absolute bottom-20 left-1/3 w-8 h-8 rounded-lg opacity-40 hidden lg:block"
+            style={{ backgroundColor: "#FFE66D" }}
+            animate={{ y: [0, -10, 0], rotate: [0, 10, 0] }}
+            transition={{ duration: 4, repeat: Infinity }}
+          />
+          <motion.div
+            className="absolute top-1/3 left-10 w-6 h-6 rounded-full opacity-30 hidden lg:block"
+            style={{ backgroundColor: "#4ECDC4" }}
+            animate={{ scale: [1, 1.3, 1] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          />
         </div>
 
         {/* Scroll indicator */}
-        <div className="reveal absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-foreground/40">
-          <span className="text-xs uppercase tracking-wider">Scroll</span>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5 animate-bounce">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 13.5L12 21m0 0l-7.5-7.5M12 21V3" />
-          </svg>
-        </div>
+        <motion.div
+          className="absolute bottom-12 left-12 text-[#1a1a1a]/40 hidden md:block"
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-12 border-2 border-current rounded-full flex justify-center pt-2">
+              <motion.div
+                className="w-1.5 h-3 bg-current rounded-full"
+                animate={{ y: [0, 8, 0], opacity: [1, 0.3, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              />
+            </div>
+            <span className="text-xs uppercase tracking-widest font-medium">Scroll</span>
+          </div>
+        </motion.div>
       </section>
 
-      {/* Servizi */}
-      <section className="py-24 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="reveal text-center mb-14">
-            <span className="badge-minimal mb-4">
-              <span className="dot-indicator"></span>
-              Cosa faccio
-            </span>
-            <h2 className="text-display mt-3">Servizi</h2>
-            <p className="text-foreground/70 mt-3 max-w-2xl mx-auto">Dalla strategia visiva allo sviluppo front‑end, ti aiuto a lanciare e far crescere prodotti digitali.</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="card-clean hover-lift p-6">
-              <h3 className="font-semibold mb-2">Brand & Visual System</h3>
-              <p className="text-sm text-foreground/70">Identità coerenti, gerarchie tipografiche e sistemi scalabili per prodotto e marketing.</p>
-            </div>
-            <div className="card-clean hover-lift p-6">
-              <h3 className="font-semibold mb-2">UI/UX per Web App</h3>
-              <p className="text-sm text-foreground/70">Wireframe, prototipi ad alta fedeltà e design system orientati a accessibilità e consistenza.</p>
-            </div>
-            <div className="card-clean hover-lift p-6">
-              <h3 className="font-semibold mb-2">Sviluppo Front‑end</h3>
-              <p className="text-sm text-foreground/70">Next.js, React e TypeScript con performance, SEO tecnica e animazioni fluide.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Competenze */}
-      <section className="py-24 px-6 border-y border-foreground/10">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="reveal">
-              <h3 className="text-xl font-bold mb-3">Stack</h3>
-              <ul className="text-foreground/75 space-y-2 text-sm">
-                <li>React, Next.js, TypeScript</li>
-                <li>Tailwind, Framer Motion</li>
-                <li>Node.js, REST/JSON</li>
-              </ul>
-            </div>
-            <div className="reveal">
-              <h3 className="text-xl font-bold mb-3">Design</h3>
-              <ul className="text-foreground/75 space-y-2 text-sm">
-                <li>Figma, Prototyping</li>
-                <li>Design System & Tokens</li>
-                <li>Tipografia e layout</li>
-              </ul>
-            </div>
-            <div className="reveal">
-              <h3 className="text-xl font-bold mb-3">Metodo</h3>
-              <ul className="text-foreground/75 space-y-2 text-sm">
-                <li>Continuous delivery</li>
-                <li>Accessibilità e performance</li>
-                <li>Collaborazione cross‑funzionale</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Work */}
-      <section id="work" className="py-32 px-6 bg-muted/30">
+      {/* Services Section */}
+      <section className="px-6 py-32 relative">
         <div className="max-w-7xl mx-auto">
-          <div className="reveal text-center mb-16">
-            <span className="badge-minimal mb-6">
-              <span className="dot-indicator"></span>
-              Selezione progetti
-            </span>
-            <h2 className="text-display mt-6">Featured Work</h2>
+          <motion.div
+            className="mb-16 lg:mb-24"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <motion.span
+              className="text-sm uppercase tracking-[0.3em] font-bold block mb-4 text-[#A855F7]"
+              initial={{ x: -30, opacity: 0 }}
+              whileInView={{ x: 0, opacity: 1 }}
+              viewport={{ once: true }}
+            >
+              Cosa faccio
+            </motion.span>
+            <div className="flex flex-wrap items-end gap-4">
+              <motion.h2
+                className="text-5xl lg:text-8xl font-black tracking-tight"
+                initial={{ y: 30, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true }}
+              >
+                SERVIZI
+              </motion.h2>
+              <motion.span
+                className="text-2xl lg:text-3xl font-light text-[#1a1a1a]/40 mb-1 lg:mb-2"
+                initial={{ y: 30, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+              >
+                (03)
+              </motion.span>
+            </div>
+          </motion.div>
+
+          {/* Service cards - responsive grid on mobile, scattered on desktop */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:relative lg:min-h-[60vh]">
+            {[
+              { title: "BRAND", sub: "Visual System", desc: "Identità coerenti e sistemi scalabili per prodotti digitali.", x: "0%", y: "0%", rotate: -4, color: "#FF4D4D" },
+              { title: "UI/UX", sub: "Web App", desc: "Wireframe, prototipi e design system accessibili.", x: "35%", y: "30%", rotate: 3, color: "#4ECDC4" },
+              { title: "CODE", sub: "Front-end", desc: "React, Next.js, TypeScript con animazioni fluide.", x: "65%", y: "5%", rotate: -2, color: "#A855F7" },
+            ].map((service, i) => (
+              <motion.div
+                key={i}
+                className="bg-white p-8 rounded-3xl shadow-lg border border-[#1a1a1a]/5 lg:absolute lg:w-80"
+                style={{
+                  left: service.x,
+                  top: service.y,
+                }}
+                initial={{ opacity: 0, y: 50, rotate: 0 }}
+                whileInView={{ opacity: 1, y: 0, rotate: service.rotate }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15 }}
+                whileHover={{ rotate: 0, scale: 1.03, zIndex: 10 }}
+              >
+                <div
+                  className="w-12 h-12 rounded-2xl mb-6 flex items-center justify-center text-white text-xl font-black"
+                  style={{ backgroundColor: service.color }}
+                >
+                  {String.fromCharCode(65 + i)}
+                </div>
+                <h3 className="text-3xl font-black tracking-tight">{service.title}</h3>
+                <span className="text-[#1a1a1a]/50 font-medium">{service.sub}</span>
+                <p className="text-[#1a1a1a]/70 mt-4 leading-relaxed">{service.desc}</p>
+              </motion.div>
+            ))}
           </div>
-          <div className="grid-obys">
-            {/* Card 1 */}
-            <div className="reveal group">
-              <div className="card-clean hover-lift overflow-hidden relative">
-                <div className="aspect-square bg-gradient-to-br from-accent/15 via-accent/5 to-background mb-4 image-overlay relative overflow-hidden">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.15),transparent_50%)]"></div>
-                  <div className="w-full h-full flex items-center justify-center relative z-10">
-                    <span className="text-8xl font-bold text-foreground/[0.03] group-hover:text-foreground/[0.06] transition-colors">NEON</span>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-accent/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                </div>
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <span className="inline-block px-3 py-1 bg-accent/10 text-accent text-xs font-semibold rounded-full mb-3">Poster Design</span>
-                    <h3 className="text-xl font-bold group-hover:text-accent transition-colors">Poster Series – NEON</h3>
-                  </div>
-                </div>
-                <p className="text-sm text-foreground/75 group-hover:text-foreground/90 transition-colors">Tipografia sperimentale e palette vibranti.</p>
-              </div>
+        </div>
+      </section>
+
+      {/* Work Section */}
+      <section id="work" className="px-6 py-32 bg-[#1a1a1a] text-white relative overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 20px, white 20px, white 21px)`
+          }}
+        />
+
+        <div className="max-w-7xl mx-auto relative">
+          <motion.div
+            className="mb-16 lg:mb-20"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <motion.span
+              className="text-sm uppercase tracking-[0.3em] font-bold block mb-4 text-[#FFE66D]"
+            >
+              Portfolio
+            </motion.span>
+            <div className="flex flex-wrap items-end gap-4">
+              <motion.h2
+                className="text-5xl lg:text-8xl font-black tracking-tight"
+                initial={{ x: -30, opacity: 0 }}
+                whileInView={{ x: 0, opacity: 1 }}
+                viewport={{ once: true }}
+              >
+                SELECTED
+              </motion.h2>
+              <motion.h2
+                className="text-5xl lg:text-8xl font-black tracking-tight bg-gradient-to-r from-[#FF4D4D] via-[#A855F7] to-[#4ECDC4] bg-clip-text text-transparent"
+                initial={{ x: 30, opacity: 0 }}
+                whileInView={{ x: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+              >
+                WORK
+              </motion.h2>
             </div>
-            {/* Card 2 */}
-            <div className="reveal group">
-              <div className="card-clean hover-lift overflow-hidden relative">
-                <div className="aspect-square bg-gradient-to-br from-accent-secondary/15 via-accent-secondary/5 to-background mb-4 image-overlay relative overflow-hidden">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(236,72,153,0.15),transparent_50%)]"></div>
-                  <div className="w-full h-full flex items-center justify-center relative z-10">
-                    <span className="text-8xl font-bold text-foreground/[0.03] group-hover:text-foreground/[0.06] transition-colors">LUME</span>
+          </motion.div>
+
+          {/* Project cards */}
+          <div className="space-y-4 lg:space-y-6">
+            {[
+              {
+                name: "ORARIO VALLAURI",
+                type: "Web App",
+                num: "01",
+                color: "#4ECDC4",
+                desc: "App per la gestione dell'orario scolastico personalizzato. PWA con supporto offline.",
+                url: "https://orario.raffaelevitale.it"
+              },
+            ].map((project, i) => (
+              <motion.a
+                key={i}
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group relative block"
+                style={{ marginLeft: `${i * 20}px` }}
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+              >
+                <motion.div
+                  className="flex items-center gap-4 lg:gap-8 p-6 lg:p-8 rounded-2xl lg:rounded-3xl border border-white/10 bg-white/5 backdrop-blur-sm transition-all cursor-pointer"
+                  whileHover={{ x: 20, backgroundColor: `${project.color}15` }}
+                >
+                  <span
+                    className="text-5xl lg:text-8xl font-black opacity-20"
+                    style={{ color: project.color }}
+                  >
+                    {project.num}
+                  </span>
+
+                  <div className="flex-1">
+                    <span
+                      className="text-xs lg:text-sm uppercase tracking-widest font-bold"
+                      style={{ color: project.color }}
+                    >
+                      {project.type}
+                    </span>
+                    <h3 className="text-2xl lg:text-5xl font-black mt-1 group-hover:translate-x-4 transition-transform">
+                      {project.name}
+                    </h3>
+                    <p className="text-white/50 mt-2 text-sm lg:text-base max-w-lg">
+                      {project.desc}
+                    </p>
                   </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-accent-secondary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                </div>
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <span className="inline-block px-3 py-1 bg-accent-secondary/10 text-accent-secondary text-xs font-semibold rounded-full mb-3">Branding</span>
-                    <h3 className="text-xl font-bold group-hover:text-accent-secondary transition-colors">Brand System – LUME</h3>
-                  </div>
-                </div>
-                <p className="text-sm text-foreground/75 group-hover:text-foreground/90 transition-colors">Identità visiva completa e linee guida.</p>
-              </div>
-            </div>
-            {/* Card 3 */}
-            <div className="reveal group">
-              <div className="card-clean hover-lift overflow-hidden relative">
-                <div className="aspect-square bg-gradient-to-br from-accent-tertiary/15 via-accent-tertiary/5 to-background mb-4 image-overlay relative overflow-hidden">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(20,184,166,0.15),transparent_50%)]"></div>
-                  <div className="w-full h-full flex items-center justify-center relative z-10">
-                    <span className="text-8xl font-bold text-foreground/[0.03] group-hover:text-foreground/[0.06] transition-colors">FRAME</span>
-                  </div>
-                  <div className="absolute inset-0 bg-gradient-to-t from-accent-tertiary/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                </div>
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <span className="inline-block px-3 py-1 bg-accent-tertiary/10 text-accent-tertiary text-xs font-semibold rounded-full mb-3">Editorial</span>
-                    <h3 className="text-xl font-bold group-hover:text-accent-tertiary transition-colors">Editorial Grid – FRAME</h3>
-                  </div>
-                </div>
-                <p className="text-sm text-foreground/75 group-hover:text-foreground/90 transition-colors">Layout magazine e sistemi a griglia.</p>
-              </div>
-            </div>
+
+                  <motion.div
+                    className="w-10 h-10 lg:w-14 lg:h-14 rounded-full border-2 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{ borderColor: project.color, color: project.color }}
+                  >
+                    <svg className="w-5 h-5 lg:w-6 lg:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
+                    </svg>
+                  </motion.div>
+                </motion.div>
+              </motion.a>
+            ))}
           </div>
-          <div className="reveal text-center mt-16">
-            <a
+
+          <motion.div
+            className="mt-12 lg:mt-16 text-center"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <motion.a
               href="#contact"
-              className="magnetic inline-flex items-center gap-2 text-lg font-semibold hover:text-accent transition-colors"
+              whileHover={{ x: 10 }}
+              className="inline-flex items-center gap-3 text-white/60 hover:text-white transition-colors font-medium"
             >
               Richiedi il portfolio completo
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
-            </a>
-          </div>
+            </motion.a>
+          </motion.div>
         </div>
       </section>
 
       {/* About Section */}
-      <section id="about" className="py-32 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center">
-            <h2 className="reveal text-display mb-8">Chi sono</h2>
-            <div className="reveal space-y-6 text-lg text-foreground/80 leading-relaxed">
-              <p>
-                Designer & developer con passione per tipografia, sistemi visivi e interfacce digitali. Unisco estetica e funzionalità, con attenzione a qualità del codice e dettaglio visivo.
-              </p>
-              <p>
-                Esperto di <span className="font-semibold text-accent">React</span>, <span className="font-semibold text-accent">Next.js</span>, <span className="font-semibold text-accent">TypeScript</span> e <span className="font-semibold text-accent">Figma</span>, lavoro end‑to‑end dal concept al rilascio.
-              </p>
+      <section id="about" className="px-6 py-32 relative">
+        <div className="max-w-4xl mx-auto text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <motion.span
+              className="text-sm uppercase tracking-[0.3em] font-bold block mb-4 text-[#EC4899]"
+            >
+              Chi sono
+            </motion.span>
+            <h2 className="text-4xl lg:text-6xl font-black mb-8">
+              Designer & Developer
+            </h2>
+            <p className="text-xl text-[#1a1a1a]/70 leading-relaxed mb-8">
+              Creo esperienze digitali dove estetica e funzionalità si incontrano.
+              Esperto di <span className="font-semibold text-[#FF4D4D]">React</span>, <span className="font-semibold text-[#4ECDC4]">Next.js</span>, <span className="font-semibold text-[#A855F7]">TypeScript</span> e <span className="font-semibold text-[#EC4899]">Figma</span>,
+              lavoro end-to-end dal concept al rilascio.
+            </p>
+            <div className="flex flex-wrap gap-3 justify-center">
+              {["React", "Next.js", "TypeScript", "Framer Motion", "Figma", "Tailwind"].map((skill, i) => (
+                <motion.span
+                  key={skill}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.05 }}
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  className="px-4 py-2 rounded-full text-sm font-medium border-2 border-[#1a1a1a]/10 hover:border-[#4ECDC4] hover:text-[#4ECDC4] transition-colors cursor-default"
+                >
+                  {skill}
+                </motion.span>
+              ))}
             </div>
-            <div className="reveal mt-12 flex flex-wrap justify-center gap-4">
-              <a
-                href="#contact"
-                className="magnetic inline-flex items-center gap-2 px-8 py-4 bg-accent text-accent-foreground rounded-full font-semibold hover:scale-105 hover:shadow-lg hover:shadow-accent/30 transition-all"
-              >
-                <span className="dot-indicator bg-accent-foreground"></span>
-                Parliamo del tuo progetto
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                </svg>
-              </a>
-              <a
-                href="mailto:raffaele.stuudio@gmail.com"
-                className="magnetic inline-flex items-center gap-2 px-8 py-4 border-2 border-foreground/20 rounded-full font-semibold hover:border-accent hover:text-accent transition-all"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-                </svg>
-                Contatto diretto
-              </a>
-            </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Contact/CTA Section */}
-      <section id="contact" className="py-32 px-6 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-accent-secondary/5 to-accent-tertiary/5"></div>
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_50%,rgba(99,102,241,0.1),transparent_50%)]"></div>
-        <div className="relative max-w-4xl mx-auto text-center">
-          <div className="reveal mb-8">
-            <span className="badge-minimal">
-              <span className="dot-indicator"></span>
-              Disponibile su nuovi progetti
-            </span>
-          </div>
-          <h2 className="reveal text-display mb-8">
-            Lavoriamo insieme
-            <br />
-            <span className="bg-gradient-to-r from-accent via-accent-secondary to-accent-tertiary bg-clip-text text-transparent">
-              per creare qualcosa di notevole
-            </span>
-          </h2>
-          <p className="reveal text-lg text-foreground/80 mb-12 max-w-2xl mx-auto">
-            Scrivimi due righe sul tuo progetto o idea. Ti rispondo presto con una proposta concreta.
-          </p>
-          <div className="reveal flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a
-              href="mailto:raffaele.stuudio@gmail.com"
-              className="magnetic inline-flex items-center gap-3 px-10 py-5 bg-accent text-accent-foreground rounded-full font-semibold text-lg hover:scale-105 hover:shadow-lg hover:shadow-accent/30 transition-all"
+      {/* Contact Section */}
+      <section id="contact" className="px-6 py-32 relative flex items-center bg-[#FAFAFA]">
+        <motion.div
+          className="absolute bottom-0 left-0 w-[50vw] h-[40vh] rounded-tr-[100px] opacity-10"
+          style={{ backgroundColor: "#4ECDC4" }}
+        />
+        <motion.div
+          className="absolute top-20 right-20 w-[20vw] h-[20vh] rounded-[40px] opacity-10 hidden lg:block"
+          style={{ backgroundColor: "#A855F7" }}
+        />
+
+        <div className="max-w-7xl mx-auto w-full">
+          <div className="grid grid-cols-12 gap-8 items-center">
+            <motion.div
+              className="col-span-12 lg:col-span-7"
+              initial={{ opacity: 0, x: -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
-              </svg>
-              Invia una mail
-            </a>
-            <a
-              href="/Profile.pdf"
-              download
-              className="magnetic inline-flex items-center gap-3 px-10 py-5 border-2 border-foreground/20 rounded-full font-semibold text-lg hover:border-accent hover:text-accent transition-all"
+              <KineticTextInline text="LETS BUILD" colors={colors} size="large" />
+              <div className="mt-2">
+                <KineticTextInline text="TOGETHER" colors={colors} size="large" />
+              </div>
+            </motion.div>
+
+            <motion.div
+              className="col-span-12 lg:col-span-5"
+              initial={{ opacity: 0, y: 50, rotate: 0 }}
+              whileInView={{ opacity: 1, y: 0, rotate: 4 }}
+              viewport={{ once: true }}
+              whileHover={{ rotate: 0 }}
             >
-              Scarica CV
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
-              </svg>
-            </a>
-          </div>
-          <div className="reveal mt-12 flex justify-center gap-6">
-            <a
-              href="https://www.instagram.com/josh63.exe/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="magnetic text-foreground/75 hover:text-accent transition-colors font-medium flex items-center gap-2"
-              aria-label="Instagram profile"
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path fillRule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.067.06 1.407.06 4.123v.80c0 2.643-.012 2.987-.06 4.043-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.067.048-1.407.60-4.123.60h-.80c-2.643 0-2.987-.010-4.043-.060-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.047-1.024-.060-1.379-.060-3.808v-.630c0-2.430.013-2.784.060-3.808.049-1.064.218-1.791.465-2.427a3.097 3.097 0 00.748-1.150 3.098 3.098 0 001.150-.748c.353-.137.882-.300 1.857-.344 1.023-.047 1.351-.058 3.807-.058zM12 6.865a5.135 5.135 0 110 10.27 5.135 5.135 0 010-10.27zm0 1.802a3.333 3.333 0 100 6.666 3.333 3.333 0 000-6.666zm5.338-3.205a1.2 1.2 0 110 2.4 1.2 1.2 0 010-2.4z" clipRule="evenodd" />
-              </svg>
-              Instagram
-            </a>
-            <a
-              href="https://www.linkedin.com/in/vitaleraffaele/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="magnetic text-foreground/75 hover:text-accent transition-colors font-medium flex items-center gap-2"
-              aria-label="LinkedIn profile"
-            >
-              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-              </svg>
-              LinkedIn
-            </a>
+              <div className="bg-[#1a1a1a] text-white p-8 lg:p-10 rounded-3xl shadow-2xl">
+                <div className="flex items-center gap-4 mb-6">
+                  <motion.div
+                    className="relative w-16 h-16 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-[#4ECDC4]/30"
+                    whileHover={{ scale: 1.1 }}
+                  >
+                    <Image
+                      src="/IMG_1870.PNG"
+                      alt="Raffaele Vitale"
+                      fill
+                      className="object-cover"
+                    />
+                  </motion.div>
+                  <div>
+                    <p className="font-bold">Raffaele Vitale</p>
+                    <motion.span
+                      className="inline-flex items-center gap-2 text-xs text-[#10B981]"
+                    >
+                      <motion.span
+                        animate={{ scale: [1, 1.3, 1] }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="w-2 h-2 rounded-full bg-[#10B981]"
+                      />
+                      Disponibile
+                    </motion.span>
+                  </div>
+                </div>
+
+                <p className="text-white/70 mb-8 leading-relaxed">
+                  Hai un progetto in mente? Parliamone e creiamo qualcosa di memorabile.
+                </p>
+
+                <motion.a
+                  href="mailto:raffaele.stuudio@gmail.com"
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
+                  className="block w-full py-4 text-center font-bold text-lg rounded-2xl text-white bg-gradient-to-r from-[#FF4D4D] via-[#A855F7] to-[#4ECDC4]"
+                >
+                  Invia una mail
+                </motion.a>
+
+                <div className="flex gap-6 mt-6 text-sm">
+                  <a href="https://www.instagram.com/josh63.exe/" target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-[#EC4899] transition-colors">
+                    Instagram
+                  </a>
+                  <a href="https://www.linkedin.com/in/vitaleraffaele/" target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-[#4ECDC4] transition-colors">
+                    LinkedIn
+                  </a>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="py-20 px-6 border-t border-foreground/10 bg-muted/20">
-        <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-12">
-            {/* Brand Column */}
-            <div className="md:col-span-2">
-              <Link href="/" className="inline-block group mb-4">
-                <span className="text-2xl font-bold gradient-text">RAFFAELE VITALE</span>
-              </Link>
-              <p className="text-foreground/75 leading-relaxed mb-4">
-                Designer & Developer: interfacce pulite, sistemi visivi e prodotti digitali.
-              </p>
-              <p className="text-foreground/75 text-sm">Basato in Italia 🇮🇹</p>
-            </div>
-
-            {/* Navigation Column */}
-            <div>
-              <h3 className="font-semibold mb-4 text-foreground">Navigazione</h3>
-              <ul className="space-y-3">
-                <li>
-                  <a href="#home" className="text-foreground/75 hover:text-accent transition-colors">
-                    Home
-                  </a>
-                </li>
-                <li>
-                  <a href="#work" className="text-foreground/75 hover:text-accent transition-colors">
-                    Progetti
-                  </a>
-                </li>
-                <li>
-                  <a href="#about" className="text-foreground/75 hover:text-accent transition-colors">
-                    Chi sono
-                  </a>
-                </li>
-                <li>
-                  <a href="#contact" className="text-foreground/75 hover:text-accent transition-colors">
-                    Contatti
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Contact Column */}
-            <div>
-              <h3 className="font-semibold mb-4 text-foreground">Connect</h3>
-              <ul className="space-y-3">
-                <li>
-                  <a
-                    href="mailto:raffaele.stuudio@gmail.com"
-                    className="text-foreground/75 hover:text-accent transition-colors"
-                  >
-                    Email
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://www.instagram.com/josh63.exe/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-foreground/75 hover:text-accent transition-colors"
-                  >
-                    Instagram
-                  </a>
-                </li>
-                <li>
-                  <a
-                    href="https://www.linkedin.com/in/vitaleraffaele/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-foreground/75 hover:text-accent transition-colors"
-                  >
-                    LinkedIn
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom Bar */}
-          <div className="pt-8 border-t border-foreground/10 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-foreground/75 flex items-center gap-2 text-sm">
-              <span className="dot-indicator"></span>
-              © {new Date().getFullYear()} Raffaele Vitale. All rights reserved.
-            </p>
-            <BackToTopButton />
-          </div>
+      <footer className="py-10 px-6 border-t border-[#1a1a1a]/10 bg-[#FAFAFA]">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+          <p className="text-[#1a1a1a]/40 text-sm">
+            © 2026 Raffaele Vitale
+          </p>
+          <motion.a
+            href="#home"
+            whileHover={{ y: -2 }}
+            className="text-[#1a1a1a]/40 hover:text-[#1a1a1a] text-sm transition-colors"
+          >
+            Torna su ↑
+          </motion.a>
         </div>
       </footer>
     </main>
+  );
+}
+
+// Kinetic Text Component
+function KineticTextInline({
+  text,
+  colors,
+  size = "default"
+}: {
+  text: string;
+  colors: string[];
+  size?: "default" | "large";
+}) {
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const sizeClasses = size === "large"
+    ? "text-4xl md:text-5xl lg:text-6xl"
+    : "text-[5.5vw] sm:text-[5vw] md:text-[4.5vw] lg:text-[4vw] xl:text-[3.5vw]";
+
+  return (
+    <div className={`${sizeClasses} font-black tracking-tighter leading-none whitespace-nowrap`}>
+      {text.split("").map((letter, i) => {
+        const colorIndex = i % colors.length;
+        const isSpace = letter === " ";
+
+        return (
+          <motion.span
+            key={i}
+            className={`inline-block cursor-pointer ${isSpace ? "w-[0.3em]" : ""}`}
+            style={{
+              color: hoveredIndex === i ? colors[colorIndex] : "#1a1a1a",
+            }}
+            onMouseEnter={() => !isSpace && setHoveredIndex(i)}
+            onMouseLeave={() => setHoveredIndex(null)}
+            whileHover={!isSpace ? {
+              y: -8,
+              rotate: Math.random() * 10 - 5,
+              scale: 1.1,
+              color: colors[colorIndex],
+            } : {}}
+            transition={{
+              type: "spring",
+              stiffness: 400,
+              damping: 20,
+            }}
+          >
+            {isSpace ? "\u00A0" : letter}
+          </motion.span>
+        );
+      })}
+    </div>
   );
 }
