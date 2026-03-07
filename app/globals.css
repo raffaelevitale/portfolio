@@ -15,9 +15,11 @@
   --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
   --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-  --gradient-glass: linear-gradient(135deg,
-      rgba(255, 255, 255, 0.1) 0%,
-      rgba(255, 255, 255, 0.05) 100%);
+  --gradient-glass: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
   --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 8px 30px -8px rgba(0, 0, 0, 0.12);
   --shadow-lg: 0 20px 50px -12px rgba(0, 0, 0, 0.25);
@@ -52,9 +54,11 @@
     --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
     --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    --gradient-glass: linear-gradient(135deg,
-        rgba(255, 255, 255, 0.05) 0%,
-        rgba(255, 255, 255, 0.02) 100%);
+    --gradient-glass: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
     --shadow-sm: 0 2px 8px -2px rgba(0, 0, 0, 0.3);
     --shadow-md: 0 8px 30px -8px rgba(0, 0, 0, 0.4);
     --shadow-lg: 0 20px 50px -12px rgba(0, 0, 0, 0.6);
@@ -66,8 +70,14 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, -apple-system, BlinkMacSystemFont,
-    "Segoe UI", Roboto, sans-serif;
+  font-family:
+    var(--font-sans),
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   position: relative;
@@ -78,12 +88,17 @@ body::before {
   content: "";
   position: fixed;
   inset: 0;
-  background: radial-gradient(circle at 20% 50%,
+  background:
+    radial-gradient(
+      circle at 20% 50%,
       rgba(99, 102, 241, 0.02) 0%,
-      transparent 50%),
-    radial-gradient(circle at 80% 50%,
+      transparent 50%
+    ),
+    radial-gradient(
+      circle at 80% 50%,
       rgba(236, 72, 153, 0.02) 0%,
-      transparent 50%);
+      transparent 50%
+    );
   pointer-events: none;
   z-index: -1;
 }
@@ -132,12 +147,17 @@ html {
   z-index: -1;
   pointer-events: none;
   contain: layout style paint;
-  background: radial-gradient(800px 600px at 90% 10%,
+  background:
+    radial-gradient(
+      800px 600px at 90% 10%,
       color-mix(in oklch, var(--accent) 35%, transparent) 0,
-      transparent 70%),
-    radial-gradient(700px 500px at 10% 90%,
+      transparent 70%
+    ),
+    radial-gradient(
+      700px 500px at 10% 90%,
       color-mix(in oklch, #ec4899 30%, transparent) 0,
-      transparent 70%);
+      transparent 70%
+    );
   filter: blur(50px) saturate(130%);
   opacity: 0.5;
   animation: auroraMove 30s ease-in-out infinite alternate;
@@ -192,7 +212,8 @@ html {
 .reveal {
   opacity: 0;
   transform: translateY(20px);
-  transition: opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1),
+  transition:
+    opacity 0.6s cubic-bezier(0.23, 1, 0.32, 1),
     transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
   transition-delay: var(--reveal-delay, 0ms);
 }
@@ -204,7 +225,6 @@ html {
 
 /* Reduced motion support */
 @media (prefers-reduced-motion: reduce) {
-
   .fade-up,
   .reveal {
     animation: none !important;
@@ -276,7 +296,9 @@ html {
   backdrop-filter: blur(30px) saturate(200%);
   -webkit-backdrop-filter: blur(30px) saturate(200%);
   border: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-glass), inset 0 0 20px rgba(99, 102, 241, 0.05);
+  box-shadow:
+    var(--shadow-glass),
+    inset 0 0 20px rgba(99, 102, 241, 0.05);
 }
 
 .glass-subtle {
@@ -301,10 +323,12 @@ html {
 
 /* Gradient text utility */
 .gradient-text {
-  background: linear-gradient(135deg,
-      var(--accent) 0%,
-      var(--accent-secondary) 50%,
-      var(--accent-tertiary) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--accent) 0%,
+    var(--accent-secondary) 50%,
+    var(--accent-tertiary) 100%
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -313,7 +337,6 @@ html {
 }
 
 @keyframes gradientShift {
-
   0%,
   100% {
     background-position: 0% 50%;
@@ -326,7 +349,6 @@ html {
 
 /* Floating animation */
 @keyframes float {
-
   0%,
   100% {
     transform: translateY(0px);
@@ -364,10 +386,12 @@ html {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.2),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
   animation: shimmer 3s infinite;
 }
 
@@ -383,11 +407,15 @@ html {
   inset: -2px;
   border-radius: inherit;
   padding: 2px;
-  background: linear-gradient(135deg,
-      var(--accent),
-      var(--accent-secondary),
-      var(--accent-tertiary));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent-secondary),
+    var(--accent-tertiary)
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   opacity: 0;
@@ -416,33 +444,42 @@ html {
   pointer-events: none;
   z-index: 9999;
   transform: translate3d(-50%, -50%, 0);
-  transition: transform 0.15s ease-out, width 0.2s ease-out,
-    height 0.2s ease-out, opacity 0.2s ease-out;
-  box-shadow: 0 0 10px var(--accent), 0 0 20px rgba(99, 102, 241, 0.3);
+  transition:
+    transform 0.15s ease-out,
+    width 0.2s ease-out,
+    height 0.2s ease-out,
+    opacity 0.2s ease-out;
+  box-shadow:
+    0 0 10px var(--accent),
+    0 0 20px rgba(99, 102, 241, 0.3);
 }
 
 .custom-cursor-ring {
   position: fixed;
   width: 40px;
   height: 40px;
-  background: radial-gradient(circle,
-      rgba(99, 102, 241, 0.1) 0%,
-      transparent 70%);
+  background: radial-gradient(
+    circle,
+    rgba(99, 102, 241, 0.1) 0%,
+    transparent 70%
+  );
   border-radius: 50%;
   pointer-events: none;
   z-index: 9998;
   transform: translate3d(-50%, -50%, 0);
-  transition: transform 0.25s ease-out, width 0.25s ease-out,
-    height 0.25s ease-out, opacity 0.2s ease-out;
+  transition:
+    transform 0.25s ease-out,
+    width 0.25s ease-out,
+    height 0.25s ease-out,
+    opacity 0.2s ease-out;
   opacity: 0.6;
   backdrop-filter: blur(2px);
 }
 
 /* Hide default cursor on desktop only when custom cursor is active */
 @media (pointer: fine) {
-
-  body[data-cursor='enabled'],
-  body[data-cursor='enabled'] * {
+  body[data-cursor="enabled"],
+  body[data-cursor="enabled"] * {
     cursor: none !important;
   }
 }
@@ -523,11 +560,13 @@ html {
 
 /* Advanced gradient text with animation */
 .gradient-text-animated {
-  background: linear-gradient(45deg,
-      var(--accent),
-      var(--accent-secondary),
-      var(--accent-tertiary),
-      var(--accent));
+  background: linear-gradient(
+    45deg,
+    var(--accent),
+    var(--accent-secondary),
+    var(--accent-tertiary),
+    var(--accent)
+  );
   background-size: 300% 300%;
   background-clip: text;
   -webkit-background-clip: text;
@@ -557,7 +596,8 @@ html {
 }
 
 .glitch:hover::after {
-  animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both infinite;
+  animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both
+    infinite;
   color: var(--accent-secondary);
   z-index: -2;
 }
@@ -612,9 +652,11 @@ html {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-      rgba(99, 102, 241, 0.1) 0%,
-      transparent 50%);
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(99, 102, 241, 0.1) 0%,
+    transparent 50%
+  );
   opacity: 0;
   transition: opacity 0.3s;
   pointer-events: none;
@@ -626,7 +668,6 @@ html {
 
 /* Blob animation */
 @keyframes blobFloat {
-
   0%,
   100% {
     transform: translate(0, 0) scale(1);
@@ -665,11 +706,15 @@ html {
 .neon-border {
   position: relative;
   border: 1px solid transparent;
-  background: linear-gradient(var(--background), var(--background)) padding-box,
-    linear-gradient(135deg,
-      var(--accent),
-      var(--accent-secondary),
-      var(--accent-tertiary)) border-box;
+  background:
+    linear-gradient(var(--background), var(--background)) padding-box,
+    linear-gradient(
+        135deg,
+        var(--accent),
+        var(--accent-secondary),
+        var(--accent-tertiary)
+      )
+      border-box;
   border-radius: 12px;
 }
 
@@ -677,10 +722,12 @@ html {
   content: "";
   position: absolute;
   inset: -2px;
-  background: linear-gradient(135deg,
-      var(--accent),
-      var(--accent-secondary),
-      var(--accent-tertiary));
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    var(--accent-secondary),
+    var(--accent-tertiary)
+  );
   border-radius: inherit;
   opacity: 0;
   filter: blur(10px);
@@ -695,16 +742,17 @@ html {
 /* Holographic effect */
 .holographic {
   position: relative;
-  background: linear-gradient(135deg,
-      rgba(99, 102, 241, 0.1),
-      rgba(236, 72, 153, 0.1),
-      rgba(20, 184, 166, 0.1));
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.1),
+    rgba(236, 72, 153, 0.1),
+    rgba(20, 184, 166, 0.1)
+  );
   background-size: 200% 200%;
   animation: holographicShift 10s ease infinite;
 }
 
 @keyframes holographicShift {
-
   0%,
   100% {
     background-position: 0% 50%;
@@ -722,20 +770,23 @@ html {
   -webkit-backdrop-filter: blur(20px) saturate(180%);
   border: 1px solid var(--glass-border);
   border-radius: 16px;
-  box-shadow: var(--shadow-glass), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  box-shadow:
+    var(--shadow-glass),
+    inset 0 1px 1px rgba(255, 255, 255, 0.1);
   transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 .frosted-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 60px 0 rgba(99, 102, 241, 0.2),
+  box-shadow:
+    0 20px 60px 0 rgba(99, 102, 241, 0.2),
     inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
 /* Cyber grid background */
 .cyber-grid {
-  background-image: linear-gradient(rgba(99, 102, 241, 0.03) 1px,
-      transparent 1px),
+  background-image:
+    linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
     linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
   background-size: 50px 50px;
   background-position: -1px -1px;
@@ -743,13 +794,14 @@ html {
 
 /* Glow text effect */
 .glow-text {
-  text-shadow: 0 0 10px rgba(99, 102, 241, 0.5),
-    0 0 20px rgba(99, 102, 241, 0.3), 0 0 30px rgba(99, 102, 241, 0.2);
+  text-shadow:
+    0 0 10px rgba(99, 102, 241, 0.5),
+    0 0 20px rgba(99, 102, 241, 0.3),
+    0 0 30px rgba(99, 102, 241, 0.2);
 }
 
 /* Floating animation variants */
 @keyframes floatSlow {
-
   0%,
   100% {
     transform: translateY(0px);
@@ -761,7 +813,6 @@ html {
 }
 
 @keyframes floatMedium {
-
   0%,
   100% {
     transform: translateY(0px) rotate(0deg);
@@ -794,20 +845,23 @@ html {
   inset: 0;
   border-radius: inherit;
   padding: 2px;
-  background: linear-gradient(45deg,
-      var(--accent),
-      var(--accent-secondary),
-      var(--accent-tertiary),
-      var(--accent));
+  background: linear-gradient(
+    45deg,
+    var(--accent),
+    var(--accent-secondary),
+    var(--accent-tertiary),
+    var(--accent)
+  );
   background-size: 300% 300%;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   animation: gradientBorderRotate 4s ease infinite;
 }
 
 @keyframes gradientBorderRotate {
-
   0%,
   100% {
     background-position: 0% 50%;
@@ -829,7 +883,8 @@ html {
   font-weight: 600;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.23, 1, 0.32, 1);
-  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3),
+  box-shadow:
+    0 4px 15px rgba(99, 102, 241, 0.3),
     inset 0 1px 1px rgba(255, 255, 255, 0.2);
 }
 
@@ -840,10 +895,12 @@ html {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(255, 255, 255, 0.3),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
   transition: left 0.5s ease;
 }
 
@@ -853,7 +910,8 @@ html {
 
 .btn-futuristic:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.5),
+  box-shadow:
+    0 8px 30px rgba(99, 102, 241, 0.5),
     inset 0 1px 1px rgba(255, 255, 255, 0.3);
 }
 
@@ -888,7 +946,6 @@ html {
 }
 
 @keyframes particleFloat {
-
   0%,
   100% {
     transform: translate(0, 0) scale(1);
@@ -905,13 +962,16 @@ html {
 
 /* Neon glow intenso */
 .neon-glow-intense {
-  box-shadow: 0 0 5px var(--accent), 0 0 10px var(--accent),
-    0 0 20px var(--accent), 0 0 40px var(--accent), 0 0 80px var(--accent);
+  box-shadow:
+    0 0 5px var(--accent),
+    0 0 10px var(--accent),
+    0 0 20px var(--accent),
+    0 0 40px var(--accent),
+    0 0 80px var(--accent);
   animation: neonPulse 2s ease-in-out infinite;
 }
 
 @keyframes neonPulse {
-
   0%,
   100% {
     filter: brightness(1);
@@ -926,14 +986,16 @@ html {
 
 /* Angoli tagliati stile gaming */
 .cyber-corners {
-  clip-path: polygon(0 10px,
-      10px 0,
-      calc(100% - 10px) 0,
-      100% 10px,
-      100% calc(100% - 10px),
-      calc(100% - 10px) 100%,
-      10px 100%,
-      0 calc(100% - 10px));
+  clip-path: polygon(
+    0 10px,
+    10px 0,
+    calc(100% - 10px) 0,
+    100% 10px,
+    100% calc(100% - 10px),
+    calc(100% - 10px) 100%,
+    10px 100%,
+    0 calc(100% - 10px)
+  );
   position: relative;
 }
 
@@ -944,7 +1006,9 @@ html {
   clip-path: inherit;
   padding: 2px;
   background: linear-gradient(135deg, var(--accent), var(--accent-secondary));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
 }
@@ -960,10 +1024,12 @@ html {
   position: absolute;
   width: 3px;
   height: 40%;
-  background: linear-gradient(to bottom,
-      transparent,
-      var(--accent),
-      transparent);
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--accent),
+    transparent
+  );
   animation: barGlow 3s ease-in-out infinite;
 }
 
@@ -979,7 +1045,6 @@ html {
 }
 
 @keyframes barGlow {
-
   0%,
   100% {
     opacity: 0.3;
@@ -994,14 +1059,19 @@ html {
 
 /* Hex grid pattern */
 .hex-grid {
-  background-image: radial-gradient(circle at center,
-      var(--accent) 1px,
-      transparent 1px),
-    radial-gradient(circle at center,
+  background-image:
+    radial-gradient(circle at center, var(--accent) 1px, transparent 1px),
+    radial-gradient(
+      circle at center,
       var(--accent-secondary) 1px,
-      transparent 1px);
-  background-size: 40px 40px, 40px 40px;
-  background-position: 0 0, 20px 20px;
+      transparent 1px
+    );
+  background-size:
+    40px 40px,
+    40px 40px;
+  background-position:
+    0 0,
+    20px 20px;
   opacity: 0.1;
 }
 
@@ -1015,11 +1085,13 @@ html {
   content: "";
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(0deg,
-      rgba(0, 0, 0, 0.05) 0px,
-      transparent 1px,
-      transparent 2px,
-      rgba(0, 0, 0, 0.05) 3px);
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.05) 0px,
+    transparent 1px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.05) 3px
+  );
   pointer-events: none;
   animation: scanlineMove 8s linear infinite;
 }
@@ -1038,34 +1110,40 @@ html {
 .gaming-badge {
   position: relative;
   padding: 8px 20px;
-  background: linear-gradient(135deg,
-      rgba(99, 102, 241, 0.2),
-      rgba(236, 72, 153, 0.2));
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.2),
+    rgba(236, 72, 153, 0.2)
+  );
   border: 2px solid var(--accent);
-  clip-path: polygon(8px 0,
-      100% 0,
-      100% calc(100% - 8px),
-      calc(100% - 8px) 100%,
-      0 100%,
-      0 8px);
+  clip-path: polygon(
+    8px 0,
+    100% 0,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    0 100%,
+    0 8px
+  );
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  box-shadow: inset 0 0 10px rgba(99, 102, 241, 0.3),
+  box-shadow:
+    inset 0 0 10px rgba(99, 102, 241, 0.3),
     0 0 20px rgba(99, 102, 241, 0.5);
   animation: badgePulse 3s ease-in-out infinite;
 }
 
 @keyframes badgePulse {
-
   0%,
   100% {
-    box-shadow: inset 0 0 10px rgba(99, 102, 241, 0.3),
+    box-shadow:
+      inset 0 0 10px rgba(99, 102, 241, 0.3),
       0 0 20px rgba(99, 102, 241, 0.5);
   }
 
   50% {
-    box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.5),
+    box-shadow:
+      inset 0 0 20px rgba(99, 102, 241, 0.5),
       0 0 40px rgba(99, 102, 241, 0.8);
   }
 }
@@ -1078,7 +1156,6 @@ html {
 }
 
 @keyframes glitchBorder {
-
   0%,
   100% {
     border-color: var(--accent);
@@ -1098,11 +1175,13 @@ html {
 
 /* Diagonal stripes background */
 .diagonal-stripes {
-  background-image: repeating-linear-gradient(45deg,
-      transparent,
-      transparent 10px,
-      rgba(99, 102, 241, 0.05) 10px,
-      rgba(99, 102, 241, 0.05) 20px);
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(99, 102, 241, 0.05) 10px,
+    rgba(99, 102, 241, 0.05) 20px
+  );
 }
 
 /* Pulsating dot */
@@ -1137,14 +1216,16 @@ html {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
-  clip-path: polygon(0 8px,
-      8px 0,
-      calc(100% - 8px) 0,
-      100% 8px,
-      100% calc(100% - 8px),
-      calc(100% - 8px) 100%,
-      8px 100%,
-      0 calc(100% - 8px));
+  clip-path: polygon(
+    0 8px,
+    8px 0,
+    calc(100% - 8px) 0,
+    100% 8px,
+    100% calc(100% - 8px),
+    calc(100% - 8px) 100%,
+    8px 100%,
+    0 calc(100% - 8px)
+  );
   transition: all 0.3s ease;
 }
 
@@ -1155,10 +1236,12 @@ html {
   left: -2px;
   right: -2px;
   bottom: -2px;
-  background: linear-gradient(45deg,
-      var(--accent),
-      var(--accent-secondary),
-      var(--accent-tertiary));
+  background: linear-gradient(
+    45deg,
+    var(--accent),
+    var(--accent-secondary),
+    var(--accent-tertiary)
+  );
   background-size: 300% 300%;
   clip-path: inherit;
   z-index: -1;
@@ -1172,7 +1255,6 @@ html {
 }
 
 @keyframes techBorderFlow {
-
   0%,
   100% {
     background-position: 0% 50%;
@@ -1245,18 +1327,19 @@ html {
 /* Holographic foil effect */
 .holographic-foil {
   position: relative;
-  background: linear-gradient(135deg,
-      rgba(99, 102, 241, 0.1) 0%,
-      rgba(236, 72, 153, 0.1) 25%,
-      rgba(20, 184, 166, 0.1) 50%,
-      rgba(99, 102, 241, 0.1) 75%,
-      rgba(236, 72, 153, 0.1) 100%);
+  background: linear-gradient(
+    135deg,
+    rgba(99, 102, 241, 0.1) 0%,
+    rgba(236, 72, 153, 0.1) 25%,
+    rgba(20, 184, 166, 0.1) 50%,
+    rgba(99, 102, 241, 0.1) 75%,
+    rgba(236, 72, 153, 0.1) 100%
+  );
   background-size: 400% 400%;
   animation: holographicFoilShift 8s ease infinite;
 }
 
 @keyframes holographicFoilShift {
-
   0%,
   100% {
     background-position: 0% 50%;
@@ -1283,12 +1366,14 @@ html {
   height: 8px;
   background: #00ff88;
   border-radius: 50%;
-  box-shadow: 0 0 5px #00ff88, 0 0 10px #00ff88, 0 0 20px #00ff88;
+  box-shadow:
+    0 0 5px #00ff88,
+    0 0 10px #00ff88,
+    0 0 20px #00ff88;
   animation: statusBlink 2s ease-in-out infinite;
 }
 
 @keyframes statusBlink {
-
   0%,
   100% {
     opacity: 1;
@@ -1363,7 +1448,6 @@ html {
 
 /* === MOBILE OPTIMIZATIONS === */
 @media (max-width: 768px) {
-
   /* Disable heavy effects on mobile */
   .neon-glow-intense {
     box-shadow: 0 0 10px var(--accent);
@@ -1452,7 +1536,9 @@ html {
 
 /* Elegant hover scale */
 .hover-lift {
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .hover-lift:hover {
@@ -1489,11 +1575,13 @@ html {
   content: "";
   position: absolute;
   inset: -1px;
-  background: linear-gradient(90deg,
-      var(--accent),
-      var(--accent-secondary),
-      var(--accent-tertiary),
-      var(--accent));
+  background: linear-gradient(
+    90deg,
+    var(--accent),
+    var(--accent-secondary),
+    var(--accent-tertiary),
+    var(--accent)
+  );
   background-size: 300% 100%;
   border-radius: inherit;
   opacity: 0;
@@ -1547,7 +1635,6 @@ html {
 }
 
 @keyframes pulse {
-
   0%,
   100% {
     opacity: 1;
@@ -1571,5 +1658,46 @@ html {
   .grid-obys {
     grid-template-columns: 1fr;
     gap: 1.5rem;
+  }
+}
+
+/* ─── Infinite Marquee ─── */
+.marquee-container {
+  overflow: hidden;
+  width: 100%;
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
+}
+
+.marquee-content {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  padding-right: 2rem;
+  flex-shrink: 0;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Pause marquee on hover */
+.marquee-container:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* Reduced motion: stop marquee */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none !important;
   }
 }
