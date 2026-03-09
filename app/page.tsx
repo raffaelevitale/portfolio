@@ -71,11 +71,11 @@ export default function Home() {
       {/* ═══════════════════ HERO ═══════════════════ */}
       <section id="home" className="min-h-screen relative px-6 py-28 lg:py-32 flex items-center">
         <motion.div
-          className="absolute top-20 right-0 w-[40vw] h-[50vh] rounded-l-[100px] opacity-[0.07]"
+          className="absolute top-20 right-0 w-[40vw] h-[50vh] rounded-l-[100px] opacity-[0.14]"
           style={{ backgroundColor: "#FF4D4D", rotate }}
         />
         <motion.div
-          className="absolute bottom-10 left-10 w-[25vw] h-[30vh] rounded-[50px] opacity-[0.07]"
+          className="absolute bottom-10 left-10 w-[25vw] h-[30vh] rounded-[50px] opacity-[0.12]"
           style={{ backgroundColor: "#4ECDC4", rotate: negRotate }}
         />
 
@@ -105,7 +105,7 @@ export default function Home() {
               </motion.div>
 
               {/* Rotating role title */}
-              <div className="mb-4 h-[5.5vw] sm:h-[5vw] md:h-[4.5vw] lg:h-[4vw] xl:h-[3.5vw] overflow-hidden relative">
+              <div className="mb-4 h-[7vw] sm:h-[6.5vw] md:h-[6vw] lg:h-[5vw] xl:h-[4.5vw] overflow-hidden relative">
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={roleIndex}
@@ -139,7 +139,7 @@ export default function Home() {
                   href="#work"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="group px-8 py-4 rounded-full font-bold text-white bg-[#1a1a1a] flex items-center gap-3 hover:gap-4 transition-all"
+                  className="group px-8 py-4 rounded-full font-bold text-white bg-[#1a1a1a] flex items-center gap-3 hover:gap-4 transition-[gap]"
                 >
                   Guarda i progetti
                   <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -159,7 +159,7 @@ export default function Home() {
             {/* Floating info card */}
             <motion.div
               className="col-span-12 lg:col-span-4 flex items-start lg:items-center justify-start lg:justify-end"
-              initial={{ opacity: 0, y: 50, rotate: 5 }}
+              initial={{ opacity: 0, y: 50, rotate: 3 }}
               animate={{ opacity: 1, y: 0, rotate: 3 }}
               transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
@@ -198,15 +198,48 @@ export default function Home() {
             </motion.div>
           </div>
 
+          {/* Floating code widget */}
+          <motion.div
+            className="absolute top-[30%] left-[50%] hidden lg:block pointer-events-none z-10"
+            initial={{ opacity: 0, y: 20, rotate: -2 }}
+            animate={{ opacity: 1, y: 0, rotate: -2 }}
+            transition={{ delay: 0.9, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <div className="bg-white/90 backdrop-blur-sm border border-[#1a1a1a]/[0.06] rounded-2xl p-5 shadow-lg shadow-black/[0.04] w-56">
+              <div className="flex items-center gap-1.5 mb-3">
+                <span className="w-2 h-2 rounded-full bg-[#FF4D4D]/60" />
+                <span className="w-2 h-2 rounded-full bg-[#FFE66D]/60" />
+                <span className="w-2 h-2 rounded-full bg-[#10B981]/60" />
+                <span className="ml-2 text-[9px] font-mono text-[#1a1a1a]/25 tracking-wider">portfolio.tsx</span>
+              </div>
+              <div className="font-mono text-[11px] leading-relaxed space-y-0.5">
+                <div><span className="text-[#A855F7]">const</span> <span className="text-[#1a1a1a]/70">craft</span> <span className="text-[#1a1a1a]/30">=</span></div>
+                <div className="pl-3 text-[#4ECDC4]">&quot;design&quot;</div>
+                <div className="pl-3"><span className="text-[#1a1a1a]/30">+</span> <span className="text-[#FF4D4D]">&quot;code&quot;</span><span className="text-[#1a1a1a]/30">;</span></div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Central gradient orb */}
+          <motion.div
+            className="absolute top-1/2 left-[55%] -translate-x-1/2 -translate-y-1/2 w-[30vw] h-[30vw] rounded-full hidden lg:block pointer-events-none"
+            style={{
+              background: "radial-gradient(circle, rgba(168,85,247,0.07) 0%, rgba(78,205,196,0.04) 40%, transparent 70%)",
+            }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.8, duration: 1.2, ease: "easeOut" }}
+          />
+
           {/* Decorative elements */}
           <motion.div
             className="absolute top-10 right-1/4 w-16 h-16 rounded-full border-2 hidden lg:block"
             style={{ borderColor: "#A855F7" }}
             initial={{ opacity: 0 }}
-            animate={{ opacity: 0.2, rotate: 360 }}
+            animate={{ opacity: 0.25, rotate: 360 }}
             transition={{
               opacity: { delay: 1, duration: 0.8, ease: "easeOut" },
-              rotate: { duration: 20, repeat: Infinity, ease: "linear" },
+              rotate: { delay: 1, duration: 20, repeat: Infinity, ease: "linear" },
             }}
           />
           <motion.div
@@ -216,10 +249,49 @@ export default function Home() {
             animate={{ opacity: 0.3, y: [0, -10, 0], rotate: [0, 10, 0] }}
             transition={{
               opacity: { delay: 1.1, duration: 0.8, ease: "easeOut" },
-              y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
-              rotate: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+              y: { delay: 1.1, duration: 4, repeat: Infinity, ease: "easeInOut" },
+              rotate: { delay: 1.1, duration: 4, repeat: Infinity, ease: "easeInOut" },
             }}
           />
+
+          {/* Additional floating decorations */}
+          <motion.div
+            className="absolute top-[28%] left-[52%] w-2 h-2 rounded-full hidden lg:block"
+            style={{ backgroundColor: "#4ECDC4" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.5, scale: [1, 1.3, 1] }}
+            transition={{
+              opacity: { delay: 1.2, duration: 0.6, ease: "easeOut" },
+              scale: { delay: 1.2, duration: 3, repeat: Infinity, ease: "easeInOut" },
+            }}
+          />
+          <motion.div
+            className="absolute bottom-[32%] left-[58%] w-16 h-px hidden lg:block"
+            style={{ backgroundColor: "#A855F7" }}
+            initial={{ opacity: 0, scaleX: 0 }}
+            animate={{ opacity: 0.25, scaleX: 1 }}
+            transition={{ delay: 1.3, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          />
+          <motion.div
+            className="absolute top-[22%] right-[18%] w-5 h-5 border border-[#FF4D4D]/25 rounded-sm hidden lg:block"
+            initial={{ opacity: 0, rotate: 0 }}
+            animate={{ opacity: 1, rotate: 360 }}
+            transition={{
+              opacity: { delay: 1.4, duration: 0.6, ease: "easeOut" },
+              rotate: { delay: 1.4, duration: 15, repeat: Infinity, ease: "linear" },
+            }}
+          />
+          <motion.div
+            className="absolute bottom-[22%] right-[28%] hidden lg:block text-[#FFE66D]/25 text-xl font-light select-none pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1, y: [0, -8, 0] }}
+            transition={{
+              opacity: { delay: 1.5, duration: 0.6, ease: "easeOut" },
+              y: { delay: 1.5, duration: 5, repeat: Infinity, ease: "easeInOut" },
+            }}
+          >
+            +
+          </motion.div>
         </div>
 
         {/* Scroll indicator */}
@@ -897,8 +969,6 @@ function KineticTextInline({
   colors: string[];
   size?: "default" | "large";
 }) {
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
-
   // Pre-compute stable random rotations per character to avoid recalculating on every render
   const rotations = useMemo(
     () => text.split("").map(() => Math.random() * 10 - 5),
@@ -920,15 +990,12 @@ function KineticTextInline({
             key={i}
             className={`inline-block cursor-default select-none ${isSpace ? "w-[0.3em]" : ""}`}
             style={{ color: "#1a1a1a" }}
-            onMouseEnter={() => !isSpace && setHoveredIndex(i)}
-            onMouseLeave={() => setHoveredIndex(null)}
-            animate={hoveredIndex === i ? { color: colorsProp[colorIndex] } : { color: "#1a1a1a" }}
             whileHover={!isSpace ? {
               y: -8,
               rotate: rotations[i],
               scale: 1.1,
               color: colorsProp[colorIndex],
-            } : {}}
+            } : undefined}
             transition={{
               type: "spring",
               stiffness: 500,
