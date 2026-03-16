@@ -34,19 +34,19 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Raffaele Vitale — Designer & Developer",
+    default: "Raffaele Vitale — Creative Director & Brand Strategist",
     template: "%s · Raffaele Vitale",
   },
   description:
-    "Il portfolio moderno di Raffaele Vitale: design di interfacce, sistemi visivi e sviluppo front-end.",
+    "Il portfolio di Raffaele Vitale: direzione creativa, brand identity, digital strategy e sistemi visivi.",
   keywords: [
     "Raffaele Vitale",
-    "design portfolio",
-    "designer",
-    "developer",
+    "creative director",
+    "brand strategist",
     "brand identity",
     "UI/UX",
-    "creative developer",
+    "digital strategy",
+    "design portfolio",
   ],
   authors: [{ name: "Raffaele Vitale", url: "https://www.linkedin.com/in/vitaleraffaele/" }],
   creator: "Raffaele Vitale",
@@ -54,9 +54,9 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Raffaele Vitale — Designer & Developer",
+    title: "Raffaele Vitale — Creative Director & Brand Strategist",
     description:
-      "Selezione di progetti tra sistemi di design, brand e interfacce, a cura di Raffaele Vitale.",
+      "Direzione creativa, brand identity e digital strategy, a cura di Raffaele Vitale.",
     url: siteUrl,
     siteName: "Raffaele Vitale Portfolio",
     locale: "it_IT",
@@ -64,9 +64,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Raffaele Vitale — Designer & Developer",
+    title: "Raffaele Vitale — Creative Director & Brand Strategist",
     description:
-      "Interfacce pulite, sistemi visivi e sviluppo front-end con Next.js/TypeScript.",
+      "Direzione creativa, sistemi visivi e brand strategy per prodotti digitali.",
   },
   robots: {
     index: true,

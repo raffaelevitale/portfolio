@@ -35,7 +35,7 @@ function useCounter(target: number, duration = 2000) {
 }
 
 /* ─── Role rotation words ─── */
-const roles = ["CREATIVE DEVELOPER", "UI/UX DESIGNER", "BRAND STRATEGIST", "PROBLEM SOLVER"];
+const roles = ["CREATIVE DIRECTOR", "UI/UX DESIGNER", "BRAND STRATEGIST", "DIGITAL STRATEGIST"];
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -125,8 +125,8 @@ export default function Home() {
                 transition={{ delay: 0.45, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
                 className="text-lg lg:text-xl text-[#1a1a1a]/60 max-w-lg leading-relaxed"
               >
-                Progetto interfacce pulite, sistemi visivi e prodotti digitali
-                curando ogni dettaglio — dalla prima idea al pixel finale.
+                Progetto identità visive, strategie digitali e sistemi di brand
+                curando ogni dettaglio — dal concept alla direzione creativa.
               </motion.p>
 
               <motion.div
@@ -191,7 +191,7 @@ export default function Home() {
                     Disponibile 2026
                   </span>
                   <p className="text-white/60 leading-relaxed text-sm mt-3">
-                    Designer & Developer con passione per tipografia e interazioni inaspettate.
+                    Creative Director & Brand Strategist con passione per sistemi visivi e identità di marca.
                   </p>
                 </div>
               </motion.div>
@@ -210,12 +210,11 @@ export default function Home() {
                 <span className="w-2 h-2 rounded-full bg-[#FF4D4D]/60" />
                 <span className="w-2 h-2 rounded-full bg-[#FFE66D]/60" />
                 <span className="w-2 h-2 rounded-full bg-[#10B981]/60" />
-                <span className="ml-2 text-[9px] font-mono text-[#1a1a1a]/25 tracking-wider">portfolio.tsx</span>
+                <span className="ml-2 text-[9px] font-mono text-[#1a1a1a]/25 tracking-wider">brand.fig</span>
               </div>
               <div className="font-mono text-[11px] leading-relaxed space-y-0.5">
-                <div><span className="text-[#A855F7]">const</span> <span className="text-[#1a1a1a]/70">craft</span> <span className="text-[#1a1a1a]/30">=</span></div>
-                <div className="pl-3 text-[#4ECDC4]">&quot;design&quot;</div>
-                <div className="pl-3"><span className="text-[#1a1a1a]/30">+</span> <span className="text-[#FF4D4D]">&quot;code&quot;</span><span className="text-[#1a1a1a]/30">;</span></div>
+                <div><span className="text-[#A855F7]">vision</span> <span className="text-[#1a1a1a]/30">→</span> <span className="text-[#4ECDC4]">identity</span></div>
+                <div><span className="text-[#FF4D4D]">strategy</span> <span className="text-[#1a1a1a]/30">→</span> <span className="text-[#1a1a1a]/70">impact</span></div>
               </div>
             </div>
           </motion.div>
@@ -320,7 +319,7 @@ export default function Home() {
           <div className="marquee-track">
             {[0, 1].map((setIndex) => (
               <div key={setIndex} className="marquee-content" aria-hidden={setIndex > 0 ? "true" : undefined}>
-                {["React", "Next.js", "TypeScript", "Tailwind CSS", "Framer Motion", "Figma", "Node.js", "UI/UX Design", "Brand Identity", "Supabase"].map((item, i) => (
+                {["Brand Identity", "UI/UX Design", "Digital Strategy", "Figma", "Notion", "Product Design", "Creative Direction", "Business Strategy", "Design Systems", "CRM Design"].map((item, i) => (
                   <span key={`${setIndex}-${i}`} className="flex items-center gap-4 text-sm font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/25 whitespace-nowrap">
                     {item}
                     <span className="w-1.5 h-1.5 rounded-full bg-[#1a1a1a]/15" />
@@ -388,13 +387,13 @@ export default function Home() {
                 tools: ["Figma", "Prototyping", "User Research"]
               },
               {
-                title: "DEVELOPMENT",
-                sub: "Front-end",
-                desc: "React, Next.js, TypeScript con animazioni fluide. Performance e accessibilit\u00e0 al primo posto.",
+                title: "DIGITAL STRATEGY",
+                sub: "Business & Product",
+                desc: "Sistemi operativi, infrastrutture digitali e strategie di crescita. Dal CRM al go-to-market, progettati da zero.",
                 color: "#A855F7",
-                icon: CodeIcon,
+                icon: Zap,
                 num: "03",
-                tools: ["React", "Next.js", "TypeScript"]
+                tools: ["Notion", "CRM Design", "Business Strategy"]
               },
             ].map((service, i) => (
               <motion.div
@@ -509,9 +508,19 @@ export default function Home() {
           <div className="space-y-6">
             {[
               {
+                name: "CRYBU S.R.L.",
+                type: "Creative Direction \u2014 Brand & Strategy",
+                num: "01",
+                color: "#FF4D4D",
+                desc: "Progettata e lanciata da zero l\u0027identit\u00e0 visiva e l\u0027infrastruttura operativa di una societ\u00e0 di business education. Coordinato team distribuito, costruito il Brand Book, configurato CRM e pipeline vendite per un ecosistema di 6 sistemi integrati.",
+                url: "https://crybu.it",
+                tags: ["Brand Identity", "Business Strategy", "EdTech", "B2B SaaS", "Notion", "CRM Design"],
+                year: "2026"
+              },
+              {
                 name: "ORARIO VALLAURI",
                 type: "Web App \u2014 PWA",
-                num: "01",
+                num: "02",
                 color: "#4ECDC4",
                 desc: "App per la gestione dell\u0027orario scolastico personalizzato. Progressive Web App con supporto offline e ricerca intelligente.",
                 url: "https://orario.raffaelevitale.it",
@@ -532,7 +541,7 @@ export default function Home() {
               >
                 <motion.div
                   className="relative p-8 lg:p-10 rounded-2xl lg:rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-sm transition-all cursor-pointer overflow-hidden"
-                  whileHover={{ backgroundColor: "rgba(78,205,196,0.04)" }}
+                  whileHover={{ backgroundColor: `${project.color}0A` }}
                 >
                   <motion.div
                     className="absolute top-0 left-0 right-0 h-px"
@@ -631,19 +640,20 @@ export default function Home() {
                 Chi sono
               </motion.span>
               <h2 className="text-5xl lg:text-7xl font-black mb-8 leading-[0.95]">
-                Designer &{" "}
+                Creative{" "}
                 <br />
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#EC4899] to-[#A855F7]">
-                  Developer
+                  Director
                 </span>
               </h2>
               <p className="text-lg text-[#1a1a1a]/60 leading-relaxed mb-10">
-                Non mi limito a scrivere codice o disegnare interfacce. Creo ponti tra{" "}
-                <span className="font-bold text-[#1a1a1a]">visione</span> e{" "}
-                <span className="font-bold text-[#1a1a1a]">realt\u00e0 digitale</span>.
+                Non mi limito a disegnare interfacce. Creo ponti tra{" "}
+                <span className="font-bold text-[#1a1a1a]">visione</span>,{" "}
+                <span className="font-bold text-[#1a1a1a]">strategia</span> e{" "}
+                <span className="font-bold text-[#1a1a1a]">identit\u00e0 di marca</span>.
                 <br /><br />
-                Il mio approccio unisce la precisione tecnica di un ingegnere con la sensibilit\u00e0 estetica
-                di un designer, garantendo prodotti che non solo funzionano perfettamente, ma emozionano.
+                Il mio approccio unisce direzione creativa e pensiero strategico,
+                costruendo brand e sistemi che non solo funzionano, ma lasciano il segno.
               </p>
 
               <AnimatedStats />
@@ -664,7 +674,7 @@ export default function Home() {
                     <Cpu className="w-5 h-5 text-[#4ECDC4]" /> Tech Stack
                   </h3>
                   <div className="flex flex-wrap gap-2 relative">
-                    {["React", "Next.js", "TypeScript", "TailwindCSS", "Framer Motion", "Node.js", "Supabase", "Figma"].map((tech, i) => (
+                    {["Figma", "Notion", "Brand Design", "UI/UX Design", "Google Workspace", "CRM Design", "Product Strategy", "Framer Motion"].map((tech, i) => (
                       <motion.span
                         key={tech}
                         initial={{ opacity: 0, scale: 0.8 }}
@@ -738,9 +748,9 @@ export default function Home() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { step: "01", title: "Scoperta", desc: "Ascolto le esigenze, analizzo il contesto e definisco obiettivi chiari.", color: "#FF4D4D", icon: Eye },
-              { step: "02", title: "Design", desc: "Wireframe, prototipi e iterazioni fino alla soluzione perfetta.", color: "#A855F7", icon: Palette },
-              { step: "03", title: "Sviluppo", desc: "Codice pulito, performante e accessibile con le tecnologie migliori.", color: "#4ECDC4", icon: CodeIcon },
-              { step: "04", title: "Lancio", desc: "Testing, deploy e supporto continuo per un prodotto impeccabile.", color: "#FFE66D", icon: Zap },
+              { step: "02", title: "Strategia", desc: "Definisco il posizionamento, l\u0027architettura di brand e la roadmap operativa.", color: "#A855F7", icon: Palette },
+              { step: "03", title: "Design", desc: "Identit\u00e0 visiva, sistemi di design e prototipi iterati fino alla perfezione.", color: "#4ECDC4", icon: Layout },
+              { step: "04", title: "Lancio", desc: "Go-to-market, coordinamento team e supporto continuo per un risultato impeccabile.", color: "#FFE66D", icon: Zap },
             ].map((item, i) => (
               <motion.div
                 key={i}
@@ -900,7 +910,7 @@ export default function Home() {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <div>
               <span className="text-xl font-black tracking-tighter">RAFFAELE VITALE</span>
-              <p className="text-[#1a1a1a]/40 text-sm mt-1">Designer & Developer</p>
+              <p className="text-[#1a1a1a]/40 text-sm mt-1">Creative Director & Brand Strategist</p>
             </div>
             <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
               <a href="#home" className="text-[#1a1a1a]/40 hover:text-[#1a1a1a] transition-colors font-medium">Home</a>
@@ -912,7 +922,7 @@ export default function Home() {
 
           <div className="mt-8 pt-8 border-t border-[#1a1a1a]/5 flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-[#1a1a1a]/30 text-xs">
-              &#169; 2026 Raffaele Vitale &#8212; Progettato e sviluppato con &#10084;
+              &#169; 2026 Raffaele Vitale &#8212; Progettato con &#10084;
             </p>
             <motion.a
               href="#home"
