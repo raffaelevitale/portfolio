@@ -4,15 +4,10 @@ import { useState, useRef, useEffect, useMemo } from "react";
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
-  Palette, Layout, Code as CodeIcon, Zap, Smartphone,
-  ArrowUpRight, Copy, Terminal, Cpu, FolderOpen, Check, Mail,
-  ArrowRight, Sparkles, Eye
+  ArrowUpRight, Copy, Check, Mail, ArrowRight, ArrowDown,
 } from "lucide-react";
 
-/* ─── Color palette ─── */
-const colors = ["#FF4D4D", "#4ECDC4", "#FFE66D", "#A855F7", "#FF6B6B", "#06B6D4", "#EC4899", "#10B981"];
-
-/* ─── Animated counter hook ─── */
+/* ─── Animated counter ─── */
 function useCounter(target: number, duration = 2000) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
@@ -34,14 +29,16 @@ function useCounter(target: number, duration = 2000) {
   return { count, ref };
 }
 
-/* ─── Role rotation words ─── */
-const roles = ["CREATIVE DIRECTOR", "UI/UX DESIGNER", "BRAND STRATEGIST", "DIGITAL STRATEGIST"];
+/* ─── Shared easing ─── */
+const ease = [0.22, 1, 0.36, 1] as const;
+
+/* ─── Role rotation ─── */
+const roles = ["Creative Director", "Brand Strategist", "UI/UX Designer", "Digital Strategist"];
 
 export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll();
-  const rotate = useTransform(scrollYProgress, [0, 1], [0, 8]);
-  const negRotate = useTransform(rotate, (r) => -r);
+  const heroParallax = useTransform(scrollYProgress, [0, 0.3], [0, -80]);
   const [copied, setCopied] = useState(false);
   const [roleIndex, setRoleIndex] = useState(0);
 
@@ -59,270 +56,153 @@ export default function Home() {
   };
 
   return (
-    <main ref={containerRef} className="bg-[#FAFAFA] text-[#1a1a1a] overflow-hidden">
-      {/* Subtle grain texture */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.015] z-40"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-        }}
-      />
+    <main ref={containerRef} className="grain overflow-hidden">
 
       {/* ═══════════════════ HERO ═══════════════════ */}
-      <section id="home" className="min-h-screen relative px-6 py-28 lg:py-32 flex items-center">
+      <section id="home" className="min-h-screen relative px-6 flex items-center">
         <motion.div
-          className="absolute top-20 right-0 w-[40vw] h-[50vh] rounded-l-[100px] opacity-[0.14]"
-          style={{ backgroundColor: "#FF4D4D", rotate }}
-        />
-        <motion.div
-          className="absolute bottom-10 left-10 w-[25vw] h-[30vh] rounded-[50px] opacity-[0.12]"
-          style={{ backgroundColor: "#4ECDC4", rotate: negRotate }}
-        />
+          className="max-w-7xl mx-auto w-full pt-32 pb-24 lg:pt-40 lg:pb-32"
+          style={{ y: heroParallax }}
+        >
+          {/* Availability badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.7, ease }}
+            className="inline-flex items-center gap-3 mb-10"
+          >
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#10B981] opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#10B981]" />
+            </span>
+            <span className="text-xs font-medium tracking-widest uppercase text-[var(--fg-muted)]">
+              Disponibile per nuovi progetti
+            </span>
+          </motion.div>
 
-        <div className="max-w-7xl mx-auto w-full relative">
-          <div className="grid grid-cols-12 gap-6">
-            <motion.div
-              className="col-span-12 lg:col-span-8 relative z-10"
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+          {/* Main headline */}
+          <div className="max-w-5xl">
+            <motion.h1
+              className="font-display text-huge mb-6"
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.9, ease }}
             >
-              {/* Badge */}
-              <motion.div
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1a1a1a]/5 border border-[#1a1a1a]/10 mb-8"
-              >
-                <motion.span
-                  animate={{ scale: [1, 1.3, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="w-2 h-2 rounded-full bg-[#10B981]"
-                />
-                <span className="text-xs font-bold uppercase tracking-widest text-[#1a1a1a]/60">
-                  Disponibile per nuovi progetti
-                </span>
-              </motion.div>
+              Raffaele Vitale
+            </motion.h1>
 
-              {/* Rotating role title */}
-              <div className="mb-4 h-[7vw] sm:h-[6.5vw] md:h-[6vw] lg:h-[5vw] xl:h-[4.5vw] overflow-hidden relative">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={roleIndex}
-                    initial={{ y: 60, opacity: 0 }}
-                    animate={{ y: 0, opacity: 1 }}
-                    exit={{ y: -60, opacity: 0 }}
-                    transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                  >
-                    <KineticTextInline text={roles[roleIndex]} colors={colors} />
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.45, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                className="text-lg lg:text-xl text-[#1a1a1a]/60 max-w-lg leading-relaxed"
-              >
-                Progetto identità visive, strategie digitali e sistemi di brand
-                curando ogni dettaglio — dal concept alla direzione creativa.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.65, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-                className="flex flex-wrap gap-4 mt-10"
-              >
-                <motion.a
-                  href="#work"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="group px-8 py-4 rounded-full font-bold text-white bg-[#1a1a1a] flex items-center gap-3 hover:gap-4 transition-[gap]"
+            {/* Rotating role */}
+            <div className="h-[1.4em] overflow-hidden mb-8">
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={roleIndex}
+                  className="text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-[var(--accent)]"
+                  initial={{ y: 40, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  exit={{ y: -40, opacity: 0 }}
+                  transition={{ duration: 0.5, ease }}
                 >
-                  Guarda i progetti
-                  <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                </motion.a>
-                <motion.a
-                  href="/Profile.pdf"
-                  download
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 rounded-full font-bold border-2 border-[#1a1a1a]/15 hover:border-[#1a1a1a]/40 transition-colors"
-                >
-                  Scarica CV
-                </motion.a>
-              </motion.div>
-            </motion.div>
+                  {roles[roleIndex]}
+                </motion.p>
+              </AnimatePresence>
+            </div>
 
-            {/* Floating info card */}
-            <motion.div
-              className="col-span-12 lg:col-span-4 flex items-start lg:items-center justify-start lg:justify-end"
-              initial={{ opacity: 0, y: 50, rotate: 3 }}
-              animate={{ opacity: 1, y: 0, rotate: 3 }}
-              transition={{ delay: 0.4, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5, duration: 0.7, ease }}
+              className="text-lg lg:text-xl text-[var(--fg-muted)] max-w-xl leading-relaxed"
             >
-              <motion.div
-                whileHover={{ rotate: 0, scale: 1.02 }}
-                transition={{ type: "spring", stiffness: 280, damping: 22 }}
-                className="bg-[#1a1a1a] text-white p-8 rounded-3xl -mt-8 lg:mt-0 lg:-ml-20 max-w-sm shadow-2xl relative overflow-hidden"
+              Progetto identità visive, strategie digitali e sistemi di brand
+              curando ogni dettaglio — dal concept alla direzione creativa.
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7, duration: 0.7, ease }}
+              className="flex flex-wrap gap-4 mt-10"
+            >
+              <motion.a
+                href="#work"
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="group px-8 py-4 rounded-full font-semibold text-white bg-[var(--fg)] flex items-center gap-3 transition-colors hover:bg-[var(--accent)]"
               >
-                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-bl from-[#4ECDC4]/10 to-transparent rounded-bl-full" />
-                <div className="relative">
-                  <motion.div
-                    className="relative w-20 h-20 mb-4 rounded-2xl overflow-hidden ring-2 ring-white/10"
-                    whileHover={{ scale: 1.05, rotate: -3 }}
-                  >
-                    <Image
-                      src="/IMG_1870.PNG"
-                      alt="Raffaele Vitale"
-                      fill
-                      className="object-cover"
-                    />
-                  </motion.div>
-                  <div className="text-lg font-bold mb-1">Raffaele Vitale</div>
-                  <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[10px] font-bold mb-4 bg-[#4ECDC4]/15 text-[#4ECDC4] uppercase tracking-widest">
-                    <motion.span
-                      animate={{ scale: [1, 1.3, 1] }}
-                      transition={{ duration: 2, repeat: Infinity }}
-                      className="w-1.5 h-1.5 rounded-full bg-[#4ECDC4]"
-                    />
-                    Disponibile 2026
-                  </span>
-                  <p className="text-white/60 leading-relaxed text-sm mt-3">
-                    Creative Director & Brand Strategist con passione per sistemi visivi e identità di marca.
-                  </p>
-                </div>
-              </motion.div>
+                Guarda i progetti
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </motion.a>
+              <motion.a
+                href="/Profile.pdf"
+                download
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+                className="px-8 py-4 rounded-full font-semibold border border-[var(--border)] hover:border-[var(--accent)] hover:text-[var(--accent)] transition-colors"
+              >
+                Scarica CV
+              </motion.a>
             </motion.div>
           </div>
 
-          {/* Floating code widget */}
+          {/* Profile card — floating */}
           <motion.div
-            className="absolute top-[30%] left-[50%] hidden lg:block pointer-events-none z-10"
-            initial={{ opacity: 0, y: 20, rotate: -2 }}
-            animate={{ opacity: 1, y: 0, rotate: -2 }}
-            transition={{ delay: 0.9, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute top-40 right-6 lg:right-12 hidden lg:block"
+            initial={{ opacity: 0, y: 30, rotate: 3 }}
+            animate={{ opacity: 1, y: 0, rotate: 3 }}
+            transition={{ delay: 0.6, duration: 0.9, ease }}
           >
-            <div className="bg-white/90 backdrop-blur-sm border border-[#1a1a1a]/[0.06] rounded-2xl p-5 shadow-lg shadow-black/[0.04] w-56">
-              <div className="flex items-center gap-1.5 mb-3">
-                <span className="w-2 h-2 rounded-full bg-[#FF4D4D]/60" />
-                <span className="w-2 h-2 rounded-full bg-[#FFE66D]/60" />
-                <span className="w-2 h-2 rounded-full bg-[#10B981]/60" />
-                <span className="ml-2 text-[9px] font-mono text-[#1a1a1a]/25 tracking-wider">brand.fig</span>
+            <motion.div
+              whileHover={{ rotate: 0, scale: 1.02 }}
+              transition={{ type: "spring", stiffness: 280, damping: 22 }}
+              className="bg-[var(--bg-dark)] text-white p-8 rounded-2xl max-w-xs shadow-2xl shadow-black/10 relative overflow-hidden"
+            >
+              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent opacity-60" />
+              <div className="relative">
+                <motion.div
+                  className="relative w-16 h-16 mb-5 rounded-xl overflow-hidden ring-1 ring-white/10"
+                  whileHover={{ scale: 1.05 }}
+                >
+                  <Image src="/IMG_1870.PNG" alt="Raffaele Vitale" fill className="object-cover" />
+                </motion.div>
+                <div className="text-base font-semibold mb-1">Raffaele Vitale</div>
+                <span className="inline-flex items-center gap-2 text-[11px] text-[#10B981] tracking-wider uppercase">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+                  Disponibile 2026
+                </span>
+                <p className="text-white/50 leading-relaxed text-sm mt-4">
+                  Creative Director & Brand Strategist con passione per sistemi visivi e identità di marca.
+                </p>
               </div>
-              <div className="font-mono text-[11px] leading-relaxed space-y-0.5">
-                <div><span className="text-[#A855F7]">vision</span> <span className="text-[#1a1a1a]/30">→</span> <span className="text-[#4ECDC4]">identity</span></div>
-                <div><span className="text-[#FF4D4D]">strategy</span> <span className="text-[#1a1a1a]/30">→</span> <span className="text-[#1a1a1a]/70">impact</span></div>
-              </div>
-            </div>
+            </motion.div>
           </motion.div>
-
-          {/* Central gradient orb */}
-          <motion.div
-            className="absolute top-1/2 left-[55%] -translate-x-1/2 -translate-y-1/2 w-[30vw] h-[30vw] rounded-full hidden lg:block pointer-events-none"
-            style={{
-              background: "radial-gradient(circle, rgba(168,85,247,0.07) 0%, rgba(78,205,196,0.04) 40%, transparent 70%)",
-            }}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.8, duration: 1.2, ease: "easeOut" }}
-          />
-
-          {/* Decorative elements */}
-          <motion.div
-            className="absolute top-10 right-1/4 w-16 h-16 rounded-full border-2 hidden lg:block"
-            style={{ borderColor: "#A855F7" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.25, rotate: 360 }}
-            transition={{
-              opacity: { delay: 1, duration: 0.8, ease: "easeOut" },
-              rotate: { delay: 1, duration: 20, repeat: Infinity, ease: "linear" },
-            }}
-          />
-          <motion.div
-            className="absolute bottom-20 left-1/3 w-8 h-8 rounded-lg hidden lg:block"
-            style={{ backgroundColor: "#FFE66D" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.3, y: [0, -10, 0], rotate: [0, 10, 0] }}
-            transition={{
-              opacity: { delay: 1.1, duration: 0.8, ease: "easeOut" },
-              y: { delay: 1.1, duration: 4, repeat: Infinity, ease: "easeInOut" },
-              rotate: { delay: 1.1, duration: 4, repeat: Infinity, ease: "easeInOut" },
-            }}
-          />
-
-          {/* Additional floating decorations */}
-          <motion.div
-            className="absolute top-[28%] left-[52%] w-2 h-2 rounded-full hidden lg:block"
-            style={{ backgroundColor: "#4ECDC4" }}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.5, scale: [1, 1.3, 1] }}
-            transition={{
-              opacity: { delay: 1.2, duration: 0.6, ease: "easeOut" },
-              scale: { delay: 1.2, duration: 3, repeat: Infinity, ease: "easeInOut" },
-            }}
-          />
-          <motion.div
-            className="absolute bottom-[32%] left-[58%] w-16 h-px hidden lg:block"
-            style={{ backgroundColor: "#A855F7" }}
-            initial={{ opacity: 0, scaleX: 0 }}
-            animate={{ opacity: 0.25, scaleX: 1 }}
-            transition={{ delay: 1.3, duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          />
-          <motion.div
-            className="absolute top-[22%] right-[18%] w-5 h-5 border border-[#FF4D4D]/25 rounded-sm hidden lg:block"
-            initial={{ opacity: 0, rotate: 0 }}
-            animate={{ opacity: 1, rotate: 360 }}
-            transition={{
-              opacity: { delay: 1.4, duration: 0.6, ease: "easeOut" },
-              rotate: { delay: 1.4, duration: 15, repeat: Infinity, ease: "linear" },
-            }}
-          />
-          <motion.div
-            className="absolute bottom-[22%] right-[28%] hidden lg:block text-[#FFE66D]/25 text-xl font-light select-none pointer-events-none"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1, y: [0, -8, 0] }}
-            transition={{
-              opacity: { delay: 1.5, duration: 0.6, ease: "easeOut" },
-              y: { delay: 1.5, duration: 5, repeat: Infinity, ease: "easeInOut" },
-            }}
-          >
-            +
-          </motion.div>
-        </div>
+        </motion.div>
 
         {/* Scroll indicator */}
         <motion.div
-          className="absolute bottom-12 left-1/2 -translate-x-1/2 text-[#1a1a1a]/30 hidden md:block"
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[var(--fg-faint)] hidden md:block"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.4, duration: 0.8 }}
+          transition={{ delay: 1.2, duration: 0.8 }}
         >
-          <div className="flex flex-col items-center gap-3">
-            <div className="w-7 h-11 border-2 border-current rounded-full flex justify-center pt-2">
-              <motion.div
-                className="w-1 h-2.5 bg-current rounded-full"
-                animate={{ y: [0, 10, 0], opacity: [1, 0.3, 1] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
-              />
-            </div>
-            <span className="text-[10px] uppercase tracking-[0.3em] font-medium">Scroll</span>
-          </div>
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+          >
+            <ArrowDown className="w-5 h-5" />
+          </motion.div>
         </motion.div>
       </section>
 
       {/* ═══════════════════ MARQUEE ═══════════════════ */}
-      <section className="py-6 border-y border-[#1a1a1a]/5 overflow-hidden bg-white/50">
+      <section className="py-5 border-y border-[var(--border)] overflow-hidden">
         <div className="marquee-container">
           <div className="marquee-track">
             {[0, 1].map((setIndex) => (
               <div key={setIndex} className="marquee-content" aria-hidden={setIndex > 0 ? "true" : undefined}>
-                {["Brand Identity", "UI/UX Design", "Digital Strategy", "Figma", "Notion", "Product Design", "Creative Direction", "Business Strategy", "Design Systems", "CRM Design"].map((item, i) => (
-                  <span key={`${setIndex}-${i}`} className="flex items-center gap-4 text-sm font-bold uppercase tracking-[0.2em] text-[#1a1a1a]/25 whitespace-nowrap">
+                {["Brand Identity", "UI/UX Design", "Digital Strategy", "Creative Direction", "Product Design", "Business Strategy", "Design Systems", "CRM Design"].map((item, i) => (
+                  <span key={`${setIndex}-${i}`} className="flex items-center gap-5 text-sm font-medium uppercase tracking-[0.2em] text-[var(--fg-faint)] whitespace-nowrap">
                     {item}
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#1a1a1a]/15" />
+                    <span className="w-1 h-1 rounded-full bg-[var(--accent)] opacity-40" />
                   </span>
                 ))}
               </div>
@@ -332,114 +212,67 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════ SERVICES ═══════════════════ */}
-      <section className="px-6 py-28 lg:py-36 relative">
+      <section className="px-6 py-28 lg:py-40 relative">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-16 lg:mb-24">
-            <motion.span
-              className="text-xs uppercase tracking-[0.3em] font-bold block mb-6 text-[#A855F7]"
-              initial={{ x: -20, opacity: 0 }}
-              whileInView={{ x: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            >
-              Cosa faccio
-            </motion.span>
-            <div className="flex flex-wrap items-end gap-4">
-              <motion.h2
-                className="text-5xl lg:text-8xl font-black tracking-tight"
-                initial={{ y: 40, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              >
-                SERVIZI
-              </motion.h2>
-              <motion.span
-                className="text-2xl lg:text-3xl font-light text-[#1a1a1a]/30 mb-1 lg:mb-2"
-                initial={{ y: 40, opacity: 0 }}
-                whileInView={{ y: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              >
-                (03)
-              </motion.span>
-            </div>
-          </div>
+          <SectionHeader
+            label="Servizi"
+            title="Cosa faccio"
+            serif
+          />
 
-          <div className="space-y-0">
+          <div className="mt-16 lg:mt-24">
             {[
               {
-                title: "BRAND IDENTITY",
-                sub: "Visual System",
-                desc: "Identit\u00e0 coerenti e sistemi scalabili per prodotti digitali. Dal logo al design system completo.",
-                color: "#FF4D4D",
-                icon: Palette,
+                title: "Brand Identity",
                 num: "01",
-                tools: ["Figma", "Illustrator", "Brand Guidelines"]
+                desc: "Identità coerenti e sistemi scalabili per prodotti digitali. Dal logo al design system completo.",
+                tools: ["Figma", "Illustrator", "Brand Guidelines"],
               },
               {
-                title: "UI/UX DESIGN",
-                sub: "User Experience",
-                desc: "Wireframe, prototipi interattivi e design system accessibili. Ogni interfaccia \u00e8 testata e iterata.",
-                color: "#4ECDC4",
-                icon: Layout,
+                title: "UI/UX Design",
                 num: "02",
-                tools: ["Figma", "Prototyping", "User Research"]
+                desc: "Wireframe, prototipi interattivi e design system accessibili. Ogni interfaccia è testata e iterata.",
+                tools: ["Figma", "Prototyping", "User Research"],
               },
               {
-                title: "DIGITAL STRATEGY",
-                sub: "Business & Product",
-                desc: "Sistemi operativi, infrastrutture digitali e strategie di crescita. Dal CRM al go-to-market, progettati da zero.",
-                color: "#A855F7",
-                icon: Zap,
+                title: "Digital Strategy",
                 num: "03",
-                tools: ["Notion", "CRM Design", "Business Strategy"]
+                desc: "Sistemi operativi, infrastrutture digitali e strategie di crescita. Dal CRM al go-to-market.",
+                tools: ["Notion", "CRM Design", "Business Strategy"],
               },
             ].map((service, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.12, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ delay: i * 0.08, duration: 0.6, ease }}
               >
-                <div className="h-px bg-[#1a1a1a]/10" />
+                <div className="divider" />
                 <motion.div
-                  className="group grid grid-cols-12 gap-4 lg:gap-8 py-8 lg:py-12 cursor-pointer items-center"
-                  whileHover={{ x: 10 }}
+                  className="group grid grid-cols-12 gap-4 lg:gap-8 py-8 lg:py-14 items-start lg:items-center cursor-pointer"
+                  whileHover={{ x: 8 }}
                   transition={{ type: "spring", stiffness: 300, damping: 30 }}
                 >
                   <div className="col-span-2 lg:col-span-1">
-                    <span className="text-sm font-bold text-[#1a1a1a]/20 group-hover:text-[#1a1a1a]/50 transition-colors">
+                    <span className="text-sm font-mono text-[var(--fg-faint)] group-hover:text-[var(--accent)] transition-colors">
                       {service.num}
                     </span>
                   </div>
 
-                  <div className="col-span-2 lg:col-span-1">
-                    <div
-                      className="w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-300"
-                      style={{ backgroundColor: `${service.color}15`, color: service.color }}
-                    >
-                      <service.icon size={22} strokeWidth={2.5} />
-                    </div>
-                  </div>
-
-                  <div className="col-span-8 lg:col-span-4">
-                    <h3 className="text-2xl lg:text-4xl font-black tracking-tight group-hover:translate-x-2 transition-transform duration-300">
+                  <div className="col-span-10 lg:col-span-4">
+                    <h3 className="font-display text-3xl lg:text-5xl group-hover:text-[var(--accent)] transition-colors duration-300">
                       {service.title}
                     </h3>
-                    <span className="text-[#1a1a1a]/40 font-bold text-xs tracking-widest uppercase mt-1 block">
-                      {service.sub}
-                    </span>
                   </div>
 
-                  <div className="col-span-12 lg:col-span-4 pl-0 lg:pl-4">
-                    <p className="text-[#1a1a1a]/50 leading-relaxed text-sm lg:text-base">
+                  <div className="col-span-12 lg:col-span-5 lg:pl-4">
+                    <p className="text-[var(--fg-muted)] leading-relaxed text-sm lg:text-base">
                       {service.desc}
                     </p>
-                    <div className="flex flex-wrap gap-2 mt-3">
+                    <div className="flex flex-wrap gap-2 mt-4">
                       {service.tools.map((tool) => (
-                        <span key={tool} className="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-full border border-[#1a1a1a]/10 text-[#1a1a1a]/40">
+                        <span key={tool} className="text-[11px] font-medium tracking-wider uppercase px-3 py-1.5 rounded-full border border-[var(--border)] text-[var(--fg-muted)]">
                           {tool}
                         </span>
                       ))}
@@ -447,16 +280,12 @@ export default function Home() {
                   </div>
 
                   <div className="hidden lg:flex col-span-2 justify-end">
-                    <motion.div
-                      className="w-10 h-10 rounded-full border-2 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
-                      style={{ borderColor: service.color, color: service.color }}
-                    >
+                    <div className="w-10 h-10 rounded-full border border-[var(--border)] flex items-center justify-center opacity-0 group-hover:opacity-100 group-hover:border-[var(--accent)] group-hover:text-[var(--accent)] transition-all duration-300">
                       <ArrowUpRight size={18} />
-                    </motion.div>
+                    </div>
                   </div>
                 </motion.div>
-
-                {i === 2 && <div className="h-px bg-[#1a1a1a]/10" />}
+                {i === 2 && <div className="divider" />}
               </motion.div>
             ))}
           </div>
@@ -464,68 +293,34 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════ WORK ═══════════════════ */}
-      <section id="work" className="px-6 py-28 lg:py-36 bg-[#1a1a1a] text-white relative overflow-hidden">
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage: `repeating-linear-gradient(45deg, transparent, transparent 20px, white 20px, white 21px)`
-          }}
-        />
-
+      <section id="work" className="px-6 py-28 lg:py-40 bg-[var(--bg-dark)] text-white relative overflow-hidden">
         <div className="max-w-7xl mx-auto relative">
-          <div className="mb-16 lg:mb-20">
-            <motion.span
-              className="text-xs uppercase tracking-[0.3em] font-bold block mb-6 text-[#FFE66D]"
-              initial={{ x: -20, opacity: 0 }}
-              whileInView={{ x: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            >
-              Portfolio
-            </motion.span>
-            <div className="flex flex-wrap items-end gap-4">
-              <motion.h2
-                className="text-5xl lg:text-8xl font-black tracking-tight"
-                initial={{ x: -40, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              >
-                SELECTED
-              </motion.h2>
-              <motion.h2
-                className="text-5xl lg:text-8xl font-black tracking-tight bg-gradient-to-r from-[#FF4D4D] via-[#A855F7] to-[#4ECDC4] bg-clip-text text-transparent"
-                initial={{ x: 40, opacity: 0 }}
-                whileInView={{ x: 0, opacity: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-              >
-                WORK
-              </motion.h2>
-            </div>
-          </div>
+          <SectionHeader
+            label="Portfolio"
+            title="Selected Work"
+            serif
+            dark
+          />
 
-          <div className="space-y-6">
+          <div className="mt-16 lg:mt-20 space-y-6">
             {[
               {
                 name: "CRYBU S.R.L.",
-                type: "Creative Direction \u2014 Brand & Strategy",
+                type: "Creative Direction — Brand & Strategy",
                 num: "01",
-                color: "#FF4D4D",
-                desc: "Progettata e lanciata da zero l\u0027identit\u00e0 visiva e l\u0027infrastruttura operativa di una societ\u00e0 di business education. Coordinato team distribuito, costruito il Brand Book, configurato CRM e pipeline vendite per un ecosistema di 6 sistemi integrati.",
-                url: "https://crybu.it",
+                desc: "Progettata e lanciata da zero l'identità visiva e l'infrastruttura operativa di una società di business education. Coordinato team distribuito, costruito il Brand Book, configurato CRM e pipeline vendite per un ecosistema di 6 sistemi integrati.",
+                url: "https://crybu.org",
                 tags: ["Brand Identity", "Business Strategy", "EdTech", "B2B SaaS", "Notion", "CRM Design"],
-                year: "2026"
+                year: "2026",
               },
               {
                 name: "ORARIO VALLAURI",
-                type: "Web App \u2014 PWA",
+                type: "Web App — PWA",
                 num: "02",
-                color: "#4ECDC4",
-                desc: "App per la gestione dell\u0027orario scolastico personalizzato. Progressive Web App con supporto offline e ricerca intelligente.",
-                url: "https://orario.raffaelevitale.it",
+                desc: "App per la gestione dell'orario scolastico personalizzato. Progressive Web App con supporto offline e ricerca intelligente.",
+                url: "https://orario.landing.raffaelevitale.it/",
                 tags: ["Next.js", "TypeScript", "PWA", "Zustand"],
-                year: "2025"
+                year: "2025",
               },
             ].map((project, i) => (
               <motion.a
@@ -537,39 +332,22 @@ export default function Home() {
                 initial={{ opacity: 0, y: 40 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.12, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ delay: i * 0.1, duration: 0.7, ease }}
               >
-                <motion.div
-                  className="relative p-8 lg:p-10 rounded-2xl lg:rounded-3xl border border-white/10 bg-white/[0.03] backdrop-blur-sm transition-all cursor-pointer overflow-hidden"
-                  whileHover={{ backgroundColor: `${project.color}0A` }}
-                >
-                  <motion.div
-                    className="absolute top-0 left-0 right-0 h-px"
-                    style={{ background: `linear-gradient(90deg, transparent, ${project.color}, transparent)` }}
-                    initial={{ opacity: 0, scaleX: 0 }}
-                    whileHover={{ opacity: 1, scaleX: 1 }}
-                    transition={{ duration: 0.4 }}
-                  />
-
-                  <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-8">
-                    <div className="flex lg:flex-col items-center lg:items-start gap-3 lg:gap-1">
-                      <span
-                        className="text-6xl lg:text-8xl font-black opacity-15"
-                        style={{ color: project.color }}
-                      >
+                <div className="relative p-8 lg:p-12 rounded-2xl border border-white/8 hover:border-white/15 bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-500 overflow-hidden">
+                  <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-12">
+                    <div className="flex lg:flex-col items-center lg:items-start gap-4 lg:gap-2 flex-shrink-0">
+                      <span className="font-display text-6xl lg:text-7xl text-white/8">
                         {project.num}
                       </span>
-                      <span className="text-xs font-bold text-white/30 tracking-widest">{project.year}</span>
+                      <span className="text-xs font-mono text-white/25">{project.year}</span>
                     </div>
 
                     <div className="flex-1">
-                      <span
-                        className="text-[10px] lg:text-xs uppercase tracking-[0.2em] font-bold"
-                        style={{ color: project.color }}
-                      >
+                      <span className="text-[11px] uppercase tracking-[0.2em] font-medium text-[var(--accent)]">
                         {project.type}
                       </span>
-                      <h3 className="text-3xl lg:text-5xl font-black mt-2 group-hover:translate-x-4 transition-transform duration-300">
+                      <h3 className="text-3xl lg:text-5xl font-semibold mt-2 tracking-tight group-hover:translate-x-3 transition-transform duration-300">
                         {project.name}
                       </h3>
                       <p className="text-white/40 mt-3 text-sm lg:text-base max-w-xl leading-relaxed">
@@ -578,79 +356,64 @@ export default function Home() {
 
                       <div className="flex flex-wrap gap-2 mt-5">
                         {project.tags.map((tag) => (
-                          <span key={tag} className="text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border border-white/10 text-white/40">
+                          <span key={tag} className="text-[10px] font-medium tracking-wider uppercase px-3 py-1.5 rounded-full border border-white/8 text-white/35">
                             {tag}
                           </span>
                         ))}
                       </div>
                     </div>
 
-                    <motion.div
-                      className="w-14 h-14 rounded-full border-2 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 self-center flex-shrink-0"
-                      style={{ borderColor: project.color, color: project.color }}
-                    >
-                      <ArrowUpRight size={24} />
-                    </motion.div>
+                    <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 self-center flex-shrink-0 group-hover:border-[var(--accent)] group-hover:text-[var(--accent)]">
+                      <ArrowUpRight size={20} />
+                    </div>
                   </div>
-                </motion.div>
+                </div>
               </motion.a>
             ))}
           </div>
 
           <motion.div
-            className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-6"
+            className="mt-16 flex items-center justify-center gap-8"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.6, ease }}
           >
-            <div className="h-px bg-white/10 flex-1 hidden sm:block" />
+            <div className="h-px bg-white/8 flex-1" />
             <motion.a
               href="#contact"
               whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 25 }}
-              className="inline-flex items-center gap-3 text-white/40 hover:text-white transition-colors font-bold text-sm uppercase tracking-widest"
+              className="text-white/30 hover:text-[var(--accent)] transition-colors font-medium text-sm tracking-widest uppercase flex items-center gap-3"
             >
-              <Sparkles className="w-4 h-4" />
               Richiedi il portfolio completo
               <ArrowRight className="w-4 h-4" />
             </motion.a>
-            <div className="h-px bg-white/10 flex-1 hidden sm:block" />
+            <div className="h-px bg-white/8 flex-1" />
           </motion.div>
         </div>
       </section>
 
       {/* ═══════════════════ ABOUT ═══════════════════ */}
-      <section id="about" className="px-6 py-28 lg:py-36 relative overflow-hidden">
+      <section id="about" className="px-6 py-28 lg:py-40 relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-start">
             <motion.div
-              initial={{ opacity: 0, x: -50 }}
+              initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.8, ease }}
             >
-              <motion.span
-                className="text-xs uppercase tracking-[0.3em] font-bold block mb-6 text-[#EC4899]"
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              >
-                Chi sono
-              </motion.span>
-              <h2 className="text-5xl lg:text-7xl font-black mb-8 leading-[0.95]">
-                Creative{" "}
-                <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#EC4899] to-[#A855F7]">
-                  Director
-                </span>
-              </h2>
-              <p className="text-lg text-[#1a1a1a]/60 leading-relaxed mb-10">
+              <SectionHeader
+                label="Chi sono"
+                title="About"
+                serif
+              />
+
+              <p className="text-lg text-[var(--fg-muted)] leading-relaxed mt-8 mb-12">
                 Non mi limito a disegnare interfacce. Creo ponti tra{" "}
-                <span className="font-bold text-[#1a1a1a]">visione</span>,{" "}
-                <span className="font-bold text-[#1a1a1a]">strategia</span> e{" "}
-                <span className="font-bold text-[#1a1a1a]">identit\u00e0 di marca</span>.
+                <span className="font-semibold text-[var(--fg)]">visione</span>,{" "}
+                <span className="font-semibold text-[var(--fg)]">strategia</span> e{" "}
+                <span className="font-semibold text-[var(--fg)]">identità di marca</span>.
                 <br /><br />
                 Il mio approccio unisce direzione creativa e pensiero strategico,
                 costruendo brand e sistemi che non solo funzionano, ma lasciano il segno.
@@ -661,28 +424,27 @@ export default function Home() {
 
             <motion.div
               className="relative"
-              initial={{ opacity: 0, x: 50 }}
+              initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ delay: 0.15, duration: 0.8, ease }}
             >
-              <div className="grid grid-cols-2 gap-4">
-                <div className="col-span-2 p-6 lg:p-8 rounded-3xl bg-[#1a1a1a] text-white overflow-hidden relative">
-                  <div className="absolute top-0 right-0 w-40 h-40 bg-[#4ECDC4] rounded-full blur-[100px] opacity-15" />
-                  <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#A855F7] rounded-full blur-[80px] opacity-10" />
-                  <h3 className="font-bold text-lg mb-5 flex items-center gap-2 relative">
-                    <Cpu className="w-5 h-5 text-[#4ECDC4]" /> Tech Stack
+              <div className="space-y-4">
+                {/* Tech stack card */}
+                <div className="p-7 lg:p-9 rounded-2xl bg-[var(--bg-dark)] text-white overflow-hidden relative">
+                  <h3 className="font-semibold text-base mb-6 text-white/70 tracking-wider uppercase text-[11px]">
+                    Strumenti & Competenze
                   </h3>
-                  <div className="flex flex-wrap gap-2 relative">
+                  <div className="flex flex-wrap gap-2">
                     {["Figma", "Notion", "Brand Design", "UI/UX Design", "Google Workspace", "CRM Design", "Product Strategy", "Framer Motion"].map((tech, i) => (
                       <motion.span
                         key={tech}
-                        initial={{ opacity: 0, scale: 0.8 }}
+                        initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
-                        transition={{ delay: i * 0.06, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                        whileHover={{ scale: 1.08, backgroundColor: "rgba(255,255,255,0.15)" }}
-                        className="px-3.5 py-2 rounded-xl bg-white/10 text-sm font-medium cursor-default transition-colors"
+                        transition={{ delay: i * 0.04, duration: 0.4, ease }}
+                        whileHover={{ backgroundColor: "rgba(196, 93, 62, 0.2)", borderColor: "rgba(196, 93, 62, 0.4)" }}
+                        className="px-4 py-2.5 rounded-lg bg-white/6 border border-white/8 text-sm font-medium cursor-default transition-all duration-200"
                       >
                         {tech}
                       </motion.span>
@@ -690,31 +452,24 @@ export default function Home() {
                   </div>
                 </div>
 
-                <motion.div
-                  className="p-6 rounded-3xl bg-white border border-[#1a1a1a]/5 text-[#1a1a1a] shadow-lg flex flex-col justify-between hover:-translate-y-2 transition-transform duration-300"
-                  whileHover={{ boxShadow: "0 20px 40px -12px rgba(0,0,0,0.15)" }}
-                >
-                  <div className="w-10 h-10 rounded-full bg-[#FFE66D]/20 flex items-center justify-center text-[#d4bd38] mb-4">
-                    <Zap strokeWidth={3} size={20} />
+                {/* Two small cards */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-6 rounded-2xl border border-[var(--border)] bg-[var(--bg)] flex flex-col justify-between min-h-[160px] hover:border-[var(--accent)] transition-colors duration-300">
+                    <span className="text-xs font-medium tracking-wider uppercase text-[var(--fg-muted)]">Approccio</span>
+                    <div>
+                      <div className="font-display text-3xl lg:text-4xl">Fast</div>
+                      <div className="text-xs text-[var(--fg-muted)] mt-1">Performance first, always.</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-3xl lg:text-4xl font-black mb-1">Fast</div>
-                    <div className="text-xs opacity-50 font-medium leading-tight">Performance first, always.</div>
-                  </div>
-                </motion.div>
 
-                <motion.div
-                  className="p-6 rounded-3xl bg-gradient-to-br from-[#FF4D4D] to-[#EC4899] text-white shadow-lg flex flex-col justify-between hover:-translate-y-2 transition-transform duration-300"
-                  whileHover={{ boxShadow: "0 20px 40px -12px rgba(236,72,153,0.3)" }}
-                >
-                  <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white mb-4">
-                    <Smartphone strokeWidth={3} size={20} />
+                  <div className="p-6 rounded-2xl bg-[var(--accent)] text-white flex flex-col justify-between min-h-[160px]">
+                    <span className="text-xs font-medium tracking-wider uppercase text-white/70">Design</span>
+                    <div>
+                      <div className="font-display text-3xl lg:text-4xl">Mobile</div>
+                      <div className="text-xs text-white/70 mt-1">Responsive & Touch ready.</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-3xl lg:text-4xl font-black mb-1">Mobile</div>
-                    <div className="text-xs opacity-70 font-medium leading-tight">Responsive & Touch ready.</div>
-                  </div>
-                </motion.div>
+                </div>
               </div>
             </motion.div>
           </div>
@@ -722,61 +477,34 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════ PROCESS ═══════════════════ */}
-      <section className="px-6 py-28 lg:py-36 bg-white relative overflow-hidden">
+      <section className="px-6 py-28 lg:py-40 bg-[var(--bg-alt)] relative overflow-hidden">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-16 lg:mb-24">
-            <motion.span
-              className="text-xs uppercase tracking-[0.3em] font-bold block mb-6 text-[#06B6D4]"
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            >
-              Come lavoro
-            </motion.span>
-            <motion.h2
-              className="text-5xl lg:text-8xl font-black tracking-tight"
-              initial={{ y: 40, opacity: 0 }}
-              whileInView={{ y: 0, opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-            >
-              PROCESSO
-            </motion.h2>
-          </div>
+          <SectionHeader
+            label="Processo"
+            title="Come lavoro"
+            serif
+          />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px mt-16 lg:mt-24 bg-[var(--border)] rounded-2xl overflow-hidden">
             {[
-              { step: "01", title: "Scoperta", desc: "Ascolto le esigenze, analizzo il contesto e definisco obiettivi chiari.", color: "#FF4D4D", icon: Eye },
-              { step: "02", title: "Strategia", desc: "Definisco il posizionamento, l\u0027architettura di brand e la roadmap operativa.", color: "#A855F7", icon: Palette },
-              { step: "03", title: "Design", desc: "Identit\u00e0 visiva, sistemi di design e prototipi iterati fino alla perfezione.", color: "#4ECDC4", icon: Layout },
-              { step: "04", title: "Lancio", desc: "Go-to-market, coordinamento team e supporto continuo per un risultato impeccabile.", color: "#FFE66D", icon: Zap },
+              { step: "01", title: "Scoperta", desc: "Ascolto le esigenze, analizzo il contesto e definisco obiettivi chiari." },
+              { step: "02", title: "Strategia", desc: "Definisco il posizionamento, l'architettura di brand e la roadmap operativa." },
+              { step: "03", title: "Design", desc: "Identità visiva, sistemi di design e prototipi iterati fino alla perfezione." },
+              { step: "04", title: "Lancio", desc: "Go-to-market, coordinamento team e supporto continuo per un risultato impeccabile." },
             ].map((item, i) => (
               <motion.div
                 key={i}
-                className="group relative p-6 lg:p-8 rounded-3xl border border-[#1a1a1a]/5 bg-[#FAFAFA] hover:bg-white hover:shadow-xl transition-all duration-500 overflow-hidden"
-                initial={{ opacity: 0, y: 40 }}
+                className="group p-7 lg:p-9 bg-[var(--bg-alt)] hover:bg-[var(--bg)] transition-colors duration-500 relative"
+                initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ delay: i * 0.1, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ delay: i * 0.08, duration: 0.6, ease }}
               >
-                <span className="text-7xl font-black opacity-[0.04] absolute top-4 right-6">{item.step}</span>
+                <span className="font-mono text-xs text-[var(--fg-faint)] group-hover:text-[var(--accent)] transition-colors">{item.step}</span>
+                <h3 className="font-display text-2xl lg:text-3xl mt-4 mb-3">{item.title}</h3>
+                <p className="text-[var(--fg-muted)] text-sm leading-relaxed">{item.desc}</p>
 
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-6 transition-colors duration-300"
-                  style={{ backgroundColor: `${item.color}15`, color: item.color }}
-                >
-                  <item.icon size={22} strokeWidth={2.5} />
-                </div>
-
-                <div className="text-xs font-bold text-[#1a1a1a]/30 tracking-widest mb-2">{item.step}</div>
-                <h3 className="text-2xl font-black mb-3">{item.title}</h3>
-                <p className="text-[#1a1a1a]/50 text-sm leading-relaxed">{item.desc}</p>
-
-                <div
-                  className="absolute bottom-0 left-6 right-6 h-0.5 rounded-full scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"
-                  style={{ backgroundColor: item.color }}
-                />
+                <div className="absolute bottom-0 left-0 right-0 h-px bg-[var(--accent)] scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
               </motion.div>
             ))}
           </div>
@@ -784,96 +512,68 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════ CONTACT ═══════════════════ */}
-      <section id="contact" className="px-6 py-28 lg:py-36 relative flex items-center bg-[#FAFAFA]">
-        <motion.div
-          className="absolute bottom-0 left-0 w-[50vw] h-[40vh] rounded-tr-[100px] opacity-[0.06]"
-          style={{ backgroundColor: "#4ECDC4" }}
-        />
-        <motion.div
-          className="absolute top-20 right-20 w-[20vw] h-[20vh] rounded-[40px] opacity-[0.06] hidden lg:block"
-          style={{ backgroundColor: "#A855F7" }}
-        />
-
-        <div className="max-w-7xl mx-auto w-full">
-          <div className="grid grid-cols-12 gap-8 items-center">
+      <section id="contact" className="px-6 py-28 lg:py-40 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-12 gap-8 lg:gap-16 items-start">
             <motion.div
               className="col-span-12 lg:col-span-7"
-              initial={{ opacity: 0, x: -50 }}
+              initial={{ opacity: 0, x: -40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.8, ease }}
             >
-              <motion.span
-                className="text-xs uppercase tracking-[0.3em] font-bold block mb-6 text-[#10B981]"
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-              >
-                Contattami
-              </motion.span>
-              <KineticTextInline text="LETS BUILD" colors={colors} size="large" />
-              <div className="mt-2">
-                <KineticTextInline text="TOGETHER" colors={colors} size="large" />
-              </div>
-              <p className="text-lg text-[#1a1a1a]/50 mt-6 max-w-md leading-relaxed">
+              <SectionHeader
+                label="Contatto"
+                title="Collaboriamo"
+                serif
+              />
+              <p className="font-display text-display mt-6 text-[var(--fg)]">
+                Let&apos;s build<br />something together.
+              </p>
+              <p className="text-lg text-[var(--fg-muted)] mt-6 max-w-md leading-relaxed">
                 Hai un progetto in mente? Parliamone. Sono sempre aperto a nuove collaborazioni creative.
               </p>
             </motion.div>
 
             <motion.div
               className="col-span-12 lg:col-span-5"
-              initial={{ opacity: 0, y: 50, rotate: 0 }}
-              whileInView={{ opacity: 1, y: 0, rotate: 3 }}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              whileHover={{ rotate: 0, scale: 1.02 }}
-              transition={{
-                default: { duration: 0.8, ease: [0.22, 1, 0.36, 1] },
-                rotate: { type: "spring", stiffness: 180, damping: 22 },
-                scale: { type: "spring", stiffness: 300, damping: 25 },
-              }}
+              transition={{ delay: 0.15, duration: 0.8, ease }}
             >
-              <div className="bg-[#1a1a1a] text-white p-8 lg:p-10 rounded-3xl shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF4D4D] via-[#A855F7] to-[#4ECDC4]" />
+              <div className="bg-[var(--bg-dark)] text-white p-8 lg:p-10 rounded-2xl relative overflow-hidden">
+                <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent opacity-50" />
 
                 <div className="flex items-center gap-4 mb-8">
                   <motion.div
-                    className="relative w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 ring-2 ring-white/10"
-                    whileHover={{ scale: 1.1 }}
+                    className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 ring-1 ring-white/10"
+                    whileHover={{ scale: 1.05 }}
                   >
-                    <Image
-                      src="/IMG_1870.PNG"
-                      alt="Raffaele Vitale"
-                      fill
-                      className="object-cover"
-                    />
+                    <Image src="/IMG_1870.PNG" alt="Raffaele Vitale" fill className="object-cover" />
                   </motion.div>
                   <div>
-                    <p className="font-bold text-lg">Raffaele Vitale</p>
-                    <motion.span className="inline-flex items-center gap-2 text-xs text-[#10B981]">
-                      <motion.span
-                        animate={{ scale: [1, 1.3, 1] }}
-                        transition={{ duration: 2, repeat: Infinity }}
-                        className="w-2 h-2 rounded-full bg-[#10B981]"
-                      />
+                    <p className="font-semibold text-base">Raffaele Vitale</p>
+                    <span className="inline-flex items-center gap-2 text-xs text-[#10B981]">
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
                       Disponibile
-                    </motion.span>
+                    </span>
                   </div>
                 </div>
 
-                <div className="bg-white/5 rounded-2xl p-4 mb-6 flex items-center justify-between">
+                <div className="bg-white/5 rounded-xl p-4 mb-6 flex items-center justify-between">
                   <div>
-                    <div className="text-[10px] uppercase tracking-widest text-white/30 font-bold mb-1">Email</div>
+                    <div className="text-[10px] uppercase tracking-widest text-white/30 font-medium mb-1">Email</div>
                     <div className="text-sm font-medium text-white/80">raffaele.stuudio@gmail.com</div>
                   </div>
                   <motion.button
                     onClick={(e) => { e.preventDefault(); copyEmail(); }}
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
-                    className="w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 flex items-center justify-center transition-colors"
+                    className="w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center transition-colors"
                     aria-label="Copia email"
                   >
-                    {copied ? <Check className="w-4 h-4 text-[#10B981]" /> : <Copy className="w-4 h-4 text-white/60" />}
+                    {copied ? <Check className="w-4 h-4 text-[#10B981]" /> : <Copy className="w-4 h-4 text-white/40" />}
                   </motion.button>
                 </div>
 
@@ -881,20 +581,20 @@ export default function Home() {
                   href="mailto:raffaele.stuudio@gmail.com"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex items-center justify-center gap-3 w-full py-4 font-bold text-base rounded-2xl text-white bg-gradient-to-r from-[#FF4D4D] via-[#A855F7] to-[#4ECDC4] transition-shadow hover:shadow-lg hover:shadow-[#A855F7]/20"
+                  className="flex items-center justify-center gap-3 w-full py-4 font-semibold text-base rounded-xl text-white bg-[var(--accent)] hover:bg-[var(--accent-hover)] transition-colors"
                 >
                   <Mail className="w-5 h-5" />
                   Invia una mail
                 </motion.a>
 
                 <div className="flex gap-6 mt-6 text-sm">
-                  <a href="https://www.instagram.com/josh63.exe/" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-[#EC4899] transition-colors font-medium">
+                  <a href="https://www.instagram.com/josh63.exe/" target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-[var(--accent)] transition-colors font-medium">
                     Instagram
                   </a>
-                  <a href="https://www.linkedin.com/in/vitaleraffaele/" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-[#4ECDC4] transition-colors font-medium">
+                  <a href="https://www.linkedin.com/in/vitaleraffaele/" target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-[var(--accent)] transition-colors font-medium">
                     LinkedIn
                   </a>
-                  <a href="https://github.com/raffaelevitale" target="_blank" rel="noopener noreferrer" className="text-white/40 hover:text-[#FFE66D] transition-colors font-medium">
+                  <a href="https://github.com/raffaelevitale" target="_blank" rel="noopener noreferrer" className="text-white/30 hover:text-[var(--accent)] transition-colors font-medium">
                     GitHub
                   </a>
                 </div>
@@ -905,32 +605,28 @@ export default function Home() {
       </section>
 
       {/* ═══════════════════ FOOTER ═══════════════════ */}
-      <footer className="py-12 px-6 border-t border-[#1a1a1a]/10 bg-[#FAFAFA]">
+      <footer className="py-12 px-6 border-t border-[var(--border)]">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8">
             <div>
-              <span className="text-xl font-black tracking-tighter">RAFFAELE VITALE</span>
-              <p className="text-[#1a1a1a]/40 text-sm mt-1">Creative Director & Brand Strategist</p>
+              <span className="font-display text-xl">Raffaele Vitale</span>
+              <p className="text-[var(--fg-muted)] text-sm mt-1">Creative Director & Brand Strategist</p>
             </div>
             <div className="flex flex-wrap gap-x-8 gap-y-2 text-sm">
-              <a href="#home" className="text-[#1a1a1a]/40 hover:text-[#1a1a1a] transition-colors font-medium">Home</a>
-              <a href="#work" className="text-[#1a1a1a]/40 hover:text-[#1a1a1a] transition-colors font-medium">Work</a>
-              <a href="#about" className="text-[#1a1a1a]/40 hover:text-[#1a1a1a] transition-colors font-medium">About</a>
-              <a href="#contact" className="text-[#1a1a1a]/40 hover:text-[#1a1a1a] transition-colors font-medium">Contact</a>
+              <a href="#home" className="text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">Home</a>
+              <a href="#work" className="text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">Work</a>
+              <a href="#about" className="text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">About</a>
+              <a href="#contact" className="text-[var(--fg-muted)] hover:text-[var(--fg)] transition-colors">Contact</a>
             </div>
           </div>
 
-          <div className="mt-8 pt-8 border-t border-[#1a1a1a]/5 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-[#1a1a1a]/30 text-xs">
-              &#169; 2026 Raffaele Vitale &#8212; Progettato con &#10084;
+          <div className="mt-8 pt-8 border-t border-[var(--border)] flex flex-col md:flex-row items-center justify-between gap-4">
+            <p className="text-[var(--fg-faint)] text-xs">
+              &#169; 2026 Raffaele Vitale
             </p>
-            <motion.a
-              href="#home"
-              whileHover={{ y: -2 }}
-              className="text-[#1a1a1a]/30 hover:text-[#1a1a1a] text-xs transition-colors font-medium flex items-center gap-2"
-            >
+            <a href="#home" className="text-[var(--fg-faint)] hover:text-[var(--fg)] text-xs transition-colors font-medium flex items-center gap-2">
               Torna su &#8593;
-            </motion.a>
+            </a>
           </div>
         </div>
       </footer>
@@ -938,12 +634,38 @@ export default function Home() {
   );
 }
 
-/* ─── Animated Stats Sub-component ─── */
+/* ─── Section Header Component ─── */
+function SectionHeader({ label, title, serif, dark }: { label: string; title: string; serif?: boolean; dark?: boolean }) {
+  return (
+    <div>
+      <motion.span
+        className={`text-[11px] uppercase tracking-[0.3em] font-medium block mb-4 ${dark ? "text-[var(--accent)]" : "text-[var(--accent)]"}`}
+        initial={{ opacity: 0, x: -16 }}
+        whileInView={{ opacity: 1, x: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6, ease }}
+      >
+        {label}
+      </motion.span>
+      <motion.h2
+        className={`${serif ? "font-display" : "font-semibold"} text-display`}
+        initial={{ y: 30, opacity: 0 }}
+        whileInView={{ y: 0, opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ delay: 0.08, duration: 0.7, ease }}
+      >
+        {title}
+      </motion.h2>
+    </div>
+  );
+}
+
+/* ─── Animated Stats ─── */
 function AnimatedStats() {
   const stats = [
-    { label: "Anni di esperienza", value: 3, suffix: "+", icon: Terminal, color: "#A855F7" },
-    { label: "Progetti completati", value: 20, suffix: "+", icon: FolderOpen, color: "#4ECDC4" },
-    { label: "Clienti soddisfatti", value: 10, suffix: "+", icon: Eye, color: "#FF4D4D" },
+    { label: "Anni di esperienza", value: 3, suffix: "+" },
+    { label: "Progetti completati", value: 20, suffix: "+" },
+    { label: "Clienti soddisfatti", value: 10, suffix: "+" },
   ];
 
   return (
@@ -955,67 +677,15 @@ function AnimatedStats() {
   );
 }
 
-function StatCard({ stat, index }: { stat: { label: string; value: number; suffix: string; icon: React.ComponentType<{ className?: string; style?: React.CSSProperties }>; color: string }; index: number }) {
+function StatCard({ stat, index }: { stat: { label: string; value: number; suffix: string }; index: number }) {
   const { count, ref } = useCounter(stat.value, 1500 + index * 300);
   return (
     <div
       ref={ref}
-      className="p-4 lg:p-5 rounded-2xl bg-white border border-[#1a1a1a]/5 shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+      className="p-4 lg:p-5 rounded-xl border border-[var(--border)] hover:border-[var(--accent)] transition-colors duration-300"
     >
-      <stat.icon className="w-5 h-5 mb-3" style={{ color: stat.color }} />
-      <div className="text-3xl lg:text-4xl font-black">{count}{stat.suffix}</div>
-      <div className="text-[11px] text-[#1a1a1a]/50 font-medium mt-1 leading-tight">{stat.label}</div>
-    </div>
-  );
-}
-
-/* ─── Kinetic Text Component ─── */
-function KineticTextInline({
-  text,
-  colors: colorsProp,
-  size = "default"
-}: {
-  text: string;
-  colors: string[];
-  size?: "default" | "large";
-}) {
-  // Pre-compute stable random rotations per character to avoid recalculating on every render
-  const rotations = useMemo(
-    () => text.split("").map(() => Math.random() * 10 - 5),
-    [text]
-  );
-
-  const sizeClasses = size === "large"
-    ? "text-4xl md:text-5xl lg:text-6xl"
-    : "text-[5.5vw] sm:text-[5vw] md:text-[4.5vw] lg:text-[4vw] xl:text-[3.5vw]";
-
-  return (
-    <div className={`${sizeClasses} font-black tracking-tighter leading-none whitespace-nowrap`}>
-      {text.split("").map((letter, i) => {
-        const colorIndex = i % colorsProp.length;
-        const isSpace = letter === " ";
-
-        return (
-          <motion.span
-            key={i}
-            className={`inline-block cursor-default select-none ${isSpace ? "w-[0.3em]" : ""}`}
-            style={{ color: "#1a1a1a" }}
-            whileHover={!isSpace ? {
-              y: -8,
-              rotate: rotations[i],
-              scale: 1.1,
-              color: colorsProp[colorIndex],
-            } : undefined}
-            transition={{
-              type: "spring",
-              stiffness: 500,
-              damping: 25,
-            }}
-          >
-            {isSpace ? "\u00A0" : letter}
-          </motion.span>
-        );
-      })}
+      <div className="font-display text-3xl lg:text-4xl">{count}{stat.suffix}</div>
+      <div className="text-[11px] text-[var(--fg-muted)] font-medium mt-2 leading-tight">{stat.label}</div>
     </div>
   );
 }

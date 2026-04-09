@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Instrument_Serif, DM_Sans, DM_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import Script from "next/script";
@@ -18,16 +18,25 @@ const siteUrl = (() => {
   return fallbackSiteUrl;
 })();
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const instrumentSerif = Instrument_Serif({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+  preload: true,
+});
+
+const dmSans = DM_Sans({
+  variable: "--font-body",
   subsets: ["latin"],
   display: "swap",
   preload: true,
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const dmMono = DM_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
+  weight: "400",
   display: "swap",
 });
 
@@ -84,7 +93,7 @@ export default function RootLayout({
     <html lang="it" suppressHydrationWarning>
       <body
         data-cursor="disabled"
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${instrumentSerif.variable} ${dmSans.variable} ${dmMono.variable} antialiased`}
       >
         <Script id="theme-init" strategy="beforeInteractive">{`
           try {
@@ -100,13 +109,9 @@ export default function RootLayout({
         `}</Script>
         {/* Client-only enhancements (dynamic with ssr:false) */}
         <ClientEnhancements />
-        {/* Decorative global background */}
-        <div className="fixed inset-0 -z-10 pointer-events-none [mask-image:radial-gradient(80%_80%_at_50%_40%,_black,_transparent)]">
+        {/* Subtle ambient background */}
+        <div className="fixed inset-0 -z-10 pointer-events-none">
           <div className="aurora" aria-hidden="true"></div>
-          <div
-            className="absolute inset-0 opacity-[.04] sm:opacity-[.07] text-foreground/80 bg-[linear-gradient(to_right,currentColor_1px,transparent_1px),linear-gradient(to_bottom,currentColor_1px,transparent_1px)] [background-size:40px_40px]"
-            aria-hidden="true"
-          ></div>
         </div>
         <ScrollProgress />
         <ConditionalNavigation />
