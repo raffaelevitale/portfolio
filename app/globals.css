@@ -1,5 +1,44 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════
+   DESIGN TOKENS
+   ═══════════════════════════════════════════════════ */
+
+@theme {
+  --color-accent: #C45D3E;
+  --color-accent-hover: #B04E32;
+  --color-accent-light: #E8A08A;
+  --color-fg: #1A1A1A;
+  --color-fg-muted: #6B6B6B;
+  --color-fg-faint: #A3A3A3;
+  --color-bg: #FAFAF8;
+  --color-bg-alt: #F2F1ED;
+  --color-bg-dark: #141414;
+  --color-border: #E5E3DD;
+
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
+}
+
+:root {
+  --accent: #C45D3E;
+  --accent-hover: #B04E32;
+  --accent-light: #E8A08A;
+  --fg: #1A1A1A;
+  --fg-muted: #6B6B6B;
+  --fg-faint: #A3A3A3;
+  --bg: #FAFAF8;
+  --bg-alt: #F2F1ED;
+  --bg-dark: #141414;
+  --border: #E5E3DD;
+  --radius: 12px;
+}
+
+/* ═══════════════════════════════════════════════════
+   BASE RESET
+   ═══════════════════════════════════════════════════ */
+
 html,
 body {
   margin: 0;
@@ -7,26 +46,256 @@ body {
   min-height: 100vh;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
-  font-family: var(--font-body), system-ui, sans-serif;
+  font-family: var(--font-body), system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg);
+  color: var(--fg);
 }
+
+::selection {
+  background: rgba(196, 93, 62, 0.15);
+  color: var(--fg);
+}
+
+/* ═══════════════════════════════════════════════════
+   TYPOGRAPHY UTILITIES
+   ═══════════════════════════════════════════════════ */
+
+.font-display {
+  font-family: var(--font-display), "Instrument Serif", Georgia, serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.font-mono {
+  font-family: var(--font-mono), "DM Mono", ui-monospace, monospace;
+}
+
+.text-huge {
+  font-size: clamp(3.5rem, 8vw, 7rem);
+  line-height: 0.92;
+  letter-spacing: -0.03em;
+}
+
+.text-display {
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+/* ═══════════════════════════════════════════════════
+   GRAIN OVERLAY
+   ═══════════════════════════════════════════════════ */
+
+.grain {
+  position: relative;
+}
+
+.grain::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 180px;
+  mix-blend-mode: multiply;
+}
+
+/* ═══════════════════════════════════════════════════
+   AURORA AMBIENT BACKGROUND
+   ═══════════════════════════════════════════════════ */
 
 .aurora {
   position: absolute;
   inset: 0;
-  opacity: 0.15;
-  background: radial-gradient(
-      ellipse 80% 60% at 50% 0%,
-      rgba(120, 119, 198, 0.3),
-      transparent
+  opacity: 0.12;
+  background:
+    radial-gradient(
+      ellipse 70% 50% at 20% 0%,
+      rgba(196, 93, 62, 0.18),
+      transparent 70%
     ),
     radial-gradient(
-      ellipse 60% 50% at 80% 50%,
-      rgba(255, 100, 100, 0.15),
+      ellipse 60% 60% at 80% 20%,
+      rgba(120, 119, 198, 0.15),
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 50% 40% at 50% 80%,
+      rgba(196, 93, 62, 0.08),
       transparent
     );
-  filter: blur(60px);
+  filter: blur(80px);
   pointer-events: none;
+  animation: aurora-drift 20s ease-in-out infinite alternate;
+}
+
+@keyframes aurora-drift {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-2%, 1%) scale(1.02); }
+  100% { transform: translate(2%, -1%) scale(0.98); }
+}
+
+/* ═══════════════════════════════════════════════════
+   DIVIDER
+   ═══════════════════════════════════════════════════ */
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════
+   MARQUEE
+   ═══════════════════════════════════════════════════ */
+
+.marquee-container {
+  overflow: hidden;
+  position: relative;
+  width: 100%;
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    black 10%,
+    black 90%,
+    transparent 100%
+  );
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.marquee-content {
+  display: flex;
+  gap: 2.5rem;
+  padding: 0 1.25rem;
+  flex-shrink: 0;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.marquee-container:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ═══════════════════════════════════════════════════
+   CUSTOM CURSOR
+   ═══════════════════════════════════════════════════ */
+
+[data-cursor="enabled"] {
+  cursor: none !important;
+}
+
+[data-cursor="enabled"] a,
+[data-cursor="enabled"] button,
+[data-cursor="enabled"] [role="button"],
+[data-cursor="enabled"] input,
+[data-cursor="enabled"] textarea,
+[data-cursor="enabled"] select,
+[data-cursor="enabled"] summary {
+  cursor: none !important;
+}
+
+.custom-cursor-dot {
+  position: fixed;
+  z-index: 99999;
+  pointer-events: none;
+  border-radius: 50%;
+  background: var(--fg);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: left, top, width, height;
+  mix-blend-mode: difference;
+}
+
+.custom-cursor-ring {
+  position: fixed;
+  z-index: 99998;
+  pointer-events: none;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent);
+  transform: translate(-50%, -50%);
+  transition:
+    width 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.3s ease;
+  will-change: left, top, width, height;
+}
+
+/* ═══════════════════════════════════════════════════
+   SCROLL REVEAL
+   ═══════════════════════════════════════════════════ */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   SMOOTH SCROLLBAR (WEBKIT)
+   ═══════════════════════════════════════════════════ */
+
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--fg-faint);
+}
+
+/* Firefox */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
 }

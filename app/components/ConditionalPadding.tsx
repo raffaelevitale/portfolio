@@ -4,11 +4,10 @@ import { usePathname } from 'next/navigation';
 
 export default function ConditionalPadding({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-
-  const noPadding = pathname?.startsWith('/orario');
+  const isSubApp = pathname?.startsWith('/orario') || pathname?.startsWith('/interfaccia');
 
   return (
-    <div className={noPadding ? 'relative' : 'relative'}>
+    <div className={isSubApp ? 'relative' : 'relative pt-[72px]'}>
       {children}
     </div>
   );

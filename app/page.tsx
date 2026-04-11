@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useRef, useEffect, useMemo } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion, useScroll, useTransform, useInView, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import {
   ArrowUpRight, Copy, Check, Mail, ArrowRight, ArrowDown,
 } from "lucide-react";
 
-/* ─── Animated counter ─── */
 function useCounter(target: number, duration = 2000) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
@@ -29,10 +28,8 @@ function useCounter(target: number, duration = 2000) {
   return { count, ref };
 }
 
-/* ─── Shared easing ─── */
 const ease = [0.22, 1, 0.36, 1] as const;
 
-/* ─── Role rotation ─── */
 const roles = ["Creative Director", "Brand Strategist", "UI/UX Designer", "Digital Strategist"];
 
 export default function Home() {
@@ -59,12 +56,11 @@ export default function Home() {
     <main ref={containerRef} className="grain overflow-hidden">
 
       {/* ═══════════════════ HERO ═══════════════════ */}
-      <section id="home" className="min-h-screen relative px-6 flex items-center">
+      <section id="home" className="min-h-[100dvh] relative px-6 flex items-center">
         <motion.div
-          className="max-w-7xl mx-auto w-full pt-32 pb-24 lg:pt-40 lg:pb-32"
+          className="max-w-7xl mx-auto w-full py-24 lg:py-32"
           style={{ y: heroParallax }}
         >
-          {/* Availability badge */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
@@ -80,7 +76,6 @@ export default function Home() {
             </span>
           </motion.div>
 
-          {/* Main headline */}
           <div className="max-w-5xl">
             <motion.h1
               className="font-display text-huge mb-6"
@@ -91,15 +86,14 @@ export default function Home() {
               Raffaele Vitale
             </motion.h1>
 
-            {/* Rotating role */}
-            <div className="h-[1.4em] overflow-hidden mb-8">
+            <div className="h-[1.3em] overflow-hidden mb-8 text-2xl md:text-3xl lg:text-4xl">
               <AnimatePresence mode="wait">
                 <motion.p
                   key={roleIndex}
-                  className="text-2xl md:text-3xl lg:text-4xl font-medium tracking-tight text-[var(--accent)]"
-                  initial={{ y: 40, opacity: 0 }}
+                  className="text-[1em] font-medium tracking-tight text-[var(--accent)] leading-[1.3]"
+                  initial={{ y: "100%", opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
-                  exit={{ y: -40, opacity: 0 }}
+                  exit={{ y: "-100%", opacity: 0 }}
                   transition={{ duration: 0.5, ease }}
                 >
                   {roles[roleIndex]}
@@ -144,40 +138,40 @@ export default function Home() {
             </motion.div>
           </div>
 
-          {/* Profile card — floating */}
+        </motion.div>
+
+        {/* Profile card -- outside parallax wrapper so it stays fixed in viewport */}
+        <motion.div
+          className="absolute top-[calc(72px+10rem)] right-6 lg:right-12 hidden lg:block"
+          initial={{ opacity: 0, y: 30, rotate: 3 }}
+          animate={{ opacity: 1, y: 0, rotate: 3 }}
+          transition={{ delay: 0.6, duration: 0.9, ease }}
+        >
           <motion.div
-            className="absolute top-40 right-6 lg:right-12 hidden lg:block"
-            initial={{ opacity: 0, y: 30, rotate: 3 }}
-            animate={{ opacity: 1, y: 0, rotate: 3 }}
-            transition={{ delay: 0.6, duration: 0.9, ease }}
+            whileHover={{ rotate: 0, scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 280, damping: 22 }}
+            className="bg-[var(--bg-dark)] text-white p-8 rounded-2xl max-w-xs shadow-2xl shadow-black/10 relative overflow-hidden"
           >
-            <motion.div
-              whileHover={{ rotate: 0, scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 280, damping: 22 }}
-              className="bg-[var(--bg-dark)] text-white p-8 rounded-2xl max-w-xs shadow-2xl shadow-black/10 relative overflow-hidden"
-            >
-              <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent opacity-60" />
-              <div className="relative">
-                <motion.div
-                  className="relative w-16 h-16 mb-5 rounded-xl overflow-hidden ring-1 ring-white/10"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <Image src="/IMG_1870.PNG" alt="Raffaele Vitale" fill className="object-cover" />
-                </motion.div>
-                <div className="text-base font-semibold mb-1">Raffaele Vitale</div>
-                <span className="inline-flex items-center gap-2 text-[11px] text-[#10B981] tracking-wider uppercase">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
-                  Disponibile 2026
-                </span>
-                <p className="text-white/50 leading-relaxed text-sm mt-4">
-                  Creative Director & Brand Strategist con passione per sistemi visivi e identità di marca.
-                </p>
-              </div>
-            </motion.div>
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--accent)] to-transparent opacity-60" />
+            <div className="relative">
+              <motion.div
+                className="relative w-16 h-16 mb-5 rounded-xl overflow-hidden ring-1 ring-white/10"
+                whileHover={{ scale: 1.05 }}
+              >
+                <Image src="/IMG_1870.PNG" alt="Raffaele Vitale" fill className="object-cover" sizes="64px" />
+              </motion.div>
+              <div className="text-base font-semibold mb-1">Raffaele Vitale</div>
+              <span className="inline-flex items-center gap-2 text-[11px] text-[#10B981] tracking-wider uppercase">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />
+                Disponibile 2026
+              </span>
+              <p className="text-white/50 leading-relaxed text-sm mt-4">
+                Creative Director & Brand Strategist con passione per sistemi visivi e identità di marca.
+              </p>
+            </div>
           </motion.div>
         </motion.div>
 
-        {/* Scroll indicator */}
         <motion.div
           className="absolute bottom-10 left-1/2 -translate-x-1/2 text-[var(--fg-faint)] hidden md:block"
           initial={{ opacity: 0 }}
@@ -335,9 +329,10 @@ export default function Home() {
                 transition={{ delay: i * 0.1, duration: 0.7, ease }}
               >
                 <div className="relative p-8 lg:p-12 rounded-2xl border border-white/8 hover:border-white/15 bg-white/[0.02] hover:bg-white/[0.04] transition-all duration-500 overflow-hidden">
-                  <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-12">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[var(--accent)]/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                  <div className="relative flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-12">
                     <div className="flex lg:flex-col items-center lg:items-start gap-4 lg:gap-2 flex-shrink-0">
-                      <span className="font-display text-6xl lg:text-7xl text-white/8">
+                      <span className="font-display text-6xl lg:text-7xl text-white/8 group-hover:text-white/12 transition-colors duration-500">
                         {project.num}
                       </span>
                       <span className="text-xs font-mono text-white/25">{project.year}</span>
@@ -430,8 +425,8 @@ export default function Home() {
               transition={{ delay: 0.15, duration: 0.8, ease }}
             >
               <div className="space-y-4">
-                {/* Tech stack card */}
                 <div className="p-7 lg:p-9 rounded-2xl bg-[var(--bg-dark)] text-white overflow-hidden relative">
+                  <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[var(--accent)]/40 to-transparent" />
                   <h3 className="font-semibold text-base mb-6 text-white/70 tracking-wider uppercase text-[11px]">
                     Strumenti & Competenze
                   </h3>
@@ -452,7 +447,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Two small cards */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-6 rounded-2xl border border-[var(--border)] bg-[var(--bg)] flex flex-col justify-between min-h-[160px] hover:border-[var(--accent)] transition-colors duration-300">
                     <span className="text-xs font-medium tracking-wider uppercase text-[var(--fg-muted)]">Approccio</span>
@@ -462,9 +456,10 @@ export default function Home() {
                     </div>
                   </div>
 
-                  <div className="p-6 rounded-2xl bg-[var(--accent)] text-white flex flex-col justify-between min-h-[160px]">
-                    <span className="text-xs font-medium tracking-wider uppercase text-white/70">Design</span>
-                    <div>
+                  <div className="p-6 rounded-2xl bg-[var(--accent)] text-white flex flex-col justify-between min-h-[160px] relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent" />
+                    <span className="relative text-xs font-medium tracking-wider uppercase text-white/70">Design</span>
+                    <div className="relative">
                       <div className="font-display text-3xl lg:text-4xl">Mobile</div>
                       <div className="text-xs text-white/70 mt-1">Responsive & Touch ready.</div>
                     </div>
@@ -550,7 +545,7 @@ export default function Home() {
                     className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 ring-1 ring-white/10"
                     whileHover={{ scale: 1.05 }}
                   >
-                    <Image src="/IMG_1870.PNG" alt="Raffaele Vitale" fill className="object-cover" />
+                    <Image src="/IMG_1870.PNG" alt="Raffaele Vitale" fill className="object-cover" sizes="56px" />
                   </motion.div>
                   <div>
                     <p className="font-semibold text-base">Raffaele Vitale</p>
@@ -624,9 +619,12 @@ export default function Home() {
             <p className="text-[var(--fg-faint)] text-xs">
               &#169; 2026 Raffaele Vitale
             </p>
-            <a href="#home" className="text-[var(--fg-faint)] hover:text-[var(--fg)] text-xs transition-colors font-medium flex items-center gap-2">
+            <button
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="text-[var(--fg-faint)] hover:text-[var(--fg)] text-xs transition-colors font-medium flex items-center gap-2"
+            >
               Torna su &#8593;
-            </a>
+            </button>
           </div>
         </div>
       </footer>
@@ -634,12 +632,11 @@ export default function Home() {
   );
 }
 
-/* ─── Section Header Component ─── */
 function SectionHeader({ label, title, serif, dark }: { label: string; title: string; serif?: boolean; dark?: boolean }) {
   return (
     <div>
       <motion.span
-        className={`text-[11px] uppercase tracking-[0.3em] font-medium block mb-4 ${dark ? "text-[var(--accent)]" : "text-[var(--accent)]"}`}
+        className={`text-[11px] uppercase tracking-[0.3em] font-medium block mb-4 text-[var(--accent)]`}
         initial={{ opacity: 0, x: -16 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
@@ -648,7 +645,7 @@ function SectionHeader({ label, title, serif, dark }: { label: string; title: st
         {label}
       </motion.span>
       <motion.h2
-        className={`${serif ? "font-display" : "font-semibold"} text-display`}
+        className={`${serif ? "font-display" : "font-semibold"} text-display ${dark ? "text-white" : ""}`}
         initial={{ y: 30, opacity: 0 }}
         whileInView={{ y: 0, opacity: 1 }}
         viewport={{ once: true }}
@@ -660,7 +657,6 @@ function SectionHeader({ label, title, serif, dark }: { label: string; title: st
   );
 }
 
-/* ─── Animated Stats ─── */
 function AnimatedStats() {
   const stats = [
     { label: "Anni di esperienza", value: 3, suffix: "+" },

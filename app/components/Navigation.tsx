@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Mail } from 'lucide-react';
 
@@ -9,7 +9,7 @@ export default function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [section, setSection] = useState<string>('home');
   const [hidden, setHidden] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
+  const lastScrollYRef = useRef(0);
 
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -26,11 +26,11 @@ export default function Navigation() {
       setScrolled(y > 20);
 
       if (y > 400) {
-        setHidden(y > lastScrollY && y - lastScrollY > 5);
+        setHidden(y > lastScrollYRef.current && y - lastScrollYRef.current > 5);
       } else {
         setHidden(false);
       }
-      setLastScrollY(y);
+      lastScrollYRef.current = y;
 
       const ids = ['home', 'work', 'about', 'contact'];
       const offsets = ids.map((id) => {
@@ -45,7 +45,7 @@ export default function Navigation() {
     window.addEventListener('scroll', handleScroll, { passive: true });
     handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  }, []);
 
   const handleNavClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>, key: string) => {
     e.preventDefault();
