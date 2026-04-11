@@ -1,0 +1,237 @@
+import { useState, useRef, useEffect } from 'react';
+import { Sun, Moon, Bell, X, LogOut, User, HelpCircle, Menu, Settings, Home } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { toast } from 'sonner';
+import logoImg from 'figma:asset/bd906186d630e4e6091ecee5c5303b2411b68d3d.png';
+import { useTheme } from './ThemeContext';
+
+interface HeaderProps {
+  onOpenSettings: () => void;
+  onToggleSidebar?: () => void;
+  sidebarOpen?: boolean;
+  onGoHome?: () => void;
+  onLogout?: () => void;
+}
+
+export function Header({ onOpenSettings, onToggleSidebar, sidebarOpen, onGoHome, onLogout }: HeaderProps) {
+  const { theme, toggleTheme, t } = useTheme();
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+  const profileRef = useRef<HTMLDivElement>(null);
+
+  const [notifs, setNotifs] = useState([
+    { id: 1, title: 'Nuovo ticket #1042', desc: 'Cliente richiede assistenza urgente', time: '5 min fa', read: false },
+    { id: 2, title: 'FAQ aggiornate', desc: 'Knowledge base sincronizzata', time: '1 ora fa', read: false },
+    { id: 3, title: 'Report completato', desc: 'Report settimanale assistenza pronto', time: '3 ore fa', read: true },
+  ]);
+  const unreadCount = notifs.filter(n => !n.read).length;
+
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (notifRef.current && !notifRef.current.contains(e.target as Node)) setNotifOpen(false);
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) setProfileOpen(false);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const headerBg = t('#1A1A1A', '#FFFFFF');
+  const borderCls = t('border-white/[0.06]', 'border-black/[0.08]');
+  const iconCls = t('text-[#666] hover:text-[#F5F5F5]', 'text-[#999] hover:text-[#222]');
+  const dropBg = t('bg-[#1E1E1E]', 'bg-white');
+  const dropBorder = t('border-white/[0.08]', 'border-black/[0.1]');
+  const textMain = t('text-white', 'text-[#111]');
+  const textSub = t('text-[#888]', 'text-[#666]');
+  const textMuted = t('text-[#555]', 'text-[#999]');
+  const hoverItem = t('hover:bg-white/[0.04]', 'hover:bg-black/[0.04]');
+  const taglineColor = t('text-[#555]', 'text-[#999]');
+
+  return (
+    <header className={`flex h-[52px] w-full items-center justify-between px-3 md:px-4 shrink-0 relative z-50 border-b ${borderCls}`} style={{ backgroundColor: headerBg }}>
+      <div className="flex items-center gap-1.5 md:gap-2">
+        {/* Hamburger - mobile only */}
+        {onToggleSidebar && (
+          <button
+            onClick={onToggleSidebar}
+            className={`md:hidden p-1.5 rounded-md ${iconCls} transition-colors ${hoverItem}`}
+          >
+            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        )}
+        <button onClick={onGoHome} className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
+          <img src={logoImg} alt="CRXBU" className={`h-[20px] md:h-[22px] w-auto ${theme === 'light' ? 'brightness-0' : ''}`} />
+        </button>
+        <div className={`hidden md:block w-[1px] h-[20px] mx-1 ${t('bg-white/[0.08]', 'bg-black/[0.08]')}`} />
+        <button
+          onClick={onGoHome}
+          className={`hidden md:flex items-center gap-1.5 px-2 py-1.5 rounded-md ${iconCls} ${hoverItem} transition-colors text-[12px]`}
+          title="Home"
+        >
+          <Home size={15} />
+          <span className="hidden lg:inline">Home</span>
+        </button>
+      </div>
+
+      <div className="hidden lg:flex items-center">
+        <span className={`text-[12px] ${taglineColor}`}>
+          Selezioniamo <span className="text-[#F73C1C] mx-0.5 font-semibold">IA</span> per evolvere la tua azienda
+        </span>
+      </div>
+
+      <div className="flex items-center gap-1.5 md:gap-2">
+        <motion.button
+          onClick={toggleTheme}
+          className={`${iconCls} transition-colors p-1.5 rounded-md ${hoverItem}`}
+          whileTap={{ scale: 0.9, rotate: 15 }}
+        >
+          {theme === 'dark' ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
+        </motion.button>
+
+        <div ref={notifRef} className="relative">
+          <button onClick={() => { setNotifOpen(!notifOpen); setProfileOpen(false); }} className={`relative ${iconCls} transition-colors p-1.5 rounded-md ${hoverItem}`}>
+            <Bell className="h-[18px] w-[18px]" />
+            {unreadCount > 0 && (
+              <motion.span
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute top-0 right-0 flex h-[14px] w-[14px] items-center justify-center rounded-full bg-[#F73C1C] text-[9px] font-bold text-white"
+              >
+                {unreadCount}
+              </motion.span>
+            )}
+          </button>
+          <AnimatePresence>
+            {notifOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                transition={{ duration: 0.15 }}
+                className={`absolute right-0 top-full mt-2 w-[280px] md:w-[300px] ${dropBg} border ${dropBorder} rounded-xl shadow-2xl shadow-black/40 overflow-hidden`}
+              >
+                <div className={`flex items-center justify-between px-4 py-3 border-b ${borderCls}`}>
+                  <span className={`text-[13px] font-bold ${textMain}`}>Notifiche</span>
+                  {unreadCount > 0 && (
+                    <button onClick={() => setNotifs(p => p.map(n => ({ ...n, read: true })))} className="text-[11px] text-[#F73C1C] hover:text-[#ff5638]">Segna tutte lette</button>
+                  )}
+                </div>
+                <div className="max-h-[260px] overflow-y-auto">
+                  {notifs.map(n => (
+                    <div key={n.id} className={`flex gap-3 px-4 py-3 ${hoverItem} cursor-pointer border-b ${t('border-white/[0.04]', 'border-black/[0.04]')} last:border-0 ${!n.read ? 'bg-[#F73C1C]/[0.03]' : ''}`}
+                      onClick={() => setNotifs(p => p.map(x => x.id === n.id ? { ...x, read: true } : x))}
+                    >
+                      {!n.read && <div className="w-1.5 h-1.5 rounded-full bg-[#F73C1C] mt-1.5 shrink-0" />}
+                      <div className={`flex flex-col flex-1 min-w-0 ${n.read ? 'ml-3' : ''}`}>
+                        <span className={`text-[12px] font-semibold ${textMain} truncate`}>{n.title}</span>
+                        <span className={`text-[11px] ${textSub} truncate`}>{n.desc}</span>
+                        <span className={`text-[10px] ${textMuted} mt-1`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>{n.time}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        <div ref={profileRef} className="relative">
+          <div onClick={() => { setProfileOpen(!profileOpen); setNotifOpen(false); }} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F73C1C] text-[11px] font-bold text-white cursor-pointer hover:ring-2 hover:ring-[#F73C1C]/40 transition-all">
+            LC
+          </div>
+          <AnimatePresence>
+            {profileOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                transition={{ duration: 0.15 }}
+                className={`absolute right-0 top-full mt-2 w-[200px] ${dropBg} border ${dropBorder} rounded-xl shadow-2xl shadow-black/40 overflow-hidden`}
+              >
+                <div className={`px-4 py-3 border-b ${borderCls}`}>
+                  <p className={`text-[13px] font-semibold ${textMain}`}>Luciano Cavallero</p>
+                  <p className={`text-[11px] ${textMuted}`}>luciano@crybu.com</p>
+                </div>
+                <div className="py-1">
+                  {[
+                    { icon: User, label: 'Profilo', action: onOpenSettings },
+                    { icon: Settings, label: 'Impostazioni', action: onOpenSettings },
+                    { icon: HelpCircle, label: 'Aiuto', action: () => {} },
+                  ].map(item => (
+                    <button key={item.label} onClick={() => { item.action(); setProfileOpen(false); }} className={`flex items-center gap-2.5 w-full px-4 py-2 text-[12px] ${t('text-[#ccc]', 'text-[#444]')} ${hoverItem} transition-colors`}>
+                      <item.icon size={14} className={textSub} /> {item.label}
+                    </button>
+                  ))}
+                </div>
+                <div className={`border-t ${borderCls} py-1`}>
+                  <button
+                    onClick={() => { setProfileOpen(false); setShowLogoutModal(true); }}
+                    className={`flex items-center gap-2.5 w-full px-4 py-2 text-[12px] text-[#F73C1C] ${hoverItem} transition-colors`}
+                  >
+                    <LogOut size={14} /> Esci
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
+      {/* Logout confirmation modal */}
+      <AnimatePresence>
+        {showLogoutModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="fixed inset-0 z-[100] flex items-center justify-center"
+            onClick={() => setShowLogoutModal(false)}
+          >
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.92, y: 10 }}
+              transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+              onClick={e => e.stopPropagation()}
+              className={`relative w-[340px] max-w-[90vw] ${dropBg} border ${dropBorder} rounded-2xl shadow-2xl shadow-black/50 p-6`}
+            >
+              <div className="flex flex-col items-center text-center gap-3">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#F73C1C]/10">
+                  <LogOut size={22} className="text-[#F73C1C]" />
+                </div>
+                <div>
+                  <h3 className={`text-[15px] font-bold ${textMain}`}>Conferma logout</h3>
+                  <p className={`text-[12px] ${textSub} mt-1`}>
+                    Sei sicuro di voler uscire dal tuo account?
+                  </p>
+                </div>
+                <div className="flex gap-2.5 w-full mt-2">
+                  <button
+                    onClick={() => setShowLogoutModal(false)}
+                    className={`flex-1 px-4 py-2.5 text-[12px] font-semibold rounded-xl border ${dropBorder} ${textMain} ${hoverItem} transition-colors`}
+                  >
+                    Annulla
+                  </button>
+                  <motion.button
+                    whileTap={{ scale: 0.97 }}
+                    onClick={() => {
+                      setShowLogoutModal(false);
+                      toast.success('Logout effettuato');
+                      onLogout?.();
+                    }}
+                    className="flex-1 px-4 py-2.5 text-[12px] font-semibold rounded-xl bg-[#F73C1C] hover:bg-[#e63518] text-white transition-colors"
+                  >
+                    Esci
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
+  );
+}
