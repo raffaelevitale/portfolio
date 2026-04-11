@@ -6,7 +6,7 @@ import Navigation from './Navigation';
 export default function ConditionalNavigation() {
   const pathname = usePathname();
 
-  if (pathname?.startsWith('/orario')) {
+  if (pathname?.startsWith('/orario') || pathname?.startsWith('/interfaccia')) {
     return null;
   }
 
