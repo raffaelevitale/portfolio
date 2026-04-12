@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "next build",
+    "build:interfaccia": "npm install --prefix Interfacciachatbot && npm run build --prefix Interfacciachatbot",
+    "build": "npm run build:interfaccia && next build",
     "start": "next start",
     "lint": "next lint"
   },
