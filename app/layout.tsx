@@ -43,18 +43,19 @@ const dmMono = DM_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Raffaele Vitale — Creative Director & Brand Strategist",
+    default: "Raffaele Vitale — Brand & Design Director · Fotografo",
     template: "%s · Raffaele Vitale",
   },
   description:
-    "Il portfolio di Raffaele Vitale: direzione creativa, brand identity, digital strategy e sistemi visivi.",
+    "Il portfolio di Raffaele Vitale: direzione creativa, brand identity, UI design, fotografia e visual communication.",
   keywords: [
     "Raffaele Vitale",
-    "creative director",
-    "brand strategist",
+    "brand design director",
+    "art direction",
     "brand identity",
-    "UI/UX",
-    "digital strategy",
+    "UI design",
+    "fotografo",
+    "visual communication",
     "design portfolio",
   ],
   authors: [{ name: "Raffaele Vitale", url: "https://www.linkedin.com/in/vitaleraffaele/" }],
@@ -63,9 +64,9 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Raffaele Vitale — Creative Director & Brand Strategist",
+    title: "Raffaele Vitale — Brand & Design Director · Fotografo",
     description:
-      "Direzione creativa, brand identity e digital strategy, a cura di Raffaele Vitale.",
+      "Direzione creativa, brand identity, UI design e fotografia, a cura di Raffaele Vitale.",
     url: siteUrl,
     siteName: "Raffaele Vitale Portfolio",
     locale: "it_IT",
@@ -73,9 +74,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Raffaele Vitale — Creative Director & Brand Strategist",
+    title: "Raffaele Vitale — Brand & Design Director · Fotografo",
     description:
-      "Direzione creativa, sistemi visivi e brand strategy per prodotti digitali.",
+      "Direzione creativa, brand identity, UI design e fotografia per startup e prodotti digitali.",
   },
   robots: {
     index: true,

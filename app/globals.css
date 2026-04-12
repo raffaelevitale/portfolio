@@ -103,10 +103,10 @@ body {
   inset: 0;
   z-index: 9999;
   pointer-events: none;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   background-repeat: repeat;
-  background-size: 180px;
+  background-size: 200px;
   mix-blend-mode: multiply;
 }
 
@@ -116,33 +116,132 @@ body {
 
 .aurora {
   position: absolute;
-  inset: 0;
-  opacity: 0.12;
+  inset: -20%;
+  opacity: 0.22;
   background:
     radial-gradient(
-      ellipse 70% 50% at 20% 0%,
-      rgba(196, 93, 62, 0.18),
+      ellipse 80% 55% at 15% 5%,
+      rgba(196, 93, 62, 0.25),
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 65% 65% at 85% 15%,
+      rgba(120, 119, 198, 0.2),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 45% 50% at 50% 85%,
+      rgba(196, 93, 62, 0.12),
       transparent 70%
     ),
     radial-gradient(
-      ellipse 60% 60% at 80% 20%,
-      rgba(120, 119, 198, 0.15),
-      transparent 70%
-    ),
-    radial-gradient(
-      ellipse 50% 40% at 50% 80%,
-      rgba(196, 93, 62, 0.08),
-      transparent
+      ellipse 50% 40% at 70% 50%,
+      rgba(180, 160, 120, 0.1),
+      transparent 65%
     );
-  filter: blur(80px);
+  filter: blur(70px);
   pointer-events: none;
-  animation: aurora-drift 20s ease-in-out infinite alternate;
+  animation: aurora-drift 25s ease-in-out infinite alternate;
+}
+
+.aurora::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.6;
+  background:
+    radial-gradient(
+      circle 35% at 30% 30%,
+      rgba(196, 93, 62, 0.12),
+      transparent 70%
+    ),
+    radial-gradient(
+      circle 30% at 75% 65%,
+      rgba(120, 119, 198, 0.1),
+      transparent 65%
+    );
+  filter: blur(60px);
+  animation: aurora-shift 18s ease-in-out infinite alternate-reverse;
 }
 
 @keyframes aurora-drift {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  33% { transform: translate(-3%, 2%) scale(1.04) rotate(0.5deg); }
+  66% { transform: translate(2%, -1%) scale(0.97) rotate(-0.3deg); }
+  100% { transform: translate(1%, 1.5%) scale(1.02) rotate(0.2deg); }
+}
+
+@keyframes aurora-shift {
   0% { transform: translate(0, 0) scale(1); }
-  50% { transform: translate(-2%, 1%) scale(1.02); }
-  100% { transform: translate(2%, -1%) scale(0.98); }
+  50% { transform: translate(3%, -2%) scale(1.06); }
+  100% { transform: translate(-2%, 2%) scale(0.95); }
+}
+
+/* ═══════════════════════════════════════════════════
+   HERO BACKGROUND DEPTH
+   ═══════════════════════════════════════════════════ */
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(
+    circle,
+    var(--border) 0.8px,
+    transparent 0.8px
+  );
+  background-size: 40px 40px;
+  mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 40%,
+    black 0%,
+    transparent 75%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 70% 60% at 50% 40%,
+    black 0%,
+    transparent 75%
+  );
+  opacity: 0.35;
+}
+
+.hero-glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.hero-glow--primary {
+  width: 500px;
+  height: 500px;
+  top: -10%;
+  right: -5%;
+  background: radial-gradient(
+    circle,
+    rgba(196, 93, 62, 0.12),
+    transparent 70%
+  );
+  animation: glow-float 12s ease-in-out infinite alternate;
+}
+
+.hero-glow--secondary {
+  width: 400px;
+  height: 400px;
+  bottom: 5%;
+  left: -8%;
+  background: radial-gradient(
+    circle,
+    rgba(120, 119, 198, 0.1),
+    transparent 70%
+  );
+  animation: glow-float 15s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes glow-float {
+  0% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(20px, -15px) scale(1.1); }
+  100% { transform: translate(-10px, 10px) scale(0.95); }
 }
 
 /* ═══════════════════════════════════════════════════
@@ -298,4 +397,150 @@ body {
 html {
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
+}
+
+/* ═══════════════════════════════════════════════════
+   CARD HOVER EFFECTS
+   ═══════════════════════════════════════════════════ */
+
+.card-glow {
+  position: relative;
+  overflow: hidden;
+}
+
+.card-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  background: radial-gradient(
+    600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(196, 93, 62, 0.06),
+    transparent 40%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.card-glow:hover::before {
+  opacity: 1;
+}
+
+.light-sweep {
+  position: relative;
+  overflow: hidden;
+}
+
+.light-sweep::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.04),
+    transparent
+  );
+  transition: none;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.light-sweep:hover::after {
+  left: 150%;
+  transition: left 0.7s ease;
+}
+
+/* ═══════════════════════════════════════════════════
+   SECTION TRANSITIONS
+   ═══════════════════════════════════════════════════ */
+
+.section-fade-edge {
+  position: relative;
+}
+
+.section-fade-edge::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 120px;
+  background: linear-gradient(
+    to bottom,
+    var(--bg),
+    transparent
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ═══════════════════════════════════════════════════
+   SOCIAL LINK HOVER
+   ═══════════════════════════════════════════════════ */
+
+.social-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}
+
+.social-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--accent);
+  transition: width 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.social-link:hover::after {
+  width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════
+   PROCESS CONNECTOR LINE
+   ═══════════════════════════════════════════════════ */
+
+.process-step {
+  position: relative;
+}
+
+.process-step::after {
+  content: "";
+  position: absolute;
+  top: 2.5rem;
+  right: 0;
+  width: 1px;
+  height: calc(100% - 3.5rem);
+  background: linear-gradient(
+    to bottom,
+    var(--accent),
+    transparent
+  );
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.process-step:hover::after {
+  opacity: 0.3;
+}
+
+@media (min-width: 1024px) {
+  .process-step::after {
+    top: auto;
+    bottom: auto;
+    right: 0;
+    width: 1px;
+    height: 60%;
+    top: 20%;
+  }
 }
