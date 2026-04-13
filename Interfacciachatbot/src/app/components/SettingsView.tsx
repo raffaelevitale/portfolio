@@ -51,8 +51,8 @@ export function SettingsView({ module }: SettingsViewProps) {
       <div className="max-w-2xl mx-auto w-full p-4 md:p-8">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 md:mb-8 gap-3">
           <div>
-            <h2 className={`text-[16px] md:text-[18px] font-bold ${textMain}`}>{module.name}</h2>
-            <p className={`text-[12px] md:text-[13px] ${textSub} mt-1`}>{module.description}</p>
+            <h2 className={`text-[12px] md:text-[13px] font-semibold ${textMain}`}>{module.name}</h2>
+            <p className={`text-[11px] md:text-[12px] ${textSub} mt-1`}>{module.description}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <button onClick={reset} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] md:text-[12px] ${btnText} transition-colors border ${btnBorder}`}>

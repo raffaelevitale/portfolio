@@ -36,7 +36,7 @@ export function ModuleTopBar({ ambitoName, ambitoColor, ambitoIcon, module, onTo
           <span className={`text-[12px] md:text-[13px] font-semibold ${t('text-[#999]', 'text-[#888]')} ${t('hover:text-white', 'hover:text-[#111]')} transition-colors`}>{ambitoName}</span>
         </button>
         <ChevronRight size={12} className={`hidden sm:inline ${t('text-[#444]', 'text-[#ccc]')} shrink-0`} />
-        <span className={`text-[13px] md:text-[14px] ${extraBreadcrumb ? `${t('text-[#999]', 'text-[#888]')} cursor-pointer ${t('hover:text-white', 'hover:text-[#111]')}` : `font-bold ${t('text-white', 'text-[#111]')}`} truncate`}
+        <span className={`text-[11px] md:text-[12px] ${extraBreadcrumb ? `${t('text-[#999]', 'text-[#888]')} cursor-pointer ${t('hover:text-white', 'hover:text-[#111]')}` : `font-semibold ${t('text-white', 'text-[#111]')}`} truncate`}
           onClick={extraBreadcrumb ? extraBreadcrumb.onClick : undefined}
         >
           {module.name}
@@ -44,7 +44,7 @@ export function ModuleTopBar({ ambitoName, ambitoColor, ambitoIcon, module, onTo
         {extraBreadcrumb && (
           <>
             <ChevronRight size={12} className={`${t('text-[#444]', 'text-[#ccc]')} shrink-0`} />
-            <span className={`text-[13px] md:text-[14px] font-bold ${t('text-white', 'text-[#111]')} truncate`}>{extraBreadcrumb.label}</span>
+            <span className={`text-[11px] md:text-[12px] font-semibold ${t('text-white', 'text-[#111]')} truncate`}>{extraBreadcrumb.label}</span>
           </>
         )}
       </div>

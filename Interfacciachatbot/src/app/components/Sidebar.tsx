@@ -107,7 +107,7 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
             placeholder="Cerca moduli..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className={`bg-transparent text-[12px] ${inputText} outline-none flex-1 min-w-0`}
+            className={`bg-transparent text-[13px] ${inputText} outline-none flex-1 min-w-0`}
           />
           {hasSearch && (
             <button onClick={() => setSearch('')} className={`${textMuted} hover:text-[#F73C1C] transition-colors`}>
@@ -122,8 +122,8 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
         {filteredAmbiti.length === 0 && (
           <div className={`flex flex-col items-center justify-center py-8 px-4 ${textMuted} text-center`}>
             <Search size={16} className="mb-2 opacity-40" />
-            <span className="text-[12px]">Nessun modulo trovato</span>
-            <button onClick={() => setSearch('')} className="text-[12px] text-[#F73C1C] mt-1 hover:underline">
+            <span className="text-[13px]">Nessun modulo trovato</span>
+            <button onClick={() => setSearch('')} className="text-[13px] text-[#F73C1C] mt-1 hover:underline">
               Cancella ricerca
             </button>
           </div>
@@ -143,7 +143,7 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
             <div key={ambito.id}>
               <button
                 onClick={() => !hasSearch && toggleAmbito(ambito.id)}
-                className={`flex items-center gap-2.5 w-full px-3 py-2 text-left transition-colors group ${hoverBg} ${hasSelectedModule && !hasSearch ? activeBg : ''}`}
+                className={`flex items-center gap-2.5 w-full px-3 py-2.5 text-left transition-colors group ${hoverBg} ${hasSelectedModule && !hasSearch ? activeBg : ''}`}
               >
                 <div
                   className="flex h-7 w-7 items-center justify-center rounded-md shrink-0"
@@ -152,12 +152,12 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
                   <AmbitoIcon size={14} style={{ color: ambito.color }} />
                 </div>
                 <div className="flex flex-col flex-1 min-w-0">
-                  <span className={`text-[12px] font-semibold ${textMain} truncate leading-tight`}>{ambito.name}</span>
-                  <span className={`text-[10px] ${textMuted} truncate leading-tight`}>{ambito.subtitle}</span>
+                  <span className={`text-[13px] font-semibold ${textMain} truncate leading-tight`}>{ambito.name}</span>
+                  <span className={`text-[11px] ${textSub} truncate leading-tight`}>{ambito.subtitle}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   {activeModuleCount > 0 && !isExpanded && (
-                    <span className="text-[10px] font-bold px-1.5 py-px rounded-full" style={{ backgroundColor: ambito.color + '18', color: ambito.color }}>
+                    <span className="text-[11px] font-bold px-1.5 py-px rounded-full" style={{ backgroundColor: ambito.color + '18', color: ambito.color }}>
                       {activeModuleCount}
                     </span>
                   )}
@@ -199,11 +199,10 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
                               <div
                                 key={mod.id}
                                 ref={isSelected ? selectedRef : undefined}
-                                className={`flex items-center gap-2 w-full pl-9 pr-3 py-1.5 text-left transition-all text-[12px] relative ${
-                                  isSelected
+                                className={`flex items-center gap-2 w-full pl-9 pr-3 py-1.5 text-left transition-all text-[12px] relative ${isSelected
                                     ? `${activeBg} font-semibold`
                                     : hoverBg
-                                } ${isLocked ? 'opacity-50' : ''}`}
+                                  } ${isLocked ? 'opacity-50' : ''}`}
                               >
                                 {isSelected && (
                                   <motion.div
@@ -217,31 +216,29 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
                                     if (isLocked) onShowLocked(mod);
                                     else handleSelectModule(mod, ambito.id);
                                   }}
-                                  className="flex items-center gap-2 flex-1 min-w-0"
+                                  className="flex items-center gap-2 flex-1 min-w-0 text-[11px] leading-tight"
                                 >
                                   <ModIcon
                                     size={13}
                                     className={`shrink-0 transition-colors ${isSelected ? 'text-[#F73C1C]' : textSub}`}
                                   />
-                                  <span className={`flex-1 truncate transition-colors text-left ${isSelected ? 'text-[#F73C1C]' : textSub}`}>
+                                  <span className={`flex-1 truncate transition-colors text-left text-[11px] leading-tight ${isSelected ? 'text-[#F73C1C]' : textSub} ${isSelected ? 'font-semibold' : 'font-medium'}`}>
                                     {mod.name}
                                   </span>
                                 </button>
-                                {isLocked && <Lock size={11} className={textMuted} />}
+                                {isLocked && <Lock size={12} className={textMuted} />}
                                 {!isLocked && (
                                   <button
                                     onClick={e => {
                                       e.stopPropagation();
                                       onToggleModule(mod.id);
                                     }}
-                                    className={`relative w-[34px] h-[18px] rounded-full transition-colors shrink-0 ${
-                                      mod.active ? 'bg-[#10B981]' : t('bg-[#333]', 'bg-[#ccc]')
-                                    }`}
+                                    className={`relative w-[34px] h-[18px] rounded-full transition-colors shrink-0 ${mod.active ? 'bg-[#10B981]' : t('bg-[#333]', 'bg-[#ccc]')
+                                      }`}
                                     title={mod.active ? 'Disattiva' : 'Attiva'}
                                   >
-                                    <div className={`absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform ${
-                                      mod.active ? 'left-[18px]' : 'left-[2px]'
-                                    }`} />
+                                    <div className={`absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform ${mod.active ? 'left-[18px]' : 'left-[2px]'
+                                      }`} />
                                   </button>
                                 )}
                               </div>
@@ -260,7 +257,7 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
 
       {/* Footer */}
       <div className={`px-3 py-2 border-t ${borderCls}`}>
-        <span className={`text-[10px] ${textMuted}`}>
+        <span className={`text-[11px] font-medium ${textMuted}`}>
           {ambiti.flatMap(a => a.funzioni.flatMap(f => f.modules)).filter(m => m.purchased && m.active).length} moduli attivi
         </span>
       </div>
@@ -281,9 +278,9 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
               onClick={onCloseMobile}
             />
             <motion.div
-              initial={{ x: -280 }}
+              initial={{ x: -260 }}
               animate={{ x: 0 }}
-              exit={{ x: -280 }}
+              exit={{ x: -260 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className="absolute left-0 top-0 bottom-0 shadow-2xl"
             >

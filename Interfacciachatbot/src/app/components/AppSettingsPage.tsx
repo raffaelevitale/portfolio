@@ -76,19 +76,18 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
 
       <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
         {/* Tab bar: horizontal scroll on mobile, vertical sidebar on desktop */}
-        <div className={`md:w-[200px] shrink-0 md:border-r ${borderColor} ${sidebarBg} overflow-x-auto md:overflow-x-hidden md:overflow-y-auto`}>
-          <div className="flex md:flex-col md:py-2 border-b md:border-b-0 ${borderColor}">
+        <div className={`md:w-[260px] shrink-0 md:border-r ${borderColor} ${sidebarBg} overflow-x-auto md:overflow-x-hidden md:overflow-y-auto`}>
+          <div className={`flex md:flex-col md:py-2 border-b md:border-b-0 ${borderColor}`}>
             {tabs.map(tab => {
               const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 md:gap-2.5 whitespace-nowrap px-3 md:px-4 py-2.5 md:py-2 text-[12px] transition-colors shrink-0 md:w-full ${
-                    isActive
+                  className={`flex items-center gap-2 md:gap-2.5 whitespace-nowrap px-3 md:px-4 py-2.5 md:py-2 text-[13px] transition-colors shrink-0 md:w-full ${isActive
                       ? `${textPrimary} font-semibold ${t('bg-white/[0.04]', 'bg-black/[0.04]')} border-b-2 md:border-b-0 border-[#F73C1C]`
                       : `${textSecondary} ${hoverBg} border-b-2 md:border-b-0 border-transparent`
-                  }`}
+                    }`}
                 >
                   <tab.icon size={14} className={isActive ? 'text-[#F73C1C]' : ''} />
                   <span className="hidden sm:inline">{tab.label}</span>
@@ -106,11 +105,11 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
               <div className="flex flex-col gap-4">
                 <div className="mb-1">
                   <h2 className={`text-[16px] font-bold ${textPrimary}`}>Generale</h2>
-                  <p className={`text-[12px] ${textSecondary} mt-0.5`}>Impostazioni generali dell'applicazione</p>
+                  <p className={`text-[13px] ${textSecondary} mt-0.5`}>Impostazioni generali dell'applicazione</p>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div className="flex flex-col gap-1">
-                    <label className={`text-[11px] font-medium ${textSecondary}`}>Lingua</label>
+                    <label className={`text-[12px] font-medium ${textSecondary}`}>Lingua</label>
                     <select
                       value={appSettings.lingua}
                       onChange={e => setAppSettings(p => ({ ...p, lingua: e.target.value }))}
@@ -123,7 +122,7 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                     </select>
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className={`text-[11px] font-medium ${textSecondary}`}>Fuso orario</label>
+                    <label className={`text-[12px] font-medium ${textSecondary}`}>Fuso orario</label>
                     <select
                       value={appSettings.timezone}
                       onChange={e => setAppSettings(p => ({ ...p, timezone: e.target.value }))}
@@ -138,7 +137,7 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                 <div className={`flex items-center justify-between py-2.5 border-b ${borderColor}`}>
                   <div>
                     <p className={`text-[13px] font-medium ${textPrimary}`}>Salvataggio automatico</p>
-                    <p className={`text-[11px] ${textSecondary}`}>Salva automaticamente le modifiche</p>
+                    <p className={`text-[12px] ${textSecondary}`}>Salva automaticamente le modifiche</p>
                   </div>
                   <SwitchToggle checked={appSettings.autoSave} onChange={v => { setAppSettings(p => ({ ...p, autoSave: v })); toast.success(v ? 'Salvataggio automatico attivato' : 'Salvataggio automatico disattivato'); }} />
                 </div>
@@ -150,14 +149,14 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
               <div className="flex flex-col gap-4">
                 <div className="mb-1">
                   <h2 className={`text-[16px] font-bold ${textPrimary}`}>Profilo</h2>
-                  <p className={`text-[12px] ${textSecondary} mt-0.5`}>Gestisci le informazioni del tuo account</p>
+                  <p className={`text-[13px] ${textSecondary} mt-0.5`}>Gestisci le informazioni del tuo account</p>
                 </div>
                 <div className="flex items-center gap-3 mb-1">
                   <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#F73C1C] text-[18px] font-bold text-white">LC</div>
                   <div>
                     <p className={`text-[14px] font-semibold ${textPrimary}`}>Luciano Cavallero</p>
-                    <p className={`text-[12px] ${textSecondary}`}>luciano@crybu.com</p>
-                    <button className="text-[11px] text-[#F73C1C] hover:text-[#ff5638] font-medium mt-0.5">Cambia foto</button>
+                    <p className={`text-[13px] ${textSecondary}`}>luciano@crybu.com</p>
+                    <button className="text-[12px] text-[#F73C1C] hover:text-[#ff5638] font-medium mt-0.5">Cambia foto</button>
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-3">
@@ -169,7 +168,7 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                     { label: 'Azienda', key: 'azienda' as const },
                   ].map(field => (
                     <div key={field.key} className={`flex flex-col gap-1 ${field.key === 'azienda' ? 'col-span-2' : ''}`}>
-                      <label className={`text-[11px] font-medium ${textSecondary}`}>{field.label}</label>
+                      <label className={`text-[12px] font-medium ${textSecondary}`}>{field.label}</label>
                       <input
                         value={profile[field.key]}
                         onChange={e => setProfile(p => ({ ...p, [field.key]: e.target.value }))}
@@ -180,7 +179,7 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                 </div>
                 <button
                   onClick={() => toast.success('Profilo aggiornato con successo')}
-                  className="self-start px-4 py-2 bg-[#F73C1C] hover:bg-[#e63518] text-white text-[12px] font-semibold rounded-lg transition-colors mt-1"
+                  className="self-start px-4 py-2 bg-[#F73C1C] hover:bg-[#e63518] text-white text-[13px] font-semibold rounded-lg transition-colors mt-1"
                 >
                   Salva modifiche
                 </button>
@@ -192,7 +191,7 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
               <div className="flex flex-col gap-3">
                 <div className="mb-1">
                   <h2 className={`text-[16px] font-bold ${textPrimary}`}>Notifiche</h2>
-                  <p className={`text-[12px] ${textSecondary} mt-0.5`}>Configura come ricevere le notifiche</p>
+                  <p className={`text-[13px] ${textSecondary} mt-0.5`}>Configura come ricevere le notifiche</p>
                 </div>
                 {[
                   { label: 'Notifiche email', desc: 'Ricevi aggiornamenti via email', key: 'email' as const },
@@ -204,7 +203,7 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                   <div key={item.key} className={`flex items-center justify-between py-2.5 border-b ${borderColor}`}>
                     <div>
                       <p className={`text-[13px] font-medium ${textPrimary}`}>{item.label}</p>
-                      <p className={`text-[11px] ${textSecondary}`}>{item.desc}</p>
+                      <p className={`text-[12px] ${textSecondary}`}>{item.desc}</p>
                     </div>
                     <SwitchToggle checked={notifSettings[item.key]} onChange={v => { setNotifSettings(p => ({ ...p, [item.key]: v })); toast.success(`${item.label} ${v ? 'attivate' : 'disattivate'}`); }} />
                   </div>
@@ -217,23 +216,22 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
               <div className="flex flex-col gap-3">
                 <div className="mb-1">
                   <h2 className={`text-[16px] font-bold ${textPrimary}`}>Aspetto</h2>
-                  <p className={`text-[12px] ${textSecondary} mt-0.5`}>Personalizza l'interfaccia</p>
+                  <p className={`text-[13px] ${textSecondary} mt-0.5`}>Personalizza l'interfaccia</p>
                 </div>
                 <div className={`flex items-center justify-between py-3 border-b ${borderColor}`}>
                   <div>
                     <p className={`text-[13px] font-medium ${textPrimary}`}>Tema</p>
-                    <p className={`text-[11px] ${textSecondary}`}>Scegli tra modalità chiara e scura</p>
+                    <p className={`text-[12px] ${textSecondary}`}>Scegli tra modalità chiara e scura</p>
                   </div>
                   <div className="flex gap-2">
                     {(['dark', 'light'] as const).map(mode => (
                       <button
                         key={mode}
                         onClick={() => { if (theme !== mode) toggleTheme(); }}
-                        className={`flex flex-col items-center gap-1.5 px-3 py-2 rounded-lg border transition-all ${
-                          theme === mode
+                        className={`flex flex-col items-center gap-1.5 px-3 py-2 rounded-lg border transition-all ${theme === mode
                             ? 'border-[#F73C1C] bg-[#F73C1C]/[0.06]'
                             : `${borderColor} ${hoverBg}`
-                        }`}
+                          }`}
                       >
                         <div className={`w-10 h-6 rounded border ${mode === 'dark' ? 'bg-[#1A1A1A] border-white/10' : 'bg-[#F5F5F5] border-black/10'}`} />
                         <span className={`text-[10px] font-medium ${theme === mode ? 'text-[#F73C1C]' : textSecondary}`}>
@@ -251,7 +249,7 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                   <div key={item.key} className={`flex items-center justify-between py-2.5 border-b ${borderColor}`}>
                     <div>
                       <p className={`text-[13px] font-medium ${textPrimary}`}>{item.label}</p>
-                      <p className={`text-[11px] ${textSecondary}`}>{item.desc}</p>
+                      <p className={`text-[12px] ${textSecondary}`}>{item.desc}</p>
                     </div>
                     <SwitchToggle checked={appSettings[item.key]} onChange={v => { setAppSettings(p => ({ ...p, [item.key]: v })); toast.success(`${item.label} ${v ? 'attivate' : 'disattivate'}`); }} />
                   </div>
@@ -264,7 +262,7 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
               <div className="flex flex-col gap-4">
                 <div className="mb-1">
                   <h2 className={`text-[16px] font-bold ${textPrimary}`}>Sicurezza e Privacy</h2>
-                  <p className={`text-[12px] ${textSecondary} mt-0.5`}>Gestisci la sicurezza del tuo account e i tuoi dati</p>
+                  <p className={`text-[13px] ${textSecondary} mt-0.5`}>Gestisci la sicurezza del tuo account e i tuoi dati</p>
                 </div>
 
                 {/* Sicurezza */}
@@ -273,11 +271,11 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className={`text-[13px] font-medium ${textPrimary}`}>Cambio password</p>
-                      <p className={`text-[11px] ${textSecondary}`}>Ultimo cambio: 15 giorni fa</p>
+                      <p className={`text-[12px] ${textSecondary}`}>Ultimo cambio: 15 giorni fa</p>
                     </div>
                     <button
                       onClick={() => toast('Funzionalità in arrivo', { description: 'Il cambio password sarà disponibile a breve' })}
-                      className="px-3 py-1.5 bg-[#F73C1C] hover:bg-[#e63518] text-white text-[12px] font-semibold rounded-lg transition-colors"
+                      className="px-3 py-1.5 bg-[#F73C1C] hover:bg-[#e63518] text-white text-[13px] font-semibold rounded-lg transition-colors"
                     >
                       Cambia
                     </button>
@@ -287,9 +285,9 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className={`text-[13px] font-medium ${textPrimary}`}>Autenticazione a due fattori</p>
-                      <p className={`text-[11px] ${textSecondary}`}>Aggiungi un livello di sicurezza extra</p>
+                      <p className={`text-[12px] ${textSecondary}`}>Aggiungi un livello di sicurezza extra</p>
                     </div>
-                    <button className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold border ${borderColor} ${textPrimary} ${hoverBg} transition-colors`}>
+                    <button className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold border ${borderColor} ${textPrimary} ${hoverBg} transition-colors`}>
                       Configura
                     </button>
                   </div>
@@ -299,7 +297,7 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                   <div className="flex flex-col gap-1.5">
                     {['Chrome su MacBook Pro — Adesso', 'Safari su iPhone 15 — 2 ore fa'].map((s, i) => (
                       <div key={i} className={`flex items-center justify-between py-1.5 border-b ${borderColor} last:border-0`}>
-                        <span className={`text-[12px] ${textPrimary}`}>{s}</span>
+                        <span className={`text-[13px] ${textPrimary}`}>{s}</span>
                         {i > 0 && <button className="text-[10px] text-[#F73C1C] font-medium">Disconnetti</button>}
                       </div>
                     ))}
@@ -312,9 +310,9 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className={`text-[13px] font-medium ${textPrimary}`}>Esporta dati</p>
-                      <p className={`text-[11px] ${textSecondary}`}>Scarica una copia di tutti i tuoi dati</p>
+                      <p className={`text-[12px] ${textSecondary}`}>Scarica una copia di tutti i tuoi dati</p>
                     </div>
-                    <button className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold border ${borderColor} ${textPrimary} ${hoverBg} transition-colors`}>
+                    <button className={`px-3 py-1.5 rounded-lg text-[13px] font-semibold border ${borderColor} ${textPrimary} ${hoverBg} transition-colors`}>
                       Esporta
                     </button>
                   </div>
@@ -323,9 +321,9 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-[13px] font-medium text-[#F73C1C]">Elimina account</p>
-                      <p className={`text-[11px] ${textSecondary}`}>Questa azione è irreversibile</p>
+                      <p className={`text-[12px] ${textSecondary}`}>Questa azione è irreversibile</p>
                     </div>
-                    <button className="px-3 py-1.5 rounded-lg text-[12px] font-semibold border border-[#F73C1C] text-[#F73C1C] hover:bg-[#F73C1C] hover:text-white transition-colors">
+                    <button className="px-3 py-1.5 rounded-lg text-[13px] font-semibold border border-[#F73C1C] text-[#F73C1C] hover:bg-[#F73C1C] hover:text-white transition-colors">
                       Elimina
                     </button>
                   </div>
@@ -338,13 +336,13 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
               <div className="flex flex-col gap-4">
                 <div className="mb-1">
                   <h2 className={`text-[16px] font-bold ${textPrimary}`}>API Keys</h2>
-                  <p className={`text-[12px] ${textSecondary} mt-0.5`}>Gestisci le chiavi API per integrazioni esterne</p>
+                  <p className={`text-[13px] ${textSecondary} mt-0.5`}>Gestisci le chiavi API per integrazioni esterne</p>
                 </div>
                 <div className={`p-4 rounded-xl border ${borderColor}`} style={{ backgroundColor: cardBg }}>
                   <div className="flex items-center justify-between mb-2">
                     <div>
                       <p className={`text-[13px] font-medium ${textPrimary}`}>Production Key</p>
-                      <p className={`text-[11px] ${textSecondary}`}>Creata il 1 Mar 2026</p>
+                      <p className={`text-[12px] ${textSecondary}`}>Creata il 1 Mar 2026</p>
                     </div>
                     <span className="text-[10px] font-medium text-[#10B981] bg-[#10B981]/10 px-2 py-0.5 rounded-full">Attiva</span>
                   </div>
@@ -354,7 +352,7 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                 </div>
                 <button
                   onClick={() => toast.success('Nuova chiave API generata')}
-                  className="self-start px-4 py-2 bg-[#F73C1C] hover:bg-[#e63518] text-white text-[12px] font-semibold rounded-lg transition-colors"
+                  className="self-start px-4 py-2 bg-[#F73C1C] hover:bg-[#e63518] text-white text-[13px] font-semibold rounded-lg transition-colors"
                 >
                   + Genera nuova chiave
                 </button>
@@ -366,7 +364,7 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
               <div className="flex flex-col gap-3">
                 <div className="mb-1">
                   <h2 className={`text-[16px] font-bold ${textPrimary}`}>Aiuto e Supporto</h2>
-                  <p className={`text-[12px] ${textSecondary} mt-0.5`}>Trova risposte e contatta il supporto</p>
+                  <p className={`text-[13px] ${textSecondary} mt-0.5`}>Trova risposte e contatta il supporto</p>
                 </div>
                 {[
                   { title: 'Centro assistenza', desc: 'Guide, tutorial e FAQ', cta: 'Visita' },
@@ -377,9 +375,9 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                   <div key={item.title} className={`flex items-center justify-between p-4 rounded-xl border ${borderColor}`} style={{ backgroundColor: cardBg }}>
                     <div>
                       <p className={`text-[13px] font-medium ${textPrimary}`}>{item.title}</p>
-                      <p className={`text-[11px] ${textSecondary}`}>{item.desc}</p>
+                      <p className={`text-[12px] ${textSecondary}`}>{item.desc}</p>
                     </div>
-                    <button className="px-3 py-1.5 text-[11px] font-semibold text-[#F73C1C] border border-[#F73C1C]/30 rounded-lg hover:bg-[#F73C1C]/[0.06] transition-colors">
+                    <button className="px-3 py-1.5 text-[12px] font-semibold text-[#F73C1C] border border-[#F73C1C]/30 rounded-lg hover:bg-[#F73C1C]/[0.06] transition-colors">
                       {item.cta}
                     </button>
                   </div>

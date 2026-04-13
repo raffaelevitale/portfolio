@@ -43,8 +43,8 @@ export function FilesView({ module }: { module: Module }) {
     <div className="flex flex-col flex-1 h-full min-w-0 overflow-y-auto">
       <div className="max-w-3xl mx-auto w-full p-4 md:p-8">
         <div className="mb-4 md:mb-6">
-          <h2 className={`text-[16px] md:text-[18px] font-bold ${textMain}`}>{module.name}</h2>
-          <p className={`text-[12px] md:text-[13px] ${textSub} mt-1`}>{module.description}</p>
+          <h2 className={`text-[12px] md:text-[13px] font-semibold ${textMain}`}>{module.name}</h2>
+          <p className={`text-[11px] md:text-[12px] ${textSub} mt-1`}>{module.description}</p>
         </div>
         <div
           className={`border-2 border-dashed rounded-xl p-6 md:p-8 flex flex-col items-center gap-3 transition-colors mb-6 md:mb-8 cursor-pointer ${dragOver ? 'border-[#F73C1C] bg-[#F73C1C]/[0.03]' : `${t('border-white/[0.08] hover:border-white/[0.15]', 'border-black/[0.12] hover:border-black/[0.2]')}`}`}

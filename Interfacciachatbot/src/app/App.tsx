@@ -65,6 +65,7 @@ function AppInner() {
     : null;
 
   const isChat = currentModule?.type === 'chat';
+  const sidePanelWidth = 260;
 
   if (!isLoggedIn) {
     return <LoginPage onLogin={() => setIsLoggedIn(true)} />;
@@ -184,7 +185,7 @@ function AppInner() {
                 {isChat && showParams && (
                   <motion.div
                     initial={{ width: 0, opacity: 0 }}
-                    animate={{ width: 260, opacity: 1 }}
+                    animate={{ width: sidePanelWidth, opacity: 1 }}
                     exit={{ width: 0, opacity: 0 }}
                     transition={{ duration: 0.2, ease: 'easeInOut' }}
                     className="hidden md:block overflow-hidden shrink-0"
@@ -206,11 +207,12 @@ function AppInner() {
                       onClick={() => setMobileParamsOpen(false)}
                     />
                     <motion.div
-                      initial={{ x: 300 }}
+                      initial={{ x: sidePanelWidth }}
                       animate={{ x: 0 }}
-                      exit={{ x: 300 }}
+                      exit={{ x: sidePanelWidth }}
                       transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                      className="absolute right-0 top-0 bottom-0 w-[300px] max-w-[85vw] shadow-2xl"
+                      className="absolute right-0 top-0 bottom-0 shadow-2xl"
+                      style={{ width: sidePanelWidth, maxWidth: '85vw' }}
                     >
                       <SettingsPanel onClose={() => setMobileParamsOpen(false)} onTogglePanel={() => setMobileParamsOpen(false)} />
                     </motion.div>

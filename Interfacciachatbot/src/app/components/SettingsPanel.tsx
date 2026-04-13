@@ -61,8 +61,8 @@ export function SettingsPanel({ onClose, onTogglePanel }: { onClose?: () => void
       <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-6">
         <div className="flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
-            <label className={`text-[12px] font-medium ${textLabel}`}>Creatività</label>
-            <span className="text-[12px] font-medium text-[#F73C1C]" style={{ fontFamily: '"JetBrains Mono", monospace' }}>{(creativity[0] / 100).toFixed(1)}</span>
+            <label className={`text-[13px] font-medium ${textLabel}`}>Creatività</label>
+            <span className="text-[13px] font-medium text-[#F73C1C]">{(creativity[0] / 100).toFixed(1)}</span>
           </div>
           <Slider.Root className="relative flex items-center select-none touch-none w-full h-5" value={creativity} onValueChange={setCreativity} max={100} step={1}>
             <Slider.Track className={`${trackBg} relative grow rounded-full h-[4px]`}>
@@ -70,31 +70,31 @@ export function SettingsPanel({ onClose, onTogglePanel }: { onClose?: () => void
             </Slider.Track>
             <Slider.Thumb className="block w-3.5 h-3.5 bg-[#F73C1C] rounded-full shadow-[0_2px_10px] shadow-black/50 hover:bg-[#ff5638] focus:outline-none focus:ring-2 focus:ring-[#F73C1C]/40" />
           </Slider.Root>
-          <div className={`flex justify-between text-[10px] ${textMuted}`}><span>Preciso</span><span>Creativo</span></div>
+          <div className={`flex justify-between text-[11px] ${textMuted}`}><span>Preciso</span><span>Creativo</span></div>
         </div>
 
         <div className="flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
-            <label className={`text-[12px] font-medium ${textLabel}`}>Lunghezza risposta</label>
-            <span className={`text-[12px] font-medium ${textValue}`}>{getLengthLabel(length[0])}</span>
+            <label className={`text-[13px] font-medium ${textLabel}`}>Lunghezza risposta</label>
+            <span className={`text-[13px] font-medium ${textValue}`}>{getLengthLabel(length[0])}</span>
           </div>
           <Slider.Root className="relative flex items-center select-none touch-none w-full h-5" value={length} onValueChange={setLength} max={100} step={1}>
             <Slider.Track className={`${trackBg} relative grow rounded-full h-[4px]`}><Slider.Range className={`absolute ${rangeBg} rounded-full h-full`} /></Slider.Track>
             <Slider.Thumb className={`block w-3 h-3 ${thumbBg} rounded-full shadow-[0_2px_10px] shadow-black/50 focus:outline-none`} />
           </Slider.Root>
-          <div className={`flex justify-between text-[10px] ${textMuted}`}><span>Breve</span><span>Dettagliata</span></div>
+          <div className={`flex justify-between text-[11px] ${textMuted}`}><span>Breve</span><span>Dettagliata</span></div>
         </div>
 
         <div className="flex flex-col gap-2.5">
           <div className="flex items-center justify-between">
-            <label className={`text-[12px] font-medium ${textLabel}`}>Tono risposte</label>
-            <span className={`text-[12px] font-medium ${textValue}`}>{getToneLabel(tone[0])}</span>
+            <label className={`text-[13px] font-medium ${textLabel}`}>Tono risposte</label>
+            <span className={`text-[13px] font-medium ${textValue}`}>{getToneLabel(tone[0])}</span>
           </div>
           <Slider.Root className="relative flex items-center select-none touch-none w-full h-5" value={tone} onValueChange={setTone} max={100} step={1}>
             <Slider.Track className={`${trackBg} relative grow rounded-full h-[4px]`}><Slider.Range className={`absolute ${rangeBg} rounded-full h-full`} /></Slider.Track>
             <Slider.Thumb className={`block w-3 h-3 ${thumbBg} rounded-full shadow-[0_2px_10px] shadow-black/50 focus:outline-none`} />
           </Slider.Root>
-          <div className={`flex justify-between text-[10px] ${textMuted}`}><span>Empatico</span><span>Formale</span></div>
+          <div className={`flex justify-between text-[11px] ${textMuted}`}><span>Empatico</span><span>Formale</span></div>
         </div>
 
         <div className={`h-[1px] ${divider}`} />
@@ -108,7 +108,7 @@ export function SettingsPanel({ onClose, onTogglePanel }: { onClose?: () => void
             <div key={item.label} className="flex items-center justify-between">
               <div className="flex flex-col">
                 <span className={`text-[12px] font-medium ${textLabel}`}>{item.label}</span>
-                <span className={`text-[10px] ${textSub} mt-0.5`}>{item.desc}</span>
+                <span className={`text-[11px] ${textSub} mt-0.5`}>{item.desc}</span>
               </div>
               <Switch.Root checked={item.value} onCheckedChange={item.onChange} className={`w-[34px] h-[18px] ${switchBg} rounded-full relative data-[state=checked]:bg-[#10B981] transition-colors outline-none shrink-0`}>
                 <Switch.Thumb className="block w-[14px] h-[14px] bg-white rounded-full transition-transform translate-x-[2px] data-[state=checked]:translate-x-[18px]" />
@@ -119,7 +119,7 @@ export function SettingsPanel({ onClose, onTogglePanel }: { onClose?: () => void
 
         <div className={`h-[1px] ${divider}`} />
 
-        <button onClick={() => setAdvancedOpen(!advancedOpen)} className={`flex items-center justify-between text-[12px] font-medium ${t('text-[#888] hover:text-[#ccc]', 'text-[#888] hover:text-[#444]')} transition-colors`}>
+        <button onClick={() => setAdvancedOpen(!advancedOpen)} className={`flex items-center justify-between text-[13px] font-medium ${t('text-[#888] hover:text-[#ccc]', 'text-[#888] hover:text-[#444]')} transition-colors`}>
           <span>Parametri avanzati</span>
           {advancedOpen ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
         </button>
@@ -128,8 +128,8 @@ export function SettingsPanel({ onClose, onTogglePanel }: { onClose?: () => void
           <div className="flex flex-col gap-5">
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center justify-between">
-                <label className={`text-[11px] font-medium ${t('text-[#999]', 'text-[#777]')}`}>Max Tokens</label>
-                <span className={`text-[11px] font-medium ${textValue}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>{Math.round(maxTokens[0] * 40.96)}</span>
+                <label className={`text-[12px] font-medium ${t('text-[#999]', 'text-[#777]')}`}>Max Tokens</label>
+                <span className={`text-[12px] font-medium ${textValue}`}>{Math.round(maxTokens[0] * 40.96)}</span>
               </div>
               <Slider.Root className="relative flex items-center select-none touch-none w-full h-5" value={maxTokens} onValueChange={setMaxTokens} max={100} step={1}>
                 <Slider.Track className={`${trackBg} relative grow rounded-full h-[3px]`}><Slider.Range className={`absolute ${rangeBg} rounded-full h-full`} /></Slider.Track>
@@ -138,8 +138,8 @@ export function SettingsPanel({ onClose, onTogglePanel }: { onClose?: () => void
             </div>
             <div className="flex flex-col gap-2.5">
               <div className="flex items-center justify-between">
-                <label className={`text-[11px] font-medium ${t('text-[#999]', 'text-[#777]')}`}>Top P</label>
-                <span className={`text-[11px] font-medium ${textValue}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>{(topP[0] / 100).toFixed(2)}</span>
+                <label className={`text-[12px] font-medium ${t('text-[#999]', 'text-[#777]')}`}>Top P</label>
+                <span className={`text-[12px] font-medium ${textValue}`}>{(topP[0] / 100).toFixed(2)}</span>
               </div>
               <Slider.Root className="relative flex items-center select-none touch-none w-full h-5" value={topP} onValueChange={setTopP} max={100} step={1}>
                 <Slider.Track className={`${trackBg} relative grow rounded-full h-[3px]`}><Slider.Range className={`absolute ${rangeBg} rounded-full h-full`} /></Slider.Track>

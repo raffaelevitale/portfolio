@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Copy, Paperclip, Send, Check, ThumbsUp, ThumbsDown, RotateCcw, Smile, X, MessageSquareWarning, AlertTriangle, Ban, HelpCircle, Bug, ChevronRight } from 'lucide-react';
+import { Copy, Paperclip, Send, Check, ThumbsUp, ThumbsDown, RotateCcw, Smile, X, MessageSquareWarning, AlertTriangle, Ban, HelpCircle, Bug, ChevronRight, Flag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import type { Module } from './data';
@@ -9,6 +9,12 @@ import { useTheme } from './ThemeContext';
 type FeedbackData = {
   category: string;
   comment: string;
+};
+
+type GeneralFeedbackData = {
+  category: string;
+  comment: string;
+  includeLogs: boolean;
 };
 
 type Message = {
@@ -27,6 +33,14 @@ const feedbackCategories = [
   { id: 'harmful', label: 'Contenuto inappropriato', description: 'Linguaggio offensivo o dannoso', icon: Ban },
   { id: 'incomplete', label: 'Risposta incompleta', description: 'Mancano dettagli importanti', icon: MessageSquareWarning },
   { id: 'bug', label: 'Errore tecnico', description: 'Problemi di formattazione o visualizzazione', icon: Bug },
+];
+
+const generalFeedbackCategories = [
+  { id: 'experience', label: 'Esperienza utente', description: 'Flussi poco naturali o UX migliorabile' },
+  { id: 'quality', label: 'Qualita risposte', description: 'Risposte poco chiare o non coerenti' },
+  { id: 'bug', label: 'Bug tecnico', description: 'Errore funzionale o visuale dell interfaccia' },
+  { id: 'feature', label: 'Nuova funzionalita', description: 'Suggerimento o miglioramento di prodotto' },
+  { id: 'other', label: 'Altro', description: 'Feedback generale non categorizzato' },
 ];
 
 function FeedbackModal({ onSubmit, onClose, isDark }: { onSubmit: (data: FeedbackData) => void; onClose: () => void; isDark: boolean }) {
@@ -80,13 +94,11 @@ function FeedbackModal({ onSubmit, onClose, isDark }: { onSubmit: (data: Feedbac
                 <button
                   key={cat.id}
                   onClick={() => setSelected(isSelected ? null : cat.id)}
-                  className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl border text-left transition-all ${
-                    isSelected ? cardSelectedBg : cardBg
-                  }`}
+                  className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl border text-left transition-all ${isSelected ? cardSelectedBg : cardBg
+                    }`}
                 >
-                  <div className={`flex h-8 w-8 items-center justify-center rounded-lg shrink-0 ${
-                    isSelected ? 'bg-[#F73C1C]/15' : t('bg-white/[0.04]', 'bg-black/[0.04]')
-                  }`}>
+                  <div className={`flex h-8 w-8 items-center justify-center rounded-lg shrink-0 ${isSelected ? 'bg-[#F73C1C]/15' : t('bg-white/[0.04]', 'bg-black/[0.04]')
+                    }`}>
                     <CatIcon size={16} className={isSelected ? 'text-[#F73C1C]' : t('text-[#777]', 'text-[#999]')} />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -142,11 +154,130 @@ function FeedbackModal({ onSubmit, onClose, isDark }: { onSubmit: (data: Feedbac
             onClick={() => {
               if (selected) onSubmit({ category: selected, comment });
             }}
-            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-semibold transition-all ${
-              selected
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-semibold transition-all ${selected
                 ? 'bg-[#F73C1C] text-white hover:bg-[#e0341a] shadow-md shadow-[#F73C1C]/20'
                 : t('bg-[#333] text-[#666]', 'bg-[#eee] text-[#bbb]') + ' cursor-not-allowed'
-            }`}
+              }`}
+          >
+            Invia feedback
+            <ChevronRight size={14} />
+          </motion.button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+function GeneralFeedbackModal({ onSubmit, onClose, isDark }: { onSubmit: (data: GeneralFeedbackData) => void; onClose: () => void; isDark: boolean }) {
+  const [selected, setSelected] = useState<string | null>(null);
+  const [comment, setComment] = useState('');
+  const [includeLogs, setIncludeLogs] = useState(true);
+  const t = (d: string, l: string) => isDark ? d : l;
+
+  const overlayBg = 'bg-black/60 backdrop-blur-sm';
+  const panelBg = t('bg-[#1A1A1A] border-white/[0.08]', 'bg-white border-black/[0.08]');
+  const textMain = t('text-white', 'text-[#111]');
+  const textSub = t('text-[#999]', 'text-[#666]');
+  const textMuted = t('text-[#555]', 'text-[#aaa]');
+  const cardBg = t('bg-[#242424] border-white/[0.06] hover:border-white/[0.12]', 'bg-[#F8F8F8] border-black/[0.06] hover:border-black/[0.12]');
+  const cardSelectedBg = t('bg-[#F73C1C]/10 border-[#F73C1C]/40', 'bg-[#FFF0EE] border-[#F73C1C]/40');
+  const inputBg = t('bg-[#242424] border-white/[0.06]', 'bg-[#F5F5F5] border-black/[0.06]');
+  const inputText = t('text-[#ccc] placeholder:text-[#555]', 'text-[#333] placeholder:text-[#bbb]');
+  const checkboxBg = t('bg-[#242424] border-white/[0.1]', 'bg-white border-black/[0.12]');
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className={`fixed inset-0 z-50 flex items-center justify-center p-4 ${overlayBg}`}
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 8 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 8 }}
+        transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+        onClick={e => e.stopPropagation()}
+        className={`w-full max-w-md rounded-2xl border ${panelBg} shadow-2xl overflow-hidden`}
+      >
+        <div className="flex items-center justify-between px-5 pt-5 pb-3">
+          <div>
+            <h3 className={`text-[15px] font-bold ${textMain}`}>Feedback generale</h3>
+            <p className={`text-[12px] ${textSub} mt-0.5`}>Condivideremo automaticamente anche il contesto tecnico</p>
+          </div>
+          <button onClick={onClose} className={`p-1.5 rounded-lg ${textMuted} hover:text-[#F73C1C] transition-colors`}>
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="px-5 pb-2">
+          <p className={`text-[11px] font-semibold uppercase tracking-wider ${textMuted} mb-2.5`}>Categoria</p>
+          <div className="flex flex-col gap-1.5">
+            {generalFeedbackCategories.map(cat => {
+              const isSelected = selected === cat.id;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setSelected(isSelected ? null : cat.id)}
+                  className={`flex items-center gap-3 w-full px-3.5 py-2.5 rounded-xl border text-left transition-all ${isSelected ? cardSelectedBg : cardBg
+                    }`}
+                >
+                  <div className="flex-1 min-w-0">
+                    <span className={`text-[13px] font-medium block ${isSelected ? 'text-[#F73C1C]' : textMain}`}>{cat.label}</span>
+                    <span className={`text-[11px] block ${textSub}`}>{cat.description}</span>
+                  </div>
+                  {isSelected && (
+                    <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }}>
+                      <div className="w-5 h-5 rounded-full bg-[#F73C1C] flex items-center justify-center">
+                        <Check size={12} className="text-white" />
+                      </div>
+                    </motion.div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="px-5 pt-2 pb-1">
+          <p className={`text-[11px] font-semibold uppercase tracking-wider ${textMuted} mb-2`}>Commento</p>
+          <textarea
+            value={comment}
+            onChange={e => setComment(e.target.value)}
+            placeholder="Racconta cosa non ti convince o cosa vorresti migliorare..."
+            rows={4}
+            className={`w-full ${inputBg} ${inputText} border rounded-xl px-3.5 py-2.5 text-[13px] resize-none outline-none focus:border-[#F73C1C]/30 transition-colors`}
+          />
+
+          <label className={`mt-3 flex items-center gap-2.5 p-2.5 rounded-xl border ${checkboxBg} ${textSub}`}>
+            <input
+              type="checkbox"
+              checked={includeLogs}
+              onChange={e => setIncludeLogs(e.target.checked)}
+              className="accent-[#F73C1C]"
+            />
+            <span className="text-[12px]">Includi log automatici (chat recente, modulo, ambiente)</span>
+          </label>
+        </div>
+
+        <div className="flex items-center justify-end gap-2 px-5 py-4">
+          <button
+            onClick={onClose}
+            className={`px-4 py-2 rounded-xl text-[13px] font-medium ${textSub} ${t('hover:bg-white/[0.04]', 'hover:bg-black/[0.04]')} transition-colors`}
+          >
+            Annulla
+          </button>
+          <motion.button
+            whileTap={{ scale: 0.97 }}
+            disabled={!selected}
+            onClick={() => {
+              if (selected) onSubmit({ category: selected, comment: comment.trim(), includeLogs });
+            }}
+            className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-semibold transition-all ${selected
+                ? 'bg-[#F73C1C] text-white hover:bg-[#e0341a] shadow-md shadow-[#F73C1C]/20'
+                : t('bg-[#333] text-[#666]', 'bg-[#eee] text-[#bbb]') + ' cursor-not-allowed'
+              }`}
           >
             Invia feedback
             <ChevronRight size={14} />
@@ -177,6 +308,7 @@ export function ChatArea({ module }: ChatAreaProps) {
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [feedbackMessageId, setFeedbackMessageId] = useState<string | null>(null);
+  const [showGeneralFeedbackModal, setShowGeneralFeedbackModal] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const isDark = t('dark', 'light') === 'dark';
@@ -240,6 +372,76 @@ export function ChatArea({ module }: ChatAreaProps) {
     setFeedbackMessageId(null);
   };
 
+  const persistGeneralFeedback = (payload: Record<string, unknown>) => {
+    try {
+      const key = 'interfaccia_feedback_reports';
+      const raw = localStorage.getItem(key);
+      const current = raw ? JSON.parse(raw) : [];
+      const safeCurrent = Array.isArray(current) ? current : [];
+      const updated = [...safeCurrent, payload].slice(-50);
+      localStorage.setItem(key, JSON.stringify(updated));
+    } catch {
+      // Non bloccare il flusso utente se localStorage non e disponibile.
+    }
+  };
+
+  const submitGeneralFeedback = async (data: GeneralFeedbackData) => {
+    const payload = {
+      kind: 'general-feedback',
+      submittedAt: new Date().toISOString(),
+      route: window.location.pathname,
+      module: {
+        id: module.id,
+        name: module.name,
+        type: module.type,
+      },
+      ui: {
+        theme: isDark ? 'dark' : 'light',
+        viewport: {
+          width: window.innerWidth,
+          height: window.innerHeight,
+        },
+      },
+      feedback: {
+        category: data.category,
+        comment: data.comment,
+      },
+      context: {
+        messageCount: messages.length,
+        isTyping,
+        recentMessages: data.includeLogs
+          ? messages.slice(-6).map(m => ({
+            id: m.id,
+            sender: m.sender,
+            content: m.content,
+            time: m.time,
+          }))
+          : [],
+      },
+      environment: {
+        userAgent: navigator.userAgent,
+      },
+    };
+
+    persistGeneralFeedback(payload);
+    console.info('[interfaccia-feedback]', payload);
+
+    const categoryLabel = generalFeedbackCategories.find(c => c.id === data.category)?.label || data.category;
+    if (data.includeLogs) {
+      try {
+        await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+        toast.success(`Feedback inviato: ${categoryLabel}. Log copiato negli appunti`);
+      } catch {
+        toast.success(`Feedback inviato: ${categoryLabel}`);
+        toast('Log salvato in localStorage (chiave: interfaccia_feedback_reports)');
+      }
+    } else {
+      toast.success(`Feedback inviato: ${categoryLabel}`);
+    }
+
+    setShowGeneralFeedbackModal(false);
+  };
+
   const renderContent = (content: string) => {
     const boldCls = t('text-white', 'text-[#111]');
     const lines = content.split('\n');
@@ -282,6 +484,10 @@ export function ChatArea({ module }: ChatAreaProps) {
   const qrText = t('text-[#888]', 'text-[#777]');
   const actionBtnBg = t('bg-[#1E1E1E] border-white/[0.06]', 'bg-white border-black/[0.08]');
   const actionBtnText = t('text-[#666] hover:text-white', 'text-[#bbb] hover:text-[#444]');
+  const feedbackInline = t(
+    'border border-[#F73C1C]/35 bg-[#F73C1C]/10 text-[#ff8d77] hover:bg-[#F73C1C]/18 hover:text-white',
+    'border border-[#F73C1C]/35 bg-[#FFF0EE] text-[#C94124] hover:bg-[#FFE3DE] hover:text-[#A8361D]'
+  );
 
   return (
     <div className="flex flex-col flex-1 h-full min-w-0 relative">
@@ -297,6 +503,18 @@ export function ChatArea({ module }: ChatAreaProps) {
           />
         )}
       </AnimatePresence>
+      <AnimatePresence>
+        {showGeneralFeedbackModal && (
+          <GeneralFeedbackModal
+            isDark={isDark}
+            onSubmit={data => {
+              void submitGeneralFeedback(data);
+            }}
+            onClose={() => setShowGeneralFeedbackModal(false)}
+          />
+        )}
+      </AnimatePresence>
+
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 md:p-6 scroll-smooth">
         <div className="max-w-3xl mx-auto flex flex-col gap-4 md:gap-5">
           <div className="flex items-center justify-center gap-4 my-2">
@@ -444,8 +662,18 @@ export function ChatArea({ module }: ChatAreaProps) {
                 </motion.button>
               </div>
             </div>
-            <div className="flex items-center justify-between px-1">
-              <span className={`text-[10px] md:text-[11px] ${dateCls}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>{input.length} / 2000</span>
+            <div className="flex items-center justify-between px-1 gap-2">
+              <div className="flex items-center gap-2">
+                <span className={`text-[10px] md:text-[11px] ${dateCls}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>{input.length} / 2000</span>
+                <button
+                  onClick={() => setShowGeneralFeedbackModal(true)}
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] md:text-[12px] font-semibold transition-colors ${feedbackInline}`}
+                  title="Invia feedback generale"
+                >
+                  <Flag size={13} />
+                  <span>Feedback</span>
+                </button>
+              </div>
               <span className={`hidden sm:inline text-[10px] md:text-[11px] ${dateCls}`}>Maiusc+Invio per nuova riga</span>
             </div>
           </div>
