@@ -48,7 +48,7 @@ export function WelcomeScreen({ ambiti, onSelectModule, onShowLocked }: WelcomeS
             Bentornato, <span className="text-[#F73C1C]">Luciano</span>
           </h1>
           <p className={`text-[13px] md:text-[14px] ${t('text-[#777]', 'text-[#888]')}`}>
-            Seleziona un ambito per iniziare a lavorare
+            Seleziona un sistema AI per iniziare a lavorare
           </p>
         </motion.div>
 
@@ -79,7 +79,7 @@ export function WelcomeScreen({ ambiti, onSelectModule, onShowLocked }: WelcomeS
           transition={{ duration: 0.4, delay: 0.35 }}
           className={`${t('bg-[#1A1A1A] border-white/[0.04]', 'bg-white border-black/[0.06]')} border rounded-xl p-4 md:p-5`}
         >
-          <h3 className={`text-[13px] font-semibold ${t('text-[#888]', 'text-[#888]')} mb-3 uppercase tracking-wider`}>I tuoi ambiti</h3>
+          <h3 className={`text-[13px] font-semibold ${t('text-[#888]', 'text-[#888]')} mb-3 uppercase tracking-wider`}>I tuoi sistemi AI</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {ambiti.map((a, i) => {
               const Icon = iconMap[a.iconName] || Compass;
@@ -95,11 +95,10 @@ export function WelcomeScreen({ ambiti, onSelectModule, onShowLocked }: WelcomeS
                   whileHover={isClickable ? { scale: 1.02 } : undefined}
                   whileTap={isClickable ? { scale: 0.98 } : undefined}
                   onClick={() => isClickable && handleAmbitoClick(a)}
-                  className={`flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${
-                    isClickable
+                  className={`flex items-center gap-3 p-3 rounded-lg text-left transition-colors ${isClickable
                       ? `cursor-pointer ${t('hover:bg-white/[0.06]', 'hover:bg-black/[0.05]')}`
                       : 'cursor-default'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center justify-center w-[30px] h-[30px] rounded-lg shrink-0" style={{ backgroundColor: a.color + '18' }}>
                     <Icon size={14} style={{ color: a.color }} />

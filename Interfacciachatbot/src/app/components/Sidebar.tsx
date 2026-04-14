@@ -200,8 +200,8 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
                                 key={mod.id}
                                 ref={isSelected ? selectedRef : undefined}
                                 className={`flex items-center gap-2 w-full pl-9 pr-3 py-1.5 text-left transition-all text-[12px] relative ${isSelected
-                                    ? `${activeBg} font-semibold`
-                                    : hoverBg
+                                  ? `${activeBg} font-semibold`
+                                  : hoverBg
                                   } ${isLocked ? 'opacity-50' : ''}`}
                               >
                                 {isSelected && (

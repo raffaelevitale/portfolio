@@ -27,127 +27,326 @@ export type Ambito = {
 
 export const ambiti: Ambito[] = [
   {
-    id: 'direzione', name: 'Direzione', subtitle: 'Strategia e decisioni', color: '#1B3A6B', iconName: 'compass',
+    id: 'aegis',
+    name: 'AEGIS',
+    subtitle: 'Data Governance & Secure AI Layer',
+    color: '#1B3A6B',
+    iconName: 'shield',
     funzioni: [
       {
-        id: 'dir-strategia', name: 'Strategia',
+        id: 'aegis-produzione',
+        name: 'Produzione',
         modules: [
-          { id: 'dir-analisi-strategica', name: 'Analisi Strategica', type: 'chat', purchased: true, active: true, description: 'Analisi strategica con AI per decisioni data-driven' },
-          { id: 'dir-forecast', name: 'Forecast Aziendale', type: 'dashboard', purchased: true, active: false, description: 'Previsioni e scenari futuri' },
+          {
+            id: 'M093',
+            name: 'MOTORE DI INSTRADAMENTO SEMANTICO',
+            type: 'chat',
+            purchased: true,
+            active: true,
+            description: 'Orchestrazione intelligente delle richieste verso i sistemi AI piu competenti.',
+          },
         ],
       },
       {
-        id: 'dir-intelligence', name: 'Intelligence',
+        id: 'aegis-utility',
+        name: 'Utility',
         modules: [
-          { id: 'dir-analisi-competitor', name: 'Analisi Competitor', type: 'dashboard', purchased: false, active: false, lockedInfo: { title: 'Analisi Competitor', subtitle: 'Intelligence competitiva', description: 'Monitora i competitor in tempo reale con analisi automatiche di mercato, prezzi e posizionamento.' } },
+          {
+            id: 'M010',
+            name: 'NORMALIZZA DATI',
+            type: 'settings',
+            purchased: true,
+            active: false,
+            description: 'Trasforma input eterogenei in dati strutturati pronti per i moduli AI.',
+          },
+          {
+            id: 'M011',
+            name: 'SMISTAMENTO EMAIL AUTOMATICO',
+            type: 'settings',
+            purchased: true,
+            active: false,
+            description: 'Analizza e assegna automaticamente le email al reparto corretto.',
+          },
+          {
+            id: 'M012',
+            name: "ORDINAMENTO PRIORITA' AUTOMATICA",
+            type: 'dashboard',
+            purchased: true,
+            active: false,
+            description: 'Riordina automaticamente le richieste in base a criteri di priorita.',
+          },
+          {
+            id: 'M013',
+            name: 'EMAIL ACTION',
+            type: 'settings',
+            purchased: true,
+            active: false,
+            description: 'Trasforma email classificate in azioni operative tracciabili.',
+          },
+          {
+            id: 'M021',
+            name: 'Estrazione dati da documenti',
+            type: 'files',
+            purchased: true,
+            active: false,
+            description: 'Estrae automaticamente campi strutturati da documenti aziendali.',
+          },
+          {
+            id: 'M024',
+            name: 'Accesso Servizi Web tramite API',
+            type: 'settings',
+            purchased: true,
+            active: false,
+            description: 'Interazione automatica con servizi web esterni tramite API ufficiali.',
+          },
+          {
+            id: 'M025',
+            name: 'Accesso Servizi Web tramite RPA',
+            type: 'settings',
+            purchased: true,
+            active: false,
+            description: 'Automazione browser per siti senza API disponibili.',
+          },
+          {
+            id: 'M026',
+            name: 'Agente Web Operativo',
+            type: 'settings',
+            purchased: true,
+            active: false,
+            description: 'Agente AI che esegue operazioni su piattaforme web in autonomia.',
+          },
+          {
+            id: 'M027',
+            name: 'WEB CONTENT CONTROL',
+            type: 'settings',
+            purchased: true,
+            active: false,
+            description: 'Modifica diretta dei contenuti web tramite chatbot conversazionale.',
+          },
+          {
+            id: 'M101',
+            name: 'Server MCP Aziendale',
+            type: 'settings',
+            purchased: true,
+            active: false,
+            description: 'Espone sistemi aziendali ad agenti esterni tramite protocollo MCP.',
+          },
         ],
       },
     ],
   },
   {
-    id: 'organizzazione', name: 'Organizzazione', subtitle: 'Processi e formazione', color: '#8B5CF6', iconName: 'cog',
+    id: 'orion',
+    name: 'ORION',
+    subtitle: 'Predictive Strategy Engine',
+    color: '#F97316',
+    iconName: 'compass',
     funzioni: [
       {
-        id: 'org-hr', name: 'Risorse Umane',
+        id: 'orion-direzione',
+        name: 'Direzione',
         modules: [
-          { id: 'org-onboarding', name: 'Onboarding Dipendenti', type: 'settings', purchased: true, active: true, description: 'Automazione processo di onboarding' },
-          { id: 'org-formazione', name: 'Formazione Continua', type: 'files', purchased: true, active: true, description: 'Knowledge base e materiali formativi' },
+          {
+            id: 'M001',
+            name: "SCOPRI L'AI COSA DICE DI TE",
+            type: 'dashboard',
+            purchased: true,
+            active: true,
+            description: 'Fotografia reputazionale aziendale su web, media, social e motori AI.',
+          },
         ],
       },
       {
-        id: 'org-processi', name: 'Processi',
+        id: 'orion-intelligence',
+        name: 'Intelligence',
         modules: [
-          { id: 'org-workflow', name: 'Automazione Processi', type: 'settings', purchased: false, active: false, lockedInfo: { title: 'ENSO', subtitle: 'Circle of Continuous Learning', description: 'Il sistema ENSO (Formazione continua e allineamento) non è incluso nel tuo piano attuale. Contattaci per scoprire come attivarlo.' } },
+          {
+            id: 'M022',
+            name: 'Analisi Sito Web',
+            type: 'dashboard',
+            purchased: true,
+            active: false,
+            description: 'Analisi automatica del sito con sintesi strutturata dei contenuti.',
+          },
+          {
+            id: 'M023',
+            name: 'Profilazione Azienda',
+            type: 'chat',
+            purchased: true,
+            active: false,
+            description: 'Chatbot che raccoglie informazioni e compila campi CRM predefiniti.',
+          },
+          {
+            id: 'M051',
+            name: 'Trascrizione e sintesi riunioni',
+            type: 'files',
+            purchased: true,
+            active: false,
+            description: 'Trasforma meeting e call in report operativi riutilizzabili.',
+          },
+          {
+            id: 'M081',
+            name: 'Monitoraggio competitor automatico',
+            type: 'dashboard',
+            purchased: true,
+            active: false,
+            description: 'Analisi continua delle attivita dei concorrenti.',
+          },
+          {
+            id: 'M091',
+            name: 'Analisi automatica KPI aziendali',
+            type: 'dashboard',
+            purchased: true,
+            active: false,
+            description: 'Genera insight dai dati aziendali in tempo reale.',
+          },
+          {
+            id: 'M092',
+            name: 'Assistente Intelligence Aziendale',
+            type: 'chat',
+            purchased: true,
+            active: false,
+            description: 'Raccoglie e analizza informazioni su aziende e mercati.',
+          },
+          {
+            id: 'M998',
+            name: 'TREND & TOPIC DI SETTORE',
+            type: 'dashboard',
+            purchased: true,
+            active: false,
+            description: 'Individua trend di settore e opportunita di contenuto.',
+          },
         ],
       },
     ],
   },
   {
-    id: 'amministrazione', name: 'Amministrazione', subtitle: 'Compliance e governance', color: '#6B7280', iconName: 'shield',
+    id: 'goji',
+    name: 'GOJI',
+    subtitle: 'Conversational Sales Agent',
+    color: '#10B981',
+    iconName: 'target',
     funzioni: [
       {
-        id: 'amm-contabilita', name: 'Contabilità',
+        id: 'goji-sales',
+        name: 'Vendita Conversazionale',
         modules: [
-          { id: 'amm-fatturazione', name: 'Fatturazione', type: 'settings', purchased: true, active: true, description: 'Gestione automatica fatturazione' },
-          { id: 'amm-smistamento-email', name: 'Smistamento Email', type: 'settings', purchased: true, active: false, description: 'Smistamento automatico email in arrivo' },
-        ],
-      },
-      {
-        id: 'amm-compliance', name: 'Compliance',
-        modules: [
-          { id: 'amm-gdpr', name: 'Compliance GDPR', type: 'files', purchased: false, active: false, lockedInfo: { title: 'Compliance GDPR', subtitle: 'Protezione dati automatica', description: 'Gestisci la conformità GDPR con audit automatici, registro trattamenti e gestione consensi.' } },
+          {
+            id: 'M041',
+            name: 'Generazione automatica preventivi',
+            type: 'chat',
+            purchased: true,
+            active: true,
+            description: 'Crea preventivi commerciali rapidi con supporto AI.',
+          },
+          {
+            id: 'M062',
+            name: 'Qualificazione automatica lead',
+            type: 'chat',
+            purchased: true,
+            active: true,
+            description: 'Valuta automaticamente qualita e priorita dei lead in ingresso.',
+          },
         ],
       },
     ],
   },
   {
-    id: 'produzione', name: 'Produzione', subtitle: 'Workflow e qualità', color: '#D97706', iconName: 'wrench',
+    id: 'enso',
+    name: 'ENSO',
+    subtitle: 'The Circle of Continuous Learning',
+    color: '#8B5CF6',
+    iconName: 'cog',
     funzioni: [
       {
-        id: 'prod-qualita', name: 'Qualità',
+        id: 'enso-learning',
+        name: 'Knowledge e Formazione',
         modules: [
-          { id: 'prod-controllo', name: 'Controllo Qualità', type: 'dashboard', purchased: true, active: true, description: 'Monitoraggio metriche qualità in tempo reale' },
-        ],
-      },
-      {
-        id: 'prod-workflow', name: 'Workflow',
-        modules: [
-          { id: 'prod-gestione-workflow', name: 'Gestione Workflow', type: 'settings', purchased: true, active: false, description: 'Configura e ottimizza i flussi di lavoro' },
+          {
+            id: 'M014',
+            name: 'ANALISI COERENZA DOCUMENTALE',
+            type: 'files',
+            purchased: true,
+            active: true,
+            description: 'Rileva incoerenze e discordanze nella documentazione aziendale.',
+          },
+          {
+            id: 'M031',
+            name: 'Assistente interno di conoscenza',
+            type: 'chat',
+            purchased: true,
+            active: false,
+            description: 'Chat aziendale che interroga documenti e know-how interno.',
+          },
         ],
       },
     ],
   },
   {
-    id: 'marketing', name: 'Marketing', subtitle: 'Lead e campagne', color: '#F59E0B', iconName: 'sun',
+    id: 'luma',
+    name: 'LUMA',
+    subtitle: 'Multimodal Lead Generator',
+    color: '#F59E0B',
+    iconName: 'sun',
     funzioni: [
       {
-        id: 'mkt-acquisizione', name: 'Acquisizione',
+        id: 'luma-marketing',
+        name: 'Marketing',
         modules: [
-          { id: 'mkt-lead-gen', name: 'Lead Generation', type: 'chat', purchased: true, active: true, description: 'Genera e qualifica lead con chatbot intelligente' },
-          { id: 'mkt-campagne-email', name: 'Campagne Email', type: 'settings', purchased: true, active: false, description: 'Automazione campagne email marketing' },
-        ],
-      },
-      {
-        id: 'mkt-analisi', name: 'Analisi',
-        modules: [
-          { id: 'mkt-analytics', name: 'Marketing Analytics', type: 'dashboard', purchased: false, active: false, lockedInfo: { title: 'Marketing Analytics', subtitle: 'Analisi performance campagne', description: 'Dashboard avanzata per monitorare ROI, conversioni e performance di tutti i canali marketing.' } },
+          {
+            id: 'M071',
+            name: 'Creazione contenuti assistita',
+            type: 'chat',
+            purchased: true,
+            active: true,
+            description: 'Supporto AI alla produzione di contenuti marketing.',
+          },
         ],
       },
     ],
   },
   {
-    id: 'vendita', name: 'Vendita', subtitle: 'Pipeline e conversione', color: '#10B981', iconName: 'target',
+    id: 'sonny',
+    name: 'SONNY',
+    subtitle: 'Vertical Knowledge AI',
+    color: '#2563EB',
+    iconName: 'wrench',
     funzioni: [
       {
-        id: 'ven-assistenza', name: 'Assistenza Vendita',
+        id: 'sonny-supporto',
+        name: 'Supporto operativo specialistico',
         modules: [
-          { id: 'ven-chatbot', name: 'Chatbot Assistenza Vendita', type: 'chat', purchased: true, active: true, description: 'Assistente AI per supporto processo di vendita' },
-          { id: 'ven-qualifica', name: 'Qualifica Lead', type: 'chat', purchased: true, active: true, description: 'Qualificazione automatica dei lead in ingresso' },
-        ],
-      },
-      {
-        id: 'ven-pipeline', name: 'Pipeline',
-        modules: [
-          { id: 'ven-gestione-pipeline', name: 'Gestione Pipeline', type: 'dashboard', purchased: true, active: true, description: 'Visualizza e gestisci la pipeline commerciale' },
+          {
+            id: 'M002',
+            name: 'ASSISTENTE INFORMATIVO SPECIALISTICO',
+            type: 'chat',
+            purchased: true,
+            active: true,
+            description: 'Assistente conversazionale basato su RAG verticalizzato.',
+          },
         ],
       },
     ],
   },
   {
-    id: 'assistenza', name: 'Assistenza', subtitle: 'Supporto pre/post vendita', color: '#06B6D4', iconName: 'heart',
+    id: 'kora',
+    name: 'KORA',
+    subtitle: 'Post-Sales Knowledge Assistant',
+    color: '#06B6D4',
+    iconName: 'heart',
     funzioni: [
       {
-        id: 'ass-supporto', name: 'Supporto',
+        id: 'kora-post-sales',
+        name: 'Post-vendita',
         modules: [
-          { id: 'ass-ticket', name: 'Gestione Ticket', type: 'settings', purchased: true, active: true, description: 'Smistamento e categorizzazione automatica ticket' },
-          { id: 'ass-chatbot', name: 'Chatbot Supporto', type: 'chat', purchased: true, active: true, description: 'Chatbot per supporto pre e post vendita' },
-        ],
-      },
-      {
-        id: 'ass-knowledge', name: 'Knowledge',
-        modules: [
-          { id: 'ass-faq', name: 'FAQ e Knowledge Base', type: 'files', purchased: true, active: true, description: 'Gestione FAQ e documenti knowledge base' },
-          { id: 'ass-report', name: 'Report Assistenza', type: 'dashboard', purchased: true, active: false, description: 'Dashboard metriche e analytics assistenza' },
+          {
+            id: 'M061',
+            name: 'Analisi conversazioni clienti',
+            type: 'dashboard',
+            purchased: true,
+            active: true,
+            description: 'Analisi qualitativa delle comunicazioni con i clienti.',
+          },
         ],
       },
     ],
@@ -155,27 +354,34 @@ export const ambiti: Ambito[] = [
 ];
 
 export const quickRepliesMap: Record<string, string[]> = {
-  'dir-analisi-strategica': ['Analisi SWOT', 'KPI direzione', 'Piano strategico Q2'],
-  'mkt-lead-gen': ['Segmenta lead per priorità', 'Scrivi messaggio primo contatto', 'Definisci piano nurturing 7 giorni'],
-  'ven-chatbot': ['Gestione obiezioni', 'Script vendita', 'Proposta commerciale'],
-  'ven-qualifica': ['Criteri qualifica', 'Scoring lead', 'Template follow-up'],
-  'ass-chatbot': ['Gestione ticket', 'FAQ aggiornate', 'Report assistenza'],
+  M093: ['Routing semantico: stato', 'Mostra domini disponibili', 'Regole di instradamento correnti'],
+  M002: ['Mostra fonti consultate', 'Rispondi su normativa tecnica', 'Apri riepilogo riferimenti'],
+  M001: ['Report reputazionale trimestrale', 'Punti di forza/debolezza', 'Confronto percezione mese su mese'],
+  M041: ['Genera preventivo base', 'Template preventivo enterprise', 'Ricalcola margine'],
+  M062: ['Scoring lead', 'Lead ad alta priorita', 'Prossime azioni consigliate'],
   default: ['Come posso aiutarti?', 'Mostra esempi reali', 'Panoramica funzionalità'],
 };
 
 export const botResponsesMap: Record<string, string[]> = {
-  'ass-chatbot': [
-    'Ecco come configurare la categorizzazione automatica:\n• **Definisci le categorie** — Crea 5-8 categorie basate sui ticket più frequenti.\n• **Imposta le regole** — Definisci parole chiave per lo smistamento automatico.\n• **Priorità intelligente** — Attiva il sistema che analizza urgenza e impatto.',
-    'Il report assistenza mostra: **142 ticket** risolti questa settimana, tempo medio di risposta **2.3 ore**, satisfaction score **4.6/5**.',
+  M093: [
+    'Instradamento completato: richiesta classificata su dominio corretto e inoltrata al motore specialistico con confidenza alta.',
+    'Posso attivare disambiguazione su richieste multi-dominio e applicare fallback verso RAG generalista controllato.',
   ],
-  'dir-analisi-strategica': [
-    'Ho analizzato i dati strategici. Ecco i punti chiave:\n• **Crescita revenue** — +12% vs previsioni Q1\n• **Market share** — Stabile al 23% nel segmento target\n• **Efficienza operativa** — Migliorata del 8% grazie alle automazioni',
+  M002: [
+    'Ho costruito una risposta grounding-based sulle fonti specialistiche disponibili, con priorita ai riferimenti normativi aggiornati.',
+    'Per aumentare accuratezza posso restringere il retrieval a uno specifico ambito tecnico o normativa.',
   ],
-  'mkt-lead-gen': [
-    'Modalità Lead Generation attiva. Posso aiutarti a segmentare contatti e costruire messaggi per conversione.\n• **Lead scoring** — Analisi automatica del potenziale\n• **Nurturing** — Sequenze personalizzate per fase del funnel',
+  M001: [
+    'Sintesi percezione aziendale pronta: evidenziati punti di forza, criticita e coerenza narrativa sui canali pubblici.',
+    'Posso confrontare l\'ultimo report con il trimestre precedente per mostrare trend reputazionali e segnali emergenti.',
   ],
-  'ven-chatbot': [
-    'Posso aiutarti con il processo di vendita:\n• **Obiezioni comuni** — Script personalizzati per ogni obiezione\n• **Proposta commerciale** — Template ottimizzati per conversione\n• **Follow-up** — Sequenze automatiche post-meeting',
+  M041: [
+    'Preventivo generato: struttura commerciale pronta con voci, condizioni e range economico configurabile.',
+    'Posso esportare una versione breve per primo contatto o una versione completa con allegati tecnici.',
+  ],
+  M062: [
+    'Lead qualificato automaticamente: score assegnato in base a fit, interesse e urgenza commerciale.',
+    'Se vuoi, ordino la coda lead per priorita e suggerisco le prossime azioni operative.',
   ],
   default: [
     'Ho elaborato la tua richiesta. Ecco cosa posso suggerirti basandomi sui dati disponibili. Vuoi approfondire qualche aspetto?',
