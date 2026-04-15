@@ -1,7 +1,8 @@
-import { Compass, Settings2, ShieldCheck, Wrench, Sun, Target, Heart, ChevronDown, Lock, Search, MessageCircle, LayoutDashboard, FileText, Cog, X } from 'lucide-react';
+import { Compass, Settings2, ShieldCheck, Wrench, Sun, Target, Heart, ChevronDown, Lock, Search, MessageCircle, LayoutDashboard, FileText, Cog, X, Bot, Link2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import React, { useState, useEffect, useRef } from 'react';
 import type { Ambito, Module } from './data';
+import type { ThirdPartyProvider, ThirdPartyProviderId, ThirdPartySection } from './thirdPartyProviders';
 import { useTheme } from './ThemeContext';
 
 const iconMap: Record<string, React.ElementType> = {
@@ -27,16 +28,35 @@ interface SidebarProps {
   onSelectModule: (mod: Module, ambitoId: string) => void;
   onToggleModule: (moduleId: string) => void;
   onShowLocked: (mod: Module) => void;
+  activeSection: ThirdPartySection;
+  onChangeSection: (section: ThirdPartySection) => void;
+  thirdPartyProviders: ThirdPartyProvider[];
+  selectedThirdPartyProviderId: ThirdPartyProviderId;
+  onSelectThirdPartyProvider: (providerId: ThirdPartyProviderId) => void;
   isMobileOpen: boolean;
   onCloseMobile: () => void;
 }
 
-export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule, onShowLocked, isMobileOpen, onCloseMobile }: SidebarProps) {
+export function Sidebar({
+  ambiti,
+  selectedModule,
+  onSelectModule,
+  onToggleModule,
+  onShowLocked,
+  activeSection,
+  onChangeSection,
+  thirdPartyProviders,
+  selectedThirdPartyProviderId,
+  onSelectThirdPartyProvider,
+  isMobileOpen,
+  onCloseMobile,
+}: SidebarProps) {
   const { t } = useTheme();
   const [expandedAmbiti, setExpandedAmbiti] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
   const selectedRef = useRef<HTMLDivElement>(null);
+  const isInternalSection = activeSection === 'internal';
 
   const findAmbitoForModule = (moduleId: string) =>
     ambiti.find(a => a.funzioni.some(f => f.modules.some(m => m.id === moduleId)));
@@ -66,21 +86,36 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
   };
 
   const hasSearch = search.trim().length > 0;
+  const normalizedSearch = search.toLowerCase();
 
   const filteredAmbiti = ambiti.map(a => ({
     ...a,
     funzioni: a.funzioni.map(f => ({
       ...f,
       modules: f.modules.filter(m =>
-        m.name.toLowerCase().includes(search.toLowerCase())
+        m.name.toLowerCase().includes(normalizedSearch)
       ),
     })).filter(f => f.modules.length > 0),
   })).filter(a => a.funzioni.length > 0);
+
+  const filteredProviders = thirdPartyProviders.filter(provider =>
+    provider.name.toLowerCase().includes(normalizedSearch) ||
+    provider.vendor.toLowerCase().includes(normalizedSearch)
+  );
 
   const handleSelectModule = (mod: Module, ambitoId: string) => {
     onSelectModule(mod, ambitoId);
     onCloseMobile();
   };
+
+  const handleSelectProvider = (providerId: ThirdPartyProviderId) => {
+    onSelectThirdPartyProvider(providerId);
+    onCloseMobile();
+  };
+
+  const activeInternalModules = ambiti.flatMap(a => a.funzioni.flatMap(f => f.modules)).filter(m => m.purchased && m.active).length;
+  const connectedProviders = thirdPartyProviders.filter(provider => provider.connected).length;
+  const totalExternalTokens = thirdPartyProviders.reduce((acc, provider) => acc + provider.inputTokens + provider.outputTokens, 0);
 
   const sidebarBg = t('#141414', '#FFFFFF');
   const borderCls = t('border-white/[0.06]', 'border-black/[0.08]');
@@ -89,6 +124,7 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
   const textMuted = t('text-[#555]', 'text-[#999]');
   const hoverBg = t('hover:bg-white/[0.04]', 'hover:bg-black/[0.04]');
   const activeBg = t('bg-white/[0.06]', 'bg-black/[0.04]');
+  const subtleBg = t('bg-white/[0.03]', 'bg-black/[0.03]');
   const inputBg = t('bg-[#1E1E1E]', 'bg-[#F5F5F5]');
   const inputText = t('text-[#ccc] placeholder:text-[#555]', 'text-[#222] placeholder:text-[#bbb]');
 
@@ -104,7 +140,7 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
           <input
             ref={searchInputRef}
             type="text"
-            placeholder="Cerca moduli..."
+            placeholder={isInternalSection ? 'Cerca moduli...' : 'Cerca provider...'}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className={`bg-transparent text-[13px] ${inputText} outline-none flex-1 min-w-0`}
@@ -119,7 +155,7 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
 
       {/* Ambiti list */}
       <div className="flex-1 overflow-y-auto py-1 scrollbar-thin">
-        {filteredAmbiti.length === 0 && (
+        {isInternalSection && filteredAmbiti.length === 0 && (
           <div className={`flex flex-col items-center justify-center py-8 px-4 ${textMuted} text-center`}>
             <Search size={16} className="mb-2 opacity-40" />
             <span className="text-[13px]">Nessun modulo trovato</span>
@@ -129,7 +165,17 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
           </div>
         )}
 
-        {filteredAmbiti.map(ambito => {
+        {!isInternalSection && filteredProviders.length === 0 && (
+          <div className={`flex flex-col items-center justify-center py-8 px-4 ${textMuted} text-center`}>
+            <Search size={16} className="mb-2 opacity-40" />
+            <span className="text-[13px]">Nessun provider trovato</span>
+            <button onClick={() => setSearch('')} className="text-[13px] text-[#F73C1C] mt-1 hover:underline">
+              Cancella ricerca
+            </button>
+          </div>
+        )}
+
+        {isInternalSection && filteredAmbiti.map(ambito => {
           const isExpanded = hasSearch || expandedAmbiti.has(ambito.id);
           const AmbitoIcon = iconMap[ambito.iconName] || Compass;
           const hasSelectedModule = ambito.funzioni.some(f =>
@@ -253,13 +299,87 @@ export function Sidebar({ ambiti, selectedModule, onSelectModule, onToggleModule
             </div>
           );
         })}
+
+        {!isInternalSection && filteredProviders.map(provider => {
+          const isSelected = selectedThirdPartyProviderId === provider.id;
+          const totalTokens = provider.inputTokens + provider.outputTokens;
+
+          return (
+            <button
+              key={provider.id}
+              onClick={() => handleSelectProvider(provider.id)}
+              className={`w-full text-left px-3 py-2.5 transition-colors ${isSelected ? activeBg : hoverBg}`}
+            >
+              <div className={`rounded-lg border ${isSelected ? t('border-[#F73C1C]/35', 'border-[#F73C1C]/35') : borderCls} p-2.5`}>
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div
+                      className="w-8 h-8 rounded-md flex items-center justify-center shrink-0"
+                      style={{ background: `linear-gradient(135deg, ${provider.brandGradient[0]}, ${provider.brandGradient[1]})` }}
+                    >
+                      <Bot size={14} style={{ color: provider.accentColor === '#FFFFFF' ? '#F5F5F5' : provider.accentColor }} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className={`text-[12px] font-semibold ${textMain} truncate`}>{provider.name}</p>
+                      <p className={`text-[10px] ${textSub} truncate`}>{provider.vendor}</p>
+                    </div>
+                  </div>
+
+                  <span className={`text-[10px] px-1.5 py-px rounded-full ${provider.connected
+                    ? 'bg-[#10B981]/15 text-[#10B981]'
+                    : t('bg-[#444]/25 text-[#aaa]', 'bg-[#ddd] text-[#777]')
+                    }`}>
+                    {provider.connected ? 'ON' : 'OFF'}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between gap-2 mt-2">
+                  <span className={`text-[10px] ${textMuted}`}>{provider.authLabel}</span>
+                  <span className={`text-[10px] ${textSub}`}>{totalTokens.toLocaleString('it-IT')} token</span>
+                </div>
+
+                <div className={`mt-2 rounded-md px-2 py-1.5 flex items-center justify-between text-[10px] ${subtleBg}`}>
+                  <span className={textMuted}>Press kit</span>
+                  <span className="text-[#F73C1C] inline-flex items-center gap-1">apri <Link2 size={10} /></span>
+                </div>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {/* Footer */}
       <div className={`px-3 py-2 border-t ${borderCls}`}>
-        <span className={`text-[11px] font-medium ${textMuted}`}>
-          {ambiti.flatMap(a => a.funzioni.flatMap(f => f.modules)).filter(m => m.purchased && m.active).length} moduli attivi
-        </span>
+        <div className={`grid grid-cols-2 gap-1 p-1 rounded-lg ${subtleBg}`}>
+          <button
+            onClick={() => {
+              setSearch('');
+              onChangeSection('internal');
+            }}
+            className={`text-[11px] py-1.5 rounded-md font-semibold transition-colors ${isInternalSection ? t('bg-white/[0.12] text-white', 'bg-black/[0.1] text-[#111]') : textMuted}`}
+          >
+            Interni
+          </button>
+          <button
+            onClick={() => {
+              setSearch('');
+              onChangeSection('third-party');
+            }}
+            className={`text-[11px] py-1.5 rounded-md font-semibold transition-colors ${!isInternalSection ? t('bg-white/[0.12] text-white', 'bg-black/[0.1] text-[#111]') : textMuted}`}
+          >
+            Terze parti
+          </button>
+        </div>
+
+        <div className="mt-2 px-0.5">
+          {isInternalSection ? (
+            <span className={`text-[11px] font-medium ${textMuted}`}>{activeInternalModules} moduli attivi</span>
+          ) : (
+            <span className={`text-[11px] font-medium ${textMuted}`}>
+              {connectedProviders}/{thirdPartyProviders.length} connessi · {totalExternalTokens.toLocaleString('it-IT')} token
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

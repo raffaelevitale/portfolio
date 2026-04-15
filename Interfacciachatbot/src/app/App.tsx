@@ -14,8 +14,11 @@ import { LockedCard } from "./components/LockedCard";
 import { AppSettingsPage } from "./components/AppSettingsPage";
 import { WelcomeScreen } from "./components/WelcomeScreen";
 import { LoginPage } from "./components/LoginPage";
+import { ThirdPartyHubView } from "./components/ThirdPartyHubView";
 import { ambiti as initialAmbiti } from "./components/data";
 import type { Module } from "./components/data";
+import { initialThirdPartyProviders } from "./components/thirdPartyProviders";
+import type { ThirdPartyProviderId, ThirdPartySection } from "./components/thirdPartyProviders";
 import { Sliders } from 'lucide-react';
 import { Toaster } from './components/ui/sonner';
 
@@ -30,10 +33,14 @@ function AppInner() {
   const [showParams, setShowParams] = useState(true);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [mobileParamsOpen, setMobileParamsOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState<ThirdPartySection>('internal');
+  const [thirdPartyProviders, setThirdPartyProviders] = useState(initialThirdPartyProviders);
+  const [selectedThirdPartyProviderId, setSelectedThirdPartyProviderId] = useState<ThirdPartyProviderId>(initialThirdPartyProviders[0]?.id ?? 'chatgpt');
 
   const selectedAmbito = ambitiState.find(a => a.id === selectedAmbitoId);
 
   const goHome = useCallback(() => {
+    setActiveSection('internal');
     setSelectedModule(null);
     setSelectedAmbitoId('');
     setShowSettings(false);
@@ -42,11 +49,37 @@ function AppInner() {
   }, []);
 
   const onSelectModule = useCallback((mod: Module, ambitoId: string) => {
+    setActiveSection('internal');
     setSelectedModule(mod);
     setSelectedAmbitoId(ambitoId);
     setLockedModule(null);
     setShowSettings(false);
     setMobileParamsOpen(false);
+  }, []);
+
+  const onChangeSection = useCallback((section: ThirdPartySection) => {
+    setActiveSection(section);
+    setShowSettings(false);
+    setLockedModule(null);
+    if (section === 'third-party') {
+      setMobileParamsOpen(false);
+    }
+  }, []);
+
+  const onSelectThirdPartyProvider = useCallback((providerId: ThirdPartyProviderId) => {
+    setActiveSection('third-party');
+    setSelectedThirdPartyProviderId(providerId);
+    setShowSettings(false);
+    setLockedModule(null);
+    setMobileParamsOpen(false);
+  }, []);
+
+  const onToggleThirdPartyProvider = useCallback((providerId: ThirdPartyProviderId) => {
+    setThirdPartyProviders(prev => prev.map(provider =>
+      provider.id === providerId
+        ? { ...provider, connected: !provider.connected }
+        : provider
+    ));
   }, []);
 
   const onToggleModule = useCallback((moduleId: string) => {
@@ -64,7 +97,7 @@ function AppInner() {
     ? ambitiState.flatMap(a => a.funzioni.flatMap(f => f.modules)).find(m => m.id === selectedModule.id) || selectedModule
     : null;
 
-  const isChat = currentModule?.type === 'chat';
+  const isChat = activeSection === 'internal' && currentModule?.type === 'chat';
   const sidePanelWidth = 260;
 
   if (!isLoggedIn) {
@@ -93,6 +126,11 @@ function AppInner() {
             onSelectModule={onSelectModule}
             onToggleModule={onToggleModule}
             onShowLocked={setLockedModule}
+            activeSection={activeSection}
+            onChangeSection={onChangeSection}
+            thirdPartyProviders={thirdPartyProviders}
+            selectedThirdPartyProviderId={selectedThirdPartyProviderId}
+            onSelectThirdPartyProvider={onSelectThirdPartyProvider}
             isMobileOpen={mobileSidebarOpen}
             onCloseMobile={() => setMobileSidebarOpen(false)}
           />
@@ -103,7 +141,7 @@ function AppInner() {
         ) : (
           <div className="flex flex-col flex-1 min-w-0 h-full">
             <AnimatePresence mode="wait">
-              {currentModule && selectedAmbito ? (
+              {activeSection === 'internal' && currentModule && selectedAmbito ? (
                 <motion.div
                   key="topbar"
                   initial={{ opacity: 0, y: -4 }}
@@ -125,7 +163,23 @@ function AppInner() {
 
             <div className="flex flex-1 overflow-hidden relative">
               <AnimatePresence mode="wait">
-                {currentModule ? (
+                {activeSection === 'third-party' ? (
+                  <motion.div
+                    key="third-party-hub"
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2, ease: 'easeOut' }}
+                    className="flex flex-1 overflow-hidden"
+                  >
+                    <ThirdPartyHubView
+                      providers={thirdPartyProviders}
+                      selectedProviderId={selectedThirdPartyProviderId}
+                      onSelectProvider={onSelectThirdPartyProvider}
+                      onToggleConnection={onToggleThirdPartyProvider}
+                    />
+                  </motion.div>
+                ) : currentModule ? (
                   <motion.div
                     key={currentModule.id}
                     initial={{ opacity: 0, y: 8 }}
