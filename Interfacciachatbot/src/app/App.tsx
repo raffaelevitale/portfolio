@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ThemeProvider, useTheme } from "./components/ThemeContext";
 import { Header } from "./components/Header";
@@ -17,14 +17,31 @@ import { LoginPage } from "./components/LoginPage";
 import { ThirdPartyHubView } from "./components/ThirdPartyHubView";
 import { ambiti as initialAmbiti } from "./components/data";
 import type { Module } from "./components/data";
-import { initialThirdPartyProviders } from "./components/thirdPartyProviders";
-import type { ThirdPartyProviderId, ThirdPartySection } from "./components/thirdPartyProviders";
+import type { ThirdPartySection } from "./components/thirdPartyProviders";
 import { Sliders } from 'lucide-react';
 import { Toaster } from './components/ui/sonner';
 
+const LOCALHOST_APP_LOGIN_KEY = 'interfaccia.localhost.appLogin';
+
+function isLocalhostEnvironment(): boolean {
+  if (typeof window === 'undefined') return false;
+  const host = window.location.hostname;
+  return host === 'localhost' || host === '::1' || host.startsWith('127.');
+}
+
+function getInitialAppLoginState(): boolean {
+  if (!isLocalhostEnvironment()) return false;
+  try {
+    return window.localStorage.getItem(LOCALHOST_APP_LOGIN_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
 function AppInner() {
   const { t } = useTheme();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const isLocalhost = isLocalhostEnvironment();
+  const [isLoggedIn, setIsLoggedIn] = useState(getInitialAppLoginState);
   const [ambitiState, setAmbitiState] = useState(initialAmbiti);
   const [selectedModule, setSelectedModule] = useState<Module | null>(null);
   const [selectedAmbitoId, setSelectedAmbitoId] = useState('');
@@ -34,8 +51,15 @@ function AppInner() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [mobileParamsOpen, setMobileParamsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<ThirdPartySection>('internal');
-  const [thirdPartyProviders, setThirdPartyProviders] = useState(initialThirdPartyProviders);
-  const [selectedThirdPartyProviderId, setSelectedThirdPartyProviderId] = useState<ThirdPartyProviderId>(initialThirdPartyProviders[0]?.id ?? 'chatgpt');
+
+  useEffect(() => {
+    if (!isLocalhost || typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(LOCALHOST_APP_LOGIN_KEY, isLoggedIn ? '1' : '0');
+    } catch {
+      // Ignore storage failures in private mode or restricted environments.
+    }
+  }, [isLocalhost, isLoggedIn]);
 
   const selectedAmbito = ambitiState.find(a => a.id === selectedAmbitoId);
 
@@ -64,22 +88,6 @@ function AppInner() {
     if (section === 'third-party') {
       setMobileParamsOpen(false);
     }
-  }, []);
-
-  const onSelectThirdPartyProvider = useCallback((providerId: ThirdPartyProviderId) => {
-    setActiveSection('third-party');
-    setSelectedThirdPartyProviderId(providerId);
-    setShowSettings(false);
-    setLockedModule(null);
-    setMobileParamsOpen(false);
-  }, []);
-
-  const onToggleThirdPartyProvider = useCallback((providerId: ThirdPartyProviderId) => {
-    setThirdPartyProviders(prev => prev.map(provider =>
-      provider.id === providerId
-        ? { ...provider, connected: !provider.connected }
-        : provider
-    ));
   }, []);
 
   const onToggleModule = useCallback((moduleId: string) => {
@@ -128,9 +136,6 @@ function AppInner() {
             onShowLocked={setLockedModule}
             activeSection={activeSection}
             onChangeSection={onChangeSection}
-            thirdPartyProviders={thirdPartyProviders}
-            selectedThirdPartyProviderId={selectedThirdPartyProviderId}
-            onSelectThirdPartyProvider={onSelectThirdPartyProvider}
             isMobileOpen={mobileSidebarOpen}
             onCloseMobile={() => setMobileSidebarOpen(false)}
           />
@@ -172,12 +177,7 @@ function AppInner() {
                     transition={{ duration: 0.2, ease: 'easeOut' }}
                     className="flex flex-1 overflow-hidden"
                   >
-                    <ThirdPartyHubView
-                      providers={thirdPartyProviders}
-                      selectedProviderId={selectedThirdPartyProviderId}
-                      onSelectProvider={onSelectThirdPartyProvider}
-                      onToggleConnection={onToggleThirdPartyProvider}
-                    />
+                    <ThirdPartyHubView />
                   </motion.div>
                 ) : currentModule ? (
                   <motion.div

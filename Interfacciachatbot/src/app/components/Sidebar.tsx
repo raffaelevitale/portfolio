@@ -1,8 +1,8 @@
-import { Compass, Settings2, ShieldCheck, Wrench, Sun, Target, Heart, ChevronDown, Lock, Search, MessageCircle, LayoutDashboard, FileText, Cog, X, Bot, Link2 } from 'lucide-react';
+import { Compass, Settings2, ShieldCheck, Wrench, Sun, Target, Heart, ChevronDown, Lock, Search, MessageCircle, LayoutDashboard, FileText, Cog, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import React, { useState, useEffect, useRef } from 'react';
 import type { Ambito, Module } from './data';
-import type { ThirdPartyProvider, ThirdPartyProviderId, ThirdPartySection } from './thirdPartyProviders';
+import type { ThirdPartySection } from './thirdPartyProviders';
 import { useTheme } from './ThemeContext';
 
 const iconMap: Record<string, React.ElementType> = {
@@ -30,9 +30,6 @@ interface SidebarProps {
   onShowLocked: (mod: Module) => void;
   activeSection: ThirdPartySection;
   onChangeSection: (section: ThirdPartySection) => void;
-  thirdPartyProviders: ThirdPartyProvider[];
-  selectedThirdPartyProviderId: ThirdPartyProviderId;
-  onSelectThirdPartyProvider: (providerId: ThirdPartyProviderId) => void;
   isMobileOpen: boolean;
   onCloseMobile: () => void;
 }
@@ -45,9 +42,6 @@ export function Sidebar({
   onShowLocked,
   activeSection,
   onChangeSection,
-  thirdPartyProviders,
-  selectedThirdPartyProviderId,
-  onSelectThirdPartyProvider,
   isMobileOpen,
   onCloseMobile,
 }: SidebarProps) {
@@ -98,24 +92,12 @@ export function Sidebar({
     })).filter(f => f.modules.length > 0),
   })).filter(a => a.funzioni.length > 0);
 
-  const filteredProviders = thirdPartyProviders.filter(provider =>
-    provider.name.toLowerCase().includes(normalizedSearch) ||
-    provider.vendor.toLowerCase().includes(normalizedSearch)
-  );
-
   const handleSelectModule = (mod: Module, ambitoId: string) => {
     onSelectModule(mod, ambitoId);
     onCloseMobile();
   };
 
-  const handleSelectProvider = (providerId: ThirdPartyProviderId) => {
-    onSelectThirdPartyProvider(providerId);
-    onCloseMobile();
-  };
-
   const activeInternalModules = ambiti.flatMap(a => a.funzioni.flatMap(f => f.modules)).filter(m => m.purchased && m.active).length;
-  const connectedProviders = thirdPartyProviders.filter(provider => provider.connected).length;
-  const totalExternalTokens = thirdPartyProviders.reduce((acc, provider) => acc + provider.inputTokens + provider.outputTokens, 0);
 
   const sidebarBg = t('#141414', '#FFFFFF');
   const borderCls = t('border-white/[0.06]', 'border-black/[0.08]');
@@ -159,16 +141,6 @@ export function Sidebar({
           <div className={`flex flex-col items-center justify-center py-8 px-4 ${textMuted} text-center`}>
             <Search size={16} className="mb-2 opacity-40" />
             <span className="text-[13px]">Nessun modulo trovato</span>
-            <button onClick={() => setSearch('')} className="text-[13px] text-[#F73C1C] mt-1 hover:underline">
-              Cancella ricerca
-            </button>
-          </div>
-        )}
-
-        {!isInternalSection && filteredProviders.length === 0 && (
-          <div className={`flex flex-col items-center justify-center py-8 px-4 ${textMuted} text-center`}>
-            <Search size={16} className="mb-2 opacity-40" />
-            <span className="text-[13px]">Nessun provider trovato</span>
             <button onClick={() => setSearch('')} className="text-[13px] text-[#F73C1C] mt-1 hover:underline">
               Cancella ricerca
             </button>
@@ -300,52 +272,11 @@ export function Sidebar({
           );
         })}
 
-        {!isInternalSection && filteredProviders.map(provider => {
-          const isSelected = selectedThirdPartyProviderId === provider.id;
-          const totalTokens = provider.inputTokens + provider.outputTokens;
-
-          return (
-            <button
-              key={provider.id}
-              onClick={() => handleSelectProvider(provider.id)}
-              className={`w-full text-left px-3 py-2.5 transition-colors ${isSelected ? activeBg : hoverBg}`}
-            >
-              <div className={`rounded-lg border ${isSelected ? t('border-[#F73C1C]/35', 'border-[#F73C1C]/35') : borderCls} p-2.5`}>
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div
-                      className="w-8 h-8 rounded-md flex items-center justify-center shrink-0"
-                      style={{ background: `linear-gradient(135deg, ${provider.brandGradient[0]}, ${provider.brandGradient[1]})` }}
-                    >
-                      <Bot size={14} style={{ color: provider.accentColor === '#FFFFFF' ? '#F5F5F5' : provider.accentColor }} />
-                    </div>
-                    <div className="min-w-0">
-                      <p className={`text-[12px] font-semibold ${textMain} truncate`}>{provider.name}</p>
-                      <p className={`text-[10px] ${textSub} truncate`}>{provider.vendor}</p>
-                    </div>
-                  </div>
-
-                  <span className={`text-[10px] px-1.5 py-px rounded-full ${provider.connected
-                    ? 'bg-[#10B981]/15 text-[#10B981]'
-                    : t('bg-[#444]/25 text-[#aaa]', 'bg-[#ddd] text-[#777]')
-                    }`}>
-                    {provider.connected ? 'ON' : 'OFF'}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between gap-2 mt-2">
-                  <span className={`text-[10px] ${textMuted}`}>{provider.authLabel}</span>
-                  <span className={`text-[10px] ${textSub}`}>{totalTokens.toLocaleString('it-IT')} token</span>
-                </div>
-
-                <div className={`mt-2 rounded-md px-2 py-1.5 flex items-center justify-between text-[10px] ${subtleBg}`}>
-                  <span className={textMuted}>Press kit</span>
-                  <span className="text-[#F73C1C] inline-flex items-center gap-1">apri <Link2 size={10} /></span>
-                </div>
-              </div>
-            </button>
-          );
-        })}
+        {!isInternalSection && (
+          <div className={`flex flex-col items-center justify-center py-8 px-4 ${textMuted} text-center`}>
+            <span className="text-[13px]">Sezione Terze parti disattivata</span>
+          </div>
+        )}
       </div>
 
       {/* Footer */}
@@ -375,9 +306,7 @@ export function Sidebar({
           {isInternalSection ? (
             <span className={`text-[11px] font-medium ${textMuted}`}>{activeInternalModules} moduli attivi</span>
           ) : (
-            <span className={`text-[11px] font-medium ${textMuted}`}>
-              {connectedProviders}/{thirdPartyProviders.length} connessi · {totalExternalTokens.toLocaleString('it-IT')} token
-            </span>
+            <span className={`text-[11px] font-medium ${textMuted}`}>Terze parti</span>
           )}
         </div>
       </div>
