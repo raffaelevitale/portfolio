@@ -1,8 +1,15 @@
-import { Compass, Settings2, ShieldCheck, Wrench, Sun, Target, Heart, ChevronDown, Lock, Search, MessageCircle, LayoutDashboard, FileText, Cog, X } from 'lucide-react';
+import { Compass, Settings2, ShieldCheck, Wrench, Sun, Target, Heart, ChevronDown, Lock, Search, MessageCircle, LayoutDashboard, FileText, Cog, X, Link2, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import React, { useState, useEffect, useRef } from 'react';
 import type { Ambito, Module } from './data';
-import type { ThirdPartySection } from './thirdPartyProviders';
+import {
+  THIRD_PARTY_ROWS_STORAGE_KEY,
+  THIRD_PARTY_ROWS_UPDATED_EVENT,
+  getSeededThirdPartyRows,
+  parseThirdPartyRows,
+  type ThirdPartySection,
+  type ThirdPartyToolRow,
+} from './thirdPartyProviders';
 import { useTheme } from './ThemeContext';
 
 const iconMap: Record<string, React.ElementType> = {
@@ -30,6 +37,7 @@ interface SidebarProps {
   onShowLocked: (mod: Module) => void;
   activeSection: ThirdPartySection;
   onChangeSection: (section: ThirdPartySection) => void;
+  onOpenThirdPartyAssistant: (toolId?: string) => void;
   isMobileOpen: boolean;
   onCloseMobile: () => void;
 }
@@ -42,12 +50,21 @@ export function Sidebar({
   onShowLocked,
   activeSection,
   onChangeSection,
+  onOpenThirdPartyAssistant,
   isMobileOpen,
   onCloseMobile,
 }: SidebarProps) {
   const { t } = useTheme();
+
+  const loadThirdPartyRows = () => {
+    if (typeof window === 'undefined') return getSeededThirdPartyRows();
+    const stored = parseThirdPartyRows(window.localStorage.getItem(THIRD_PARTY_ROWS_STORAGE_KEY));
+    return stored && stored.length > 0 ? stored : getSeededThirdPartyRows();
+  };
+
   const [expandedAmbiti, setExpandedAmbiti] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
+  const [thirdPartyRows, setThirdPartyRows] = useState<ThirdPartyToolRow[]>(loadThirdPartyRows);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const selectedRef = useRef<HTMLDivElement>(null);
   const isInternalSection = activeSection === 'internal';
@@ -69,6 +86,21 @@ export function Sidebar({
       selectedRef.current.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     }
   }, [selectedModule?.id]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+
+    const syncRows = () => setThirdPartyRows(loadThirdPartyRows());
+    syncRows();
+
+    window.addEventListener('storage', syncRows);
+    window.addEventListener(THIRD_PARTY_ROWS_UPDATED_EVENT, syncRows);
+
+    return () => {
+      window.removeEventListener('storage', syncRows);
+      window.removeEventListener(THIRD_PARTY_ROWS_UPDATED_EVENT, syncRows);
+    };
+  }, []);
 
   const toggleAmbito = (id: string) => {
     setExpandedAmbiti(prev => {
@@ -109,6 +141,12 @@ export function Sidebar({
   const subtleBg = t('bg-white/[0.03]', 'bg-black/[0.03]');
   const inputBg = t('bg-[#1E1E1E]', 'bg-[#F5F5F5]');
   const inputText = t('text-[#ccc] placeholder:text-[#555]', 'text-[#222] placeholder:text-[#bbb]');
+  const treeLine = t('border-white/[0.16]', 'border-black/[0.16]');
+  const treeToggleBg = t('bg-white/[0.05]', 'bg-black/[0.05]');
+  const accentBorder = t('border-white/[0.08]', 'border-black/[0.1]');
+
+  const connectedThirdPartyRows = thirdPartyRows.filter(row => row.connected);
+  const activeThirdPartySubscriptions = thirdPartyRows.filter(row => row.connected && row.subscribed).length;
 
   const sidebarContent = (
     <div
@@ -122,7 +160,7 @@ export function Sidebar({
           <input
             ref={searchInputRef}
             type="text"
-            placeholder={isInternalSection ? 'Cerca moduli...' : 'Cerca provider...'}
+            placeholder={isInternalSection ? 'Cerca moduli ecosistema...' : 'Cerca provider...'}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className={`bg-transparent text-[13px] ${inputText} outline-none flex-1 min-w-0`}
@@ -183,6 +221,7 @@ export function Sidebar({
                     <motion.div
                       animate={{ rotate: isExpanded ? 0 : -90 }}
                       transition={{ duration: 0.2 }}
+                      className={`flex h-5 w-5 items-center justify-center rounded-md ${treeToggleBg}`}
                     >
                       <ChevronDown size={13} className={textMuted} />
                     </motion.div>
@@ -200,68 +239,72 @@ export function Sidebar({
                     transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
                     className="overflow-hidden"
                   >
-                    <div className="pb-1">
+                    <div className="pb-1 pt-0.5">
                       {ambito.funzioni.map(funzione => (
-                        <div key={funzione.id}>
-                          <div className="px-3 py-1 ml-5">
+                        <div key={funzione.id} className={`ml-5 mb-1 border-l ${treeLine}`}>
+                          <div className="relative py-1 pr-2 pl-4">
+                            <span className={`pointer-events-none absolute left-0 top-1/2 h-0 w-3 -translate-y-1/2 border-t ${treeLine}`} />
                             <span className={`text-[9px] font-semibold ${textMuted} uppercase tracking-[1.2px]`}>
                               {funzione.name}
                             </span>
                           </div>
-                          {funzione.modules.map(mod => {
-                            const isSelected = selectedModule?.id === mod.id;
-                            const ModIcon = typeIconMap[mod.type] || MessageCircle;
-                            const isLocked = !mod.purchased;
+                          <div className="pb-0.5">
+                            {funzione.modules.map(mod => {
+                              const isSelected = selectedModule?.id === mod.id;
+                              const ModIcon = typeIconMap[mod.type] || MessageCircle;
+                              const isLocked = !mod.purchased;
 
-                            return (
-                              <div
-                                key={mod.id}
-                                ref={isSelected ? selectedRef : undefined}
-                                className={`flex items-center gap-2 w-full pl-9 pr-3 py-1.5 text-left transition-all text-[12px] relative ${isSelected
-                                  ? `${activeBg} font-semibold`
-                                  : hoverBg
-                                  } ${isLocked ? 'opacity-50' : ''}`}
-                              >
-                                {isSelected && (
-                                  <motion.div
-                                    layoutId="sidebar-active-indicator"
-                                    className="absolute left-0 top-[3px] bottom-[3px] w-[2px] rounded-r-full bg-[#F73C1C]"
-                                    transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                                  />
-                                )}
-                                <button
-                                  onClick={() => {
-                                    if (isLocked) onShowLocked(mod);
-                                    else handleSelectModule(mod, ambito.id);
-                                  }}
-                                  className="flex items-center gap-2 flex-1 min-w-0 text-[11px] leading-tight"
+                              return (
+                                <div
+                                  key={mod.id}
+                                  ref={isSelected ? selectedRef : undefined}
+                                  className={`relative flex items-center gap-2 w-full pl-5 pr-2 py-1.5 text-left transition-all text-[12px] rounded-r-md ${isSelected
+                                    ? `${activeBg} font-semibold`
+                                    : hoverBg
+                                    } ${isLocked ? 'opacity-50' : ''}`}
                                 >
-                                  <ModIcon
-                                    size={13}
-                                    className={`shrink-0 transition-colors ${isSelected ? 'text-[#F73C1C]' : textSub}`}
-                                  />
-                                  <span className={`flex-1 truncate transition-colors text-left text-[11px] leading-tight ${isSelected ? 'text-[#F73C1C]' : textSub} ${isSelected ? 'font-semibold' : 'font-medium'}`}>
-                                    {mod.name}
-                                  </span>
-                                </button>
-                                {isLocked && <Lock size={12} className={textMuted} />}
-                                {!isLocked && (
+                                  <span className={`pointer-events-none absolute left-0 top-1/2 h-0 w-3 -translate-y-1/2 border-t ${treeLine}`} />
+                                  {isSelected && (
+                                    <motion.div
+                                      layoutId="sidebar-active-indicator"
+                                      className="absolute left-0 top-[3px] bottom-[3px] w-[2px] rounded-r-full bg-[#F73C1C]"
+                                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                                    />
+                                  )}
                                   <button
-                                    onClick={e => {
-                                      e.stopPropagation();
-                                      onToggleModule(mod.id);
+                                    onClick={() => {
+                                      if (isLocked) onShowLocked(mod);
+                                      else handleSelectModule(mod, ambito.id);
                                     }}
-                                    className={`relative w-[34px] h-[18px] rounded-full transition-colors shrink-0 ${mod.active ? 'bg-[#10B981]' : t('bg-[#333]', 'bg-[#ccc]')
-                                      }`}
-                                    title={mod.active ? 'Disattiva' : 'Attiva'}
+                                    className="flex items-center gap-2 flex-1 min-w-0 text-[11px] leading-tight"
                                   >
-                                    <div className={`absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform ${mod.active ? 'left-[18px]' : 'left-[2px]'
-                                      }`} />
+                                    <ModIcon
+                                      size={13}
+                                      className={`shrink-0 transition-colors ${isSelected ? 'text-[#F73C1C]' : textSub}`}
+                                    />
+                                    <span className={`flex-1 truncate transition-colors text-left text-[11px] leading-tight ${isSelected ? 'text-[#F73C1C]' : textSub} ${isSelected ? 'font-semibold' : 'font-medium'}`}>
+                                      {mod.name}
+                                    </span>
                                   </button>
-                                )}
-                              </div>
-                            );
-                          })}
+                                  {isLocked && <Lock size={12} className={textMuted} />}
+                                  {!isLocked && (
+                                    <button
+                                      onClick={e => {
+                                        e.stopPropagation();
+                                        onToggleModule(mod.id);
+                                      }}
+                                      className={`relative w-[34px] h-[18px] rounded-full transition-colors shrink-0 ${mod.active ? 'bg-[#10B981]' : t('bg-[#333]', 'bg-[#ccc]')
+                                        }`}
+                                      title={mod.active ? 'Disattiva' : 'Attiva'}
+                                    >
+                                      <div className={`absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform ${mod.active ? 'left-[18px]' : 'left-[2px]'
+                                        }`} />
+                                    </button>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -273,8 +316,60 @@ export function Sidebar({
         })}
 
         {!isInternalSection && (
-          <div className={`flex flex-col items-center justify-center py-8 px-4 ${textMuted} text-center`}>
-            <span className="text-[13px]">Sezione Terze parti disattivata</span>
+          <div className="px-3 py-2.5 space-y-2.5">
+            <div className={`rounded-lg border ${accentBorder} ${subtleBg} p-2.5`}>
+              <div className="flex items-center gap-2">
+                <Sparkles size={13} className="text-[#F73C1C]" />
+                <span className={`text-[11px] font-semibold ${textMain}`}>Assistente Integrato</span>
+              </div>
+              <p className={`text-[11px] mt-2 ${textMuted}`}>
+                Usa ChatGPT direttamente dentro CRYBU con una configurazione guidata lato azienda.
+              </p>
+              <div className="mt-2">
+                <button
+                  onClick={() => {
+                    onOpenThirdPartyAssistant('seed-chatgpt');
+                    onCloseMobile();
+                  }}
+                  className="w-full text-[11px] py-1.5 rounded-md font-semibold transition-colors bg-[#F73C1C] hover:bg-[#e63518] text-white"
+                >
+                  Apri ChatGPT in Dashboard
+                </button>
+              </div>
+            </div>
+
+            <div className={`rounded-lg border ${accentBorder} p-2.5`}>
+              <div className="flex items-center justify-between">
+                <span className={`text-[11px] font-semibold ${textMain}`}>Accesso rapido prompt</span>
+                <span className={`text-[10px] ${textMuted}`}>{connectedThirdPartyRows.length} connessi</span>
+              </div>
+
+              {connectedThirdPartyRows.length === 0 ? (
+                <p className={`text-[11px] ${textMuted} mt-2`}>Connetti un provider nella vista Terze parti per abilitarne il prompt interno.</p>
+              ) : (
+                <div className="mt-2 space-y-1.5">
+                  {connectedThirdPartyRows.slice(0, 5).map(row => (
+                    <button
+                      key={row.id}
+                      onClick={() => {
+                        onOpenThirdPartyAssistant(row.id);
+                        onCloseMobile();
+                      }}
+                      className={`w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md transition-colors ${hoverBg}`}
+                    >
+                      <div className="min-w-0 text-left">
+                        <p className={`text-[11px] font-medium ${textMain} truncate`}>{row.serviceName || 'Servizio esterno'}</p>
+                        <p className={`text-[10px] ${textMuted} truncate`}>{row.vendor || 'Vendor non definito'}</p>
+                      </div>
+                      <span className="inline-flex items-center gap-1 text-[10px] text-[#F73C1C] shrink-0">
+                        <Link2 size={11} />
+                        Prompt
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>
@@ -289,7 +384,7 @@ export function Sidebar({
             }}
             className={`text-[11px] py-1.5 rounded-md font-semibold transition-colors ${isInternalSection ? t('bg-white/[0.12] text-white', 'bg-black/[0.1] text-[#111]') : textMuted}`}
           >
-            Interni
+            Ecosistema
           </button>
           <button
             onClick={() => {
@@ -304,9 +399,9 @@ export function Sidebar({
 
         <div className="mt-2 px-0.5">
           {isInternalSection ? (
-            <span className={`text-[11px] font-medium ${textMuted}`}>{activeInternalModules} moduli attivi</span>
+            <span className={`text-[11px] font-medium ${textMuted}`}>Ecosistema: {activeInternalModules} moduli attivi</span>
           ) : (
-            <span className={`text-[11px] font-medium ${textMuted}`}>Terze parti</span>
+            <span className={`text-[11px] font-medium ${textMuted}`}>Terze parti: {activeThirdPartySubscriptions} abbonamenti attivi</span>
           )}
         </div>
       </div>

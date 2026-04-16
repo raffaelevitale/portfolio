@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import { Sun, Moon, Bell, X, LogOut, User, HelpCircle, Menu, Settings, Home } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
-import logoImg from 'figma:asset/bd906186d630e4e6091ecee5c5303b2411b68d3d.png';
+import logoLight from '../../../loghi/BiancoNero.png';
+import logoDark from '../../../loghi/nerobianco.png';
 import { useTheme } from './ThemeContext';
 
 interface HeaderProps {
@@ -15,6 +16,7 @@ interface HeaderProps {
 
 export function Header({ onOpenSettings, onToggleSidebar, sidebarOpen, onGoHome, onLogout }: HeaderProps) {
   const { theme, toggleTheme, t } = useTheme();
+  const currentLogo = theme === 'dark' ? logoDark : logoLight;
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -61,7 +63,7 @@ export function Header({ onOpenSettings, onToggleSidebar, sidebarOpen, onGoHome,
           </button>
         )}
         <button onClick={onGoHome} className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
-          <img src={logoImg} alt="CRXBU" className={`h-[20px] md:h-[22px] w-auto ${theme === 'light' ? 'brightness-0' : ''}`} />
+          <img src={currentLogo} alt="CRYBU" className="h-[20px] md:h-[22px] w-auto object-contain" />
         </button>
         <div className={`hidden md:block w-[1px] h-[20px] mx-1 ${t('bg-white/[0.08]', 'bg-black/[0.08]')}`} />
         <button
@@ -157,7 +159,7 @@ export function Header({ onOpenSettings, onToggleSidebar, sidebarOpen, onGoHome,
                   {[
                     { icon: User, label: 'Profilo', action: onOpenSettings },
                     { icon: Settings, label: 'Impostazioni', action: onOpenSettings },
-                    { icon: HelpCircle, label: 'Aiuto', action: () => {} },
+                    { icon: HelpCircle, label: 'Aiuto', action: () => { } },
                   ].map(item => (
                     <button key={item.label} onClick={() => { item.action(); setProfileOpen(false); }} className={`flex items-center gap-2.5 w-full px-4 py-2 text-[12px] ${t('text-[#ccc]', 'text-[#444]')} ${hoverItem} transition-colors`}>
                       <item.icon size={14} className={textSub} /> {item.label}

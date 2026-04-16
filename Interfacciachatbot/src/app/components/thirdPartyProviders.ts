@@ -1,4 +1,22 @@
 export type ThirdPartySection = 'internal' | 'third-party';
+export type ThirdPartyWorkspaceMode = 'registry' | 'prompt';
+
+export type ThirdPartyBillingType = 'free' | 'paid';
+
+export interface ThirdPartyToolRow {
+    id: string;
+    serviceName: string;
+    vendor: string;
+    url: string;
+    notes: string;
+    billingType: ThirdPartyBillingType;
+    monthlyCostEur: number;
+    subscribed: boolean;
+    connected: boolean;
+}
+
+export const THIRD_PARTY_ROWS_STORAGE_KEY = 'interfaccia.thirdPartyRows.v1';
+export const THIRD_PARTY_ROWS_UPDATED_EVENT = 'interfaccia-third-party-rows-updated';
 
 export type ThirdPartyProviderId = 'chatgpt' | 'claude' | 'gemini' | 'grok';
 
@@ -120,3 +138,56 @@ export const initialThirdPartyProviders: ThirdPartyProvider[] = [
         accentColor: '#FFFFFF',
     },
 ];
+
+export function getSeededThirdPartyRows(): ThirdPartyToolRow[] {
+    return initialThirdPartyProviders.map((provider) => ({
+        id: `seed-${provider.id}`,
+        serviceName: provider.name,
+        vendor: provider.vendor,
+        url: provider.chatUrl,
+        notes: '',
+        billingType: provider.subscriptionMonthlyUsd > 0 ? 'paid' : 'free',
+        monthlyCostEur: Math.round(provider.subscriptionMonthlyUsd * 100) / 100,
+        subscribed: provider.subscriptionMonthlyUsd > 0,
+        connected: provider.connected,
+    }));
+}
+
+export function parseThirdPartyRows(raw: string | null): ThirdPartyToolRow[] | null {
+    if (!raw) return null;
+
+    try {
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return null;
+
+        return parsed.filter((row): row is ThirdPartyToolRow => (
+            typeof row?.id === 'string'
+            && typeof row?.serviceName === 'string'
+            && typeof row?.vendor === 'string'
+            && typeof row?.url === 'string'
+            && typeof row?.notes === 'string'
+            && (row?.billingType === 'free' || row?.billingType === 'paid')
+            && typeof row?.monthlyCostEur === 'number'
+            && typeof row?.subscribed === 'boolean'
+            && typeof row?.connected === 'boolean'
+        ));
+    } catch {
+        return null;
+    }
+}
+
+export function createEmptyThirdPartyRow(): ThirdPartyToolRow {
+    const uniqueId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+    return {
+        id: `custom-${uniqueId}`,
+        serviceName: '',
+        vendor: '',
+        url: '',
+        notes: '',
+        billingType: 'free',
+        monthlyCostEur: 0,
+        subscribed: false,
+        connected: false,
+    };
+}

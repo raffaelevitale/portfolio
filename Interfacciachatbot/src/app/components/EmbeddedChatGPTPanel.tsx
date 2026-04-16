@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Loader2, SendHorizontal, ShieldCheck } from 'lucide-react';
 import { useTheme } from './ThemeContext';
 
@@ -12,6 +12,10 @@ interface ChatMessage {
 
 interface EmbeddedChatGPTPanelProps {
     providerConnected: boolean;
+    inputPreset?: string | null;
+    onPresetApplied?: () => void;
+    title?: string;
+    subtitle?: string;
 }
 
 const initialAssistantMessage: ChatMessage = {
@@ -28,7 +32,13 @@ function createMessage(role: ChatRole, content: string): ChatMessage {
     };
 }
 
-export function EmbeddedChatGPTPanel({ providerConnected }: EmbeddedChatGPTPanelProps) {
+export function EmbeddedChatGPTPanel({
+    providerConnected,
+    inputPreset,
+    onPresetApplied,
+    title,
+    subtitle,
+}: EmbeddedChatGPTPanelProps) {
     const { t } = useTheme();
 
     const [messages, setMessages] = useState<ChatMessage[]>([initialAssistantMessage]);
@@ -46,6 +56,12 @@ export function EmbeddedChatGPTPanel({ providerConnected }: EmbeddedChatGPTPanel
     const textMain = t('text-white', 'text-[#111]');
     const textSub = t('text-[#888]', 'text-[#666]');
     const textMuted = t('text-[#666]', 'text-[#999]');
+
+    useEffect(() => {
+        if (!inputPreset || inputPreset.trim().length === 0) return;
+        setInputValue(inputPreset);
+        onPresetApplied?.();
+    }, [inputPreset, onPresetApplied]);
 
     async function sendMessage() {
         const trimmed = inputValue.trim();
@@ -112,8 +128,8 @@ export function EmbeddedChatGPTPanel({ providerConnected }: EmbeddedChatGPTPanel
         <div className={`${cardBg} border rounded-xl p-4 md:p-5 mt-4 md:mt-6`}>
             <div className="flex items-center justify-between gap-3 flex-wrap mb-3">
                 <div>
-                    <h3 className={`text-[14px] md:text-[15px] font-semibold ${textMain}`}>ChatGPT integrata nella tua interfaccia</h3>
-                    <p className={`text-[11px] ${textSub}`}>Sessione in-app via API server-side</p>
+                    <h3 className={`text-[14px] md:text-[15px] font-semibold ${textMain}`}>{title ?? 'ChatGPT integrata nella tua interfaccia'}</h3>
+                    <p className={`text-[11px] ${textSub}`}>{subtitle ?? 'Sessione in-app via API server-side'}</p>
                 </div>
                 <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] ${providerConnected ? 'border-[#10B981]/35 text-[#10B981] bg-[#10B981]/10' : t('border-[#666]/40 text-[#999] bg-[#666]/10', 'border-[#bbb] text-[#777] bg-[#eee]')}`}>
                     <ShieldCheck size={11} />

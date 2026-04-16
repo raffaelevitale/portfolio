@@ -51,6 +51,7 @@ function AppInner() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [mobileParamsOpen, setMobileParamsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<ThirdPartySection>('internal');
+  const [thirdPartyToolId, setThirdPartyToolId] = useState<string | null>('seed-chatgpt');
 
   useEffect(() => {
     if (!isLocalhost || typeof window === 'undefined') return;
@@ -65,6 +66,7 @@ function AppInner() {
 
   const goHome = useCallback(() => {
     setActiveSection('internal');
+    setThirdPartyToolId('seed-chatgpt');
     setSelectedModule(null);
     setSelectedAmbitoId('');
     setShowSettings(false);
@@ -88,6 +90,14 @@ function AppInner() {
     if (section === 'third-party') {
       setMobileParamsOpen(false);
     }
+  }, []);
+
+  const openThirdPartyAssistant = useCallback((toolId?: string) => {
+    setActiveSection('third-party');
+    setThirdPartyToolId(toolId ?? 'seed-chatgpt');
+    setShowSettings(false);
+    setLockedModule(null);
+    setMobileParamsOpen(false);
   }, []);
 
   const onToggleModule = useCallback((moduleId: string) => {
@@ -136,6 +146,7 @@ function AppInner() {
             onShowLocked={setLockedModule}
             activeSection={activeSection}
             onChangeSection={onChangeSection}
+            onOpenThirdPartyAssistant={openThirdPartyAssistant}
             isMobileOpen={mobileSidebarOpen}
             onCloseMobile={() => setMobileSidebarOpen(false)}
           />
@@ -177,7 +188,10 @@ function AppInner() {
                     transition={{ duration: 0.2, ease: 'easeOut' }}
                     className="flex flex-1 overflow-hidden"
                   >
-                    <ThirdPartyHubView />
+                    <ThirdPartyHubView
+                      selectedToolId={thirdPartyToolId}
+                      onSelectToolId={setThirdPartyToolId}
+                    />
                   </motion.div>
                 ) : currentModule ? (
                   <motion.div
