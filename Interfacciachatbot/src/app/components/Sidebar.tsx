@@ -1,4 +1,4 @@
-import { Compass, Settings2, ShieldCheck, Wrench, Sun, Target, Heart, ChevronDown, Lock, Search, MessageCircle, LayoutDashboard, FileText, Cog, X, Link2, Sparkles } from 'lucide-react';
+import { Compass, Settings2, ShieldCheck, Wrench, Sun, Target, Heart, ChevronDown, Lock, Search, MessageCircle, LayoutDashboard, FileText, Cog, X, Activity, Mail, Database, Globe, Bot, Server, BarChart3, GitBranch } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import React, { useState, useEffect, useRef } from 'react';
 import type { Ambito, Module } from './data';
@@ -11,6 +11,7 @@ import {
   type ThirdPartyToolRow,
 } from './thirdPartyProviders';
 import { useTheme } from './ThemeContext';
+import { getAmbitoIconSrc } from '../icone';
 
 const iconMap: Record<string, React.ElementType> = {
   compass: Compass,
@@ -29,6 +30,42 @@ const typeIconMap: Record<string, React.ElementType> = {
   files: FileText,
 };
 
+const moduleKeywordIconMap: Array<{ pattern: RegExp; Icon: React.ElementType }> = [
+  { pattern: /(instrad|routing|smistament)/i, Icon: GitBranch },
+  { pattern: /(email|mail)/i, Icon: Mail },
+  { pattern: /(dati|data|estrazione|document)/i, Icon: Database },
+  { pattern: /(api|web|rpa)/i, Icon: Globe },
+  { pattern: /(agente|assistente|chatbot)/i, Icon: Bot },
+  { pattern: /(server|mcp)/i, Icon: Server },
+  { pattern: /(kpi|analisi|monitoraggio|trend|report|profilazione)/i, Icon: BarChart3 },
+];
+
+const ambitoListVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.04,
+      delayChildren: 0.02,
+    },
+  },
+};
+
+const ambitoItemVariants = {
+  hidden: { opacity: 0, y: 6 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.22, ease: 'easeOut' },
+  },
+};
+
+function resolveModuleIcon(mod: Module): React.ElementType {
+  const semanticMatch = moduleKeywordIconMap.find(({ pattern }) => pattern.test(mod.name));
+  if (semanticMatch) return semanticMatch.Icon;
+  return typeIconMap[mod.type] || MessageCircle;
+}
+
 interface SidebarProps {
   ambiti: Ambito[];
   selectedModule: Module | null;
@@ -37,7 +74,6 @@ interface SidebarProps {
   onShowLocked: (mod: Module) => void;
   activeSection: ThirdPartySection;
   onChangeSection: (section: ThirdPartySection) => void;
-  onOpenThirdPartyAssistant: (toolId?: string) => void;
   isMobileOpen: boolean;
   onCloseMobile: () => void;
 }
@@ -50,7 +86,6 @@ export function Sidebar({
   onShowLocked,
   activeSection,
   onChangeSection,
-  onOpenThirdPartyAssistant,
   isMobileOpen,
   onCloseMobile,
 }: SidebarProps) {
@@ -62,24 +97,34 @@ export function Sidebar({
     return stored && stored.length > 0 ? stored : getSeededThirdPartyRows();
   };
 
-  const [expandedAmbiti, setExpandedAmbiti] = useState<Set<string>>(new Set());
+  const [expandedAmbitoId, setExpandedAmbitoId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [thirdPartyRows, setThirdPartyRows] = useState<ThirdPartyToolRow[]>(loadThirdPartyRows);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const selectedRef = useRef<HTMLDivElement>(null);
   const isInternalSection = activeSection === 'internal';
 
-  const findAmbitoForModule = (moduleId: string) =>
-    ambiti.find(a => a.funzioni.some(f => f.modules.some(m => m.id === moduleId)));
+  const hasSearch = search.trim().length > 0;
+  const normalizedSearch = search.toLowerCase();
 
   useEffect(() => {
-    if (selectedModule) {
-      const parentAmbito = findAmbitoForModule(selectedModule.id);
-      if (parentAmbito && !expandedAmbiti.has(parentAmbito.id)) {
-        setExpandedAmbiti(prev => new Set(prev).add(parentAmbito.id));
-      }
+    if (!isInternalSection) {
+      setExpandedAmbitoId(null);
+      return;
     }
-  }, [selectedModule?.id]);
+
+    if (!selectedModule) {
+      if (!hasSearch) {
+        setExpandedAmbitoId(null);
+      }
+      return;
+    }
+
+    const parentAmbito = ambiti.find(a => a.funzioni.some(f => f.modules.some(m => m.id === selectedModule.id)));
+    if (parentAmbito) {
+      setExpandedAmbitoId(parentAmbito.id);
+    }
+  }, [ambiti, hasSearch, isInternalSection, selectedModule]);
 
   useEffect(() => {
     if (selectedRef.current) {
@@ -103,16 +148,8 @@ export function Sidebar({
   }, []);
 
   const toggleAmbito = (id: string) => {
-    setExpandedAmbiti(prev => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
+    setExpandedAmbitoId(prev => (prev === id ? null : id));
   };
-
-  const hasSearch = search.trim().length > 0;
-  const normalizedSearch = search.toLowerCase();
 
   const filteredAmbiti = ambiti.map(a => ({
     ...a,
@@ -123,6 +160,12 @@ export function Sidebar({
       ),
     })).filter(f => f.modules.length > 0),
   })).filter(a => a.funzioni.length > 0);
+
+  const trackedThirdPartyRows = thirdPartyRows.filter(row => row.subscribed || row.connected);
+  const filteredThirdPartyRows = trackedThirdPartyRows.filter((row) => {
+    if (!normalizedSearch) return true;
+    return [row.serviceName, row.vendor, row.notes].join(' ').toLowerCase().includes(normalizedSearch);
+  });
 
   const handleSelectModule = (mod: Module, ambitoId: string) => {
     onSelectModule(mod, ambitoId);
@@ -145,12 +188,25 @@ export function Sidebar({
   const treeToggleBg = t('bg-white/[0.05]', 'bg-black/[0.05]');
   const accentBorder = t('border-white/[0.08]', 'border-black/[0.1]');
 
-  const connectedThirdPartyRows = thirdPartyRows.filter(row => row.connected);
-  const activeThirdPartySubscriptions = thirdPartyRows.filter(row => row.connected && row.subscribed).length;
+  const activeThirdPartySubscriptions = thirdPartyRows.filter(row => row.subscribed).length;
+  const connectedThirdPartyProviders = thirdPartyRows.filter(row => row.connected).length;
+  const thirdPartySetupPending = thirdPartyRows.filter(row => row.subscribed && !row.connected).length;
+  const thirdPartyMonthlySpend = thirdPartyRows.reduce((sum, row) => {
+    if (!row.subscribed) return sum;
+    return sum + Math.max(0, row.monthlyCostEur);
+  }, 0);
+
+  const prioritizedThirdPartyRows = [...filteredThirdPartyRows].sort((a, b) => {
+    if (a.connected !== b.connected) return Number(b.connected) - Number(a.connected);
+    if (a.subscribed !== b.subscribed) return Number(b.subscribed) - Number(a.subscribed);
+    return (a.serviceName || '').localeCompare(b.serviceName || '', 'it');
+  });
+
+  const sidebarWidth = 276;
 
   const sidebarContent = (
     <div
-      className={`flex flex-col h-full w-[260px] shrink-0 border-r ${borderCls} overflow-hidden`}
+      className={`flex flex-col h-full w-[276px] shrink-0 border-r ${borderCls} overflow-hidden`}
       style={{ backgroundColor: sidebarBg }}
     >
       {/* Search */}
@@ -160,7 +216,7 @@ export function Sidebar({
           <input
             ref={searchInputRef}
             type="text"
-            placeholder={isInternalSection ? 'Cerca moduli ecosistema...' : 'Cerca provider...'}
+            placeholder={isInternalSection ? 'Cerca modulo o processo...' : 'Cerca sottoscrizione...'}
             value={search}
             onChange={e => setSearch(e.target.value)}
             className={`bg-transparent text-[13px] ${inputText} outline-none flex-1 min-w-0`}
@@ -185,9 +241,12 @@ export function Sidebar({
           </div>
         )}
 
-        {isInternalSection && filteredAmbiti.map(ambito => {
-          const isExpanded = hasSearch || expandedAmbiti.has(ambito.id);
+        {isInternalSection && (
+          <motion.div variants={ambitoListVariants} initial="hidden" animate="show">
+            {filteredAmbiti.map(ambito => {
+          const isExpanded = hasSearch || expandedAmbitoId === ambito.id;
           const AmbitoIcon = iconMap[ambito.iconName] || Compass;
+          const ambitoIconSrc = getAmbitoIconSrc(ambito.id);
           const hasSelectedModule = ambito.funzioni.some(f =>
             f.modules.some(m => m.id === selectedModule?.id)
           );
@@ -196,20 +255,26 @@ export function Sidebar({
           );
 
           return (
-            <div key={ambito.id}>
-              <button
+            <motion.div key={ambito.id} variants={ambitoItemVariants}>
+              <motion.button
                 onClick={() => !hasSearch && toggleAmbito(ambito.id)}
-                className={`flex items-center gap-2.5 w-full px-3 py-2.5 text-left transition-colors group ${hoverBg} ${hasSelectedModule && !hasSearch ? activeBg : ''}`}
+                whileHover={{ x: 1.5 }}
+                whileTap={{ scale: 0.995 }}
+                className={`flex items-start gap-2.5 w-full px-3 py-2 text-left transition-colors group ${hoverBg} ${hasSelectedModule && !hasSearch ? activeBg : ''}`}
               >
                 <div
                   className="flex h-7 w-7 items-center justify-center rounded-md shrink-0"
                   style={{ backgroundColor: ambito.color + '20' }}
                 >
-                  <AmbitoIcon size={14} style={{ color: ambito.color }} />
+                  {ambitoIconSrc ? (
+                    <img src={ambitoIconSrc} alt={ambito.name} className="h-4 w-4 rounded-[4px] object-contain" />
+                  ) : (
+                    <AmbitoIcon size={14} style={{ color: ambito.color }} />
+                  )}
                 </div>
-                <div className="flex flex-col flex-1 min-w-0">
-                  <span className={`text-[13px] font-semibold ${textMain} truncate leading-tight`}>{ambito.name}</span>
-                  <span className={`text-[11px] ${textSub} truncate leading-tight`}>{ambito.subtitle}</span>
+                <div className="flex flex-col flex-1 min-w-0 gap-0.5">
+                  <span className={`text-[13px] font-semibold ${textMain} leading-tight line-clamp-1`}>{ambito.name}</span>
+                  <span className={`text-[11px] ${textSub} leading-tight line-clamp-2`}>{ambito.subtitle}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   {activeModuleCount > 0 && !isExpanded && (
@@ -227,7 +292,7 @@ export function Sidebar({
                     </motion.div>
                   )}
                 </div>
-              </button>
+              </motion.button>
 
               <AnimatePresence initial={false}>
                 {isExpanded && (
@@ -242,26 +307,28 @@ export function Sidebar({
                     <div className="pb-1 pt-0.5">
                       {ambito.funzioni.map(funzione => (
                         <div key={funzione.id} className={`ml-5 mb-1 border-l ${treeLine}`}>
-                          <div className="relative py-1 pr-2 pl-4">
+                          <div className="relative py-0.5 pr-2 pl-4">
                             <span className={`pointer-events-none absolute left-0 top-1/2 h-0 w-3 -translate-y-1/2 border-t ${treeLine}`} />
-                            <span className={`text-[9px] font-semibold ${textMuted} uppercase tracking-[1.2px]`}>
+                            <span className={`text-[10px] font-semibold ${textMuted} normal-case tracking-[0.6px]`}>
                               {funzione.name}
                             </span>
                           </div>
                           <div className="pb-0.5">
                             {funzione.modules.map(mod => {
                               const isSelected = selectedModule?.id === mod.id;
-                              const ModIcon = typeIconMap[mod.type] || MessageCircle;
+                              const ModIcon = resolveModuleIcon(mod);
                               const isLocked = !mod.purchased;
 
                               return (
-                                <div
+                                <motion.div
                                   key={mod.id}
                                   ref={isSelected ? selectedRef : undefined}
                                   className={`relative flex items-center gap-2 w-full pl-5 pr-2 py-1.5 text-left transition-all text-[12px] rounded-r-md ${isSelected
                                     ? `${activeBg} font-semibold`
                                     : hoverBg
                                     } ${isLocked ? 'opacity-50' : ''}`}
+                                  whileHover={{ x: 1 }}
+                                  transition={{ duration: 0.14 }}
                                 >
                                   <span className={`pointer-events-none absolute left-0 top-1/2 h-0 w-3 -translate-y-1/2 border-t ${treeLine}`} />
                                   {isSelected && (
@@ -271,37 +338,39 @@ export function Sidebar({
                                       transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                                     />
                                   )}
-                                  <button
+                                  <motion.button
                                     onClick={() => {
                                       if (isLocked) onShowLocked(mod);
                                       else handleSelectModule(mod, ambito.id);
                                     }}
-                                    className="flex items-center gap-2 flex-1 min-w-0 text-[11px] leading-tight"
+                                    whileTap={{ scale: 0.99 }}
+                                    className="flex items-start gap-2 flex-1 min-w-0 text-[11px] leading-tight"
                                   >
                                     <ModIcon
                                       size={13}
-                                      className={`shrink-0 transition-colors ${isSelected ? 'text-[#F73C1C]' : textSub}`}
+                                      className={`shrink-0 mt-[2px] transition-colors ${isSelected ? 'text-[#F73C1C]' : textSub}`}
                                     />
-                                    <span className={`flex-1 truncate transition-colors text-left text-[11px] leading-tight ${isSelected ? 'text-[#F73C1C]' : textSub} ${isSelected ? 'font-semibold' : 'font-medium'}`}>
+                                    <span className={`flex-1 transition-colors text-left text-[11px] leading-tight line-clamp-2 ${isSelected ? 'text-[#F73C1C]' : textSub} ${isSelected ? 'font-semibold' : 'font-medium'}`}>
                                       {mod.name}
                                     </span>
-                                  </button>
+                                  </motion.button>
                                   {isLocked && <Lock size={12} className={textMuted} />}
                                   {!isLocked && (
-                                    <button
+                                    <motion.button
                                       onClick={e => {
                                         e.stopPropagation();
                                         onToggleModule(mod.id);
                                       }}
+                                      whileTap={{ scale: 0.92 }}
                                       className={`relative w-[34px] h-[18px] rounded-full transition-colors shrink-0 ${mod.active ? 'bg-[#10B981]' : t('bg-[#333]', 'bg-[#ccc]')
                                         }`}
                                       title={mod.active ? 'Disattiva' : 'Attiva'}
                                     >
                                       <div className={`absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform ${mod.active ? 'left-[18px]' : 'left-[2px]'
                                         }`} />
-                                    </button>
+                                    </motion.button>
                                   )}
-                                </div>
+                                </motion.div>
                               );
                             })}
                           </div>
@@ -311,61 +380,63 @@ export function Sidebar({
                   </motion.div>
                 )}
               </AnimatePresence>
-            </div>
+            </motion.div>
           );
         })}
+          </motion.div>
+        )}
 
         {!isInternalSection && (
-          <div className="px-3 py-2.5 space-y-2.5">
-            <div className={`rounded-lg border ${accentBorder} ${subtleBg} p-2.5`}>
-              <div className="flex items-center gap-2">
-                <Sparkles size={13} className="text-[#F73C1C]" />
-                <span className={`text-[11px] font-semibold ${textMain}`}>Assistente Integrato</span>
+          <div className="px-3 py-2.5 space-y-2">
+            <div className={`rounded-lg border ${accentBorder} ${subtleBg} p-3`}>
+              <div className="flex items-center justify-between gap-2">
+                <p className={`text-[11px] font-semibold ${textMain}`}>Sottoscrizioni in gestione centrale</p>
+                <span className="inline-flex items-center gap-1 text-[10px] text-[#10B981]">
+                  <Activity size={11} />
+                  Operativa
+                </span>
               </div>
               <p className={`text-[11px] mt-2 ${textMuted}`}>
-                Usa ChatGPT direttamente dentro CRYBU con una configurazione guidata lato azienda.
+                In questa sezione la sidebar resta minimale: il lavoro operativo e nel pannello centrale.
               </p>
-              <div className="mt-2">
-                <button
-                  onClick={() => {
-                    onOpenThirdPartyAssistant('seed-chatgpt');
-                    onCloseMobile();
-                  }}
-                  className="w-full text-[11px] py-1.5 rounded-md font-semibold transition-colors bg-[#F73C1C] hover:bg-[#e63518] text-white"
-                >
-                  Apri ChatGPT in Dashboard
-                </button>
+
+              <div className="mt-2.5 grid grid-cols-2 gap-1.5">
+                <div className={`rounded-md px-2 py-1.5 ${t('bg-white/[0.04]', 'bg-black/[0.04]')}`}>
+                  <p className={`text-[10px] ${textMuted}`}>Spesa mese</p>
+                  <p className={`text-[11px] font-semibold ${textMain}`}>EUR {thirdPartyMonthlySpend.toFixed(2)}</p>
+                </div>
+                <div className={`rounded-md px-2 py-1.5 ${t('bg-white/[0.04]', 'bg-black/[0.04]')}`}>
+                  <p className={`text-[10px] ${textMuted}`}>Da completare</p>
+                  <p className={`text-[11px] font-semibold ${thirdPartySetupPending > 0 ? 'text-[#F59E0B]' : textMain}`}>{thirdPartySetupPending}</p>
+                </div>
               </div>
             </div>
 
             <div className={`rounded-lg border ${accentBorder} p-2.5`}>
               <div className="flex items-center justify-between">
-                <span className={`text-[11px] font-semibold ${textMain}`}>Accesso rapido prompt</span>
-                <span className={`text-[10px] ${textMuted}`}>{connectedThirdPartyRows.length} connessi</span>
+                <span className={`text-[11px] font-semibold ${textMain}`}>Provider registrati</span>
+                <span className={`text-[10px] ${textMuted}`}>{trackedThirdPartyRows.length} registrati</span>
               </div>
 
-              {connectedThirdPartyRows.length === 0 ? (
-                <p className={`text-[11px] ${textMuted} mt-2`}>Connetti un provider nella vista Terze parti per abilitarne il prompt interno.</p>
+              {filteredThirdPartyRows.length === 0 ? (
+                <p className={`text-[11px] ${textMuted} mt-2`}>Aggiungi la prima sottoscrizione nella dashboard Terze parti.</p>
               ) : (
                 <div className="mt-2 space-y-1.5">
-                  {connectedThirdPartyRows.slice(0, 5).map(row => (
-                    <button
+                  {prioritizedThirdPartyRows.slice(0, 6).map(row => (
+                    <div
                       key={row.id}
-                      onClick={() => {
-                        onOpenThirdPartyAssistant(row.id);
-                        onCloseMobile();
-                      }}
-                      className={`w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md transition-colors ${hoverBg}`}
+                      className={`w-full flex items-center justify-between gap-2 px-2.5 py-2 rounded-md ${subtleBg}`}
                     >
                       <div className="min-w-0 text-left">
-                        <p className={`text-[11px] font-medium ${textMain} truncate`}>{row.serviceName || 'Servizio esterno'}</p>
-                        <p className={`text-[10px] ${textMuted} truncate`}>{row.vendor || 'Vendor non definito'}</p>
+                        <p className={`text-[11px] font-medium ${textMain} whitespace-normal break-words`}>{row.serviceName || 'Servizio esterno'}</p>
+                        <p className={`text-[10px] ${textMuted} whitespace-normal break-words`}>{row.vendor || 'Vendor non definito'}</p>
                       </div>
-                      <span className="inline-flex items-center gap-1 text-[10px] text-[#F73C1C] shrink-0">
-                        <Link2 size={11} />
-                        Prompt
-                      </span>
-                    </button>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        {row.subscribed && <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#F59E0B]/15 text-[#F59E0B]">ABB</span>}
+                        {row.connected && <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#10B981]/15 text-[#10B981]">ON</span>}
+                        {row.subscribed && !row.connected && <span className="text-[9px] px-1.5 py-0.5 rounded bg-[#F59E0B]/15 text-[#F59E0B]">SETUP</span>}
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}
@@ -377,31 +448,33 @@ export function Sidebar({
       {/* Footer */}
       <div className={`px-3 py-2 border-t ${borderCls}`}>
         <div className={`grid grid-cols-2 gap-1 p-1 rounded-lg ${subtleBg}`}>
-          <button
+          <motion.button
             onClick={() => {
               setSearch('');
               onChangeSection('internal');
             }}
+            whileTap={{ scale: 0.97 }}
             className={`text-[11px] py-1.5 rounded-md font-semibold transition-colors ${isInternalSection ? t('bg-white/[0.12] text-white', 'bg-black/[0.1] text-[#111]') : textMuted}`}
           >
             Ecosistema
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             onClick={() => {
               setSearch('');
               onChangeSection('third-party');
             }}
+            whileTap={{ scale: 0.97 }}
             className={`text-[11px] py-1.5 rounded-md font-semibold transition-colors ${!isInternalSection ? t('bg-white/[0.12] text-white', 'bg-black/[0.1] text-[#111]') : textMuted}`}
           >
-            Terze parti
-          </button>
+            Sottoscrizioni
+          </motion.button>
         </div>
 
         <div className="mt-2 px-0.5">
           {isInternalSection ? (
             <span className={`text-[11px] font-medium ${textMuted}`}>Ecosistema: {activeInternalModules} moduli attivi</span>
           ) : (
-            <span className={`text-[11px] font-medium ${textMuted}`}>Terze parti: {activeThirdPartySubscriptions} abbonamenti attivi</span>
+            <span className={`text-[11px] font-medium ${textMuted}`}>Terze parti: {activeThirdPartySubscriptions} abbonamenti, {connectedThirdPartyProviders} operativi</span>
           )}
         </div>
       </div>
@@ -422,9 +495,9 @@ export function Sidebar({
               onClick={onCloseMobile}
             />
             <motion.div
-              initial={{ x: -260 }}
+              initial={{ x: -sidebarWidth }}
               animate={{ x: 0 }}
-              exit={{ x: -260 }}
+              exit={{ x: -sidebarWidth }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
               className="absolute left-0 top-0 bottom-0 shadow-2xl"
             >

@@ -37,7 +37,7 @@ export function LoginPage({ onLogin }: { onLogin: () => void }) {
         >
           <img src={logoImg} alt="CRXBU" className="h-[32px] w-auto mb-4" />
           <p className="text-[13px] text-[#555]">
-            Selezioniamo <span className="text-[#F73C1C] font-semibold">IA</span> per evolvere la tua azienda
+            Automazione <span className="text-[#F73C1C] font-semibold">AI</span> progettata per aziende
           </p>
         </motion.div>
 
@@ -47,8 +47,8 @@ export function LoginPage({ onLogin }: { onLogin: () => void }) {
           transition={{ duration: 0.4, delay: 0.2 }}
           className="bg-[#1A1A1A] border border-white/[0.06] rounded-2xl p-6 md:p-8 shadow-2xl"
         >
-          <h2 className="text-[18px] font-bold text-white mb-1">Accedi</h2>
-          <p className="text-[13px] text-[#666] mb-6">Inserisci le tue credenziali per continuare</p>
+          <h2 className="text-[18px] font-bold text-white mb-1">Accesso aziendale</h2>
+          <p className="text-[13px] text-[#666] mb-6">Inserisci le credenziali del workspace per continuare</p>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">

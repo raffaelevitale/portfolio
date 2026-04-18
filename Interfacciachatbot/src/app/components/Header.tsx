@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, Bell, X, LogOut, User, HelpCircle, Menu, Settings, Home } from 'lucide-react';
+import { Sun, Moon, Bell, X, LogOut, User, HelpCircle, Menu, Settings, Home, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import logoLight from '../../../loghi/BiancoNero.png';
@@ -12,9 +12,21 @@ interface HeaderProps {
   sidebarOpen?: boolean;
   onGoHome?: () => void;
   onLogout?: () => void;
+  greetingName?: string;
+  operativityPercent?: number;
+  activeModulesCount?: number;
 }
 
-export function Header({ onOpenSettings, onToggleSidebar, sidebarOpen, onGoHome, onLogout }: HeaderProps) {
+export function Header({
+  onOpenSettings,
+  onToggleSidebar,
+  sidebarOpen,
+  onGoHome,
+  onLogout,
+  greetingName = 'Luciano',
+  operativityPercent = 0,
+  activeModulesCount = 0,
+}: HeaderProps) {
   const { theme, toggleTheme, t } = useTheme();
   const currentLogo = theme === 'dark' ? logoDark : logoLight;
   const [notifOpen, setNotifOpen] = useState(false);
@@ -49,37 +61,78 @@ export function Header({ onOpenSettings, onToggleSidebar, sidebarOpen, onGoHome,
   const textMuted = t('text-[#555]', 'text-[#999]');
   const hoverItem = t('hover:bg-white/[0.04]', 'hover:bg-black/[0.04]');
   const taglineColor = t('text-[#555]', 'text-[#999]');
+  const normalizedOperativity = Math.max(0, Math.min(100, operativityPercent));
+  const hour = new Date().getHours();
+  const saluto = hour < 12 ? 'Buongiorno' : hour < 18 ? 'Buon pomeriggio' : 'Buonasera';
 
   return (
-    <header className={`flex h-[52px] w-full items-center justify-between px-3 md:px-4 shrink-0 relative z-50 border-b ${borderCls}`} style={{ backgroundColor: headerBg }}>
+    <motion.header
+      initial={{ opacity: 0, y: -8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.25, ease: 'easeOut' }}
+      className={`flex h-[52px] w-full items-center justify-between px-3 md:px-4 shrink-0 relative z-50 border-b ${borderCls}`}
+      style={{ backgroundColor: headerBg }}
+    >
       <div className="flex items-center gap-1.5 md:gap-2">
         {/* Hamburger - mobile only */}
         {onToggleSidebar && (
-          <button
+          <motion.button
             onClick={onToggleSidebar}
+            whileTap={{ scale: 0.92 }}
             className={`md:hidden p-1.5 rounded-md ${iconCls} transition-colors ${hoverItem}`}
           >
             {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          </motion.button>
         )}
-        <button onClick={onGoHome} className="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
-          <img src={currentLogo} alt="CRYBU" className="h-[20px] md:h-[22px] w-auto object-contain" />
-        </button>
-        <div className={`hidden md:block w-[1px] h-[20px] mx-1 ${t('bg-white/[0.08]', 'bg-black/[0.08]')}`} />
-        <button
+        <motion.button
           onClick={onGoHome}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
+        >
+          <img src={currentLogo} alt="CRYBU" className="h-[20px] md:h-[22px] w-auto object-contain" />
+        </motion.button>
+        <div className={`hidden md:block w-[1px] h-[20px] mx-1 ${t('bg-white/[0.08]', 'bg-black/[0.08]')}`} />
+        <motion.button
+          onClick={onGoHome}
+          whileHover={{ y: -1 }}
+          whileTap={{ scale: 0.97 }}
           className={`hidden md:flex items-center gap-1.5 px-2 py-1.5 rounded-md ${iconCls} ${hoverItem} transition-colors text-[12px]`}
           title="Home"
         >
           <Home size={15} />
           <span className="hidden lg:inline">Home</span>
-        </button>
+        </motion.button>
       </div>
 
-      <div className="hidden lg:flex items-center">
-        <span className={`text-[12px] ${taglineColor}`}>
-          Selezioniamo <span className="text-[#F73C1C] mx-0.5 font-semibold">IA</span> per evolvere la tua azienda
+      <div className="hidden lg:flex items-center gap-3 min-w-0">
+        <span className={`text-[12px] ${taglineColor} truncate`}>
+          {saluto} {greetingName}, stiamo coordinando i moduli AI per te.
         </span>
+        <motion.div
+          initial={{ opacity: 0, x: 8 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3, delay: 0.08 }}
+          className={`flex items-center gap-2 rounded-full px-2.5 py-1 border ${t('border-white/[0.08] bg-white/[0.03]', 'border-black/[0.08] bg-black/[0.03]')}`}
+        >
+          <span className="relative inline-flex h-2.5 w-2.5 shrink-0">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#10B981] opacity-55" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[#10B981]" />
+          </span>
+          <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#10B981]">
+            <Activity size={11} />
+            Operativita {normalizedOperativity}%
+          </span>
+          <div className={`h-[4px] w-14 rounded-full ${t('bg-white/[0.08]', 'bg-black/[0.08]')}`}>
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${normalizedOperativity}%` }}
+              transition={{ duration: 0.45, ease: 'easeOut' }}
+              className="h-[4px] rounded-full bg-[#10B981]"
+            />
+          </div>
+          <span className={`text-[10px] ${textMuted}`}>{activeModulesCount} attivi</span>
+        </motion.div>
       </div>
 
       <div className="flex items-center gap-1.5 md:gap-2">
@@ -92,7 +145,11 @@ export function Header({ onOpenSettings, onToggleSidebar, sidebarOpen, onGoHome,
         </motion.button>
 
         <div ref={notifRef} className="relative">
-          <button onClick={() => { setNotifOpen(!notifOpen); setProfileOpen(false); }} className={`relative ${iconCls} transition-colors p-1.5 rounded-md ${hoverItem}`}>
+          <motion.button
+            onClick={() => { setNotifOpen(!notifOpen); setProfileOpen(false); }}
+            whileTap={{ scale: 0.9 }}
+            className={`relative ${iconCls} transition-colors p-1.5 rounded-md ${hoverItem}`}
+          >
             <Bell className="h-[18px] w-[18px]" />
             {unreadCount > 0 && (
               <motion.span
@@ -103,7 +160,7 @@ export function Header({ onOpenSettings, onToggleSidebar, sidebarOpen, onGoHome,
                 {unreadCount}
               </motion.span>
             )}
-          </button>
+          </motion.button>
           <AnimatePresence>
             {notifOpen && (
               <motion.div
@@ -139,9 +196,14 @@ export function Header({ onOpenSettings, onToggleSidebar, sidebarOpen, onGoHome,
         </div>
 
         <div ref={profileRef} className="relative">
-          <div onClick={() => { setProfileOpen(!profileOpen); setNotifOpen(false); }} className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F73C1C] text-[11px] font-bold text-white cursor-pointer hover:ring-2 hover:ring-[#F73C1C]/40 transition-all">
+          <motion.button
+            onClick={() => { setProfileOpen(!profileOpen); setNotifOpen(false); }}
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-[#F73C1C] text-[11px] font-bold text-white cursor-pointer hover:ring-2 hover:ring-[#F73C1C]/40 transition-all"
+          >
             LC
-          </div>
+          </motion.button>
           <AnimatePresence>
             {profileOpen && (
               <motion.div
@@ -234,6 +296,6 @@ export function Header({ onOpenSettings, onToggleSidebar, sidebarOpen, onGoHome,
           </motion.div>
         )}
       </AnimatePresence>
-    </header>
+    </motion.header>
   );
 }

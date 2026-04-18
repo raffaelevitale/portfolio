@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import * as Switch from '@radix-ui/react-switch';
-import { Save, RotateCcw } from 'lucide-react';
+import { Save, RotateCcw, Play, Plus, Trash2 } from 'lucide-react';
 import type { Module } from './data';
 import { useTheme } from './ThemeContext';
 
@@ -22,17 +22,54 @@ const settingsConfigs: Record<string, { label: string; desc: string; default: bo
   ],
 };
 
+const defaultRules = [
+  'Se contiene "urgente" -> Priorità Alta',
+  'Se contiene "fattura" -> Categoria Billing',
+  'Se nessuna regola -> Assegna a coda generale',
+];
+
 export function SettingsView({ module }: SettingsViewProps) {
   const { t } = useTheme();
   const config = settingsConfigs[module.id] || settingsConfigs.default;
   const defaultValues = Object.fromEntries(config.map(c => [c.label, c.default]));
   const [values, setValues] = useState<Record<string, boolean>>(defaultValues);
+  const [rules, setRules] = useState<string[]>(defaultRules);
+  const [newRule, setNewRule] = useState('');
+  const [simulating, setSimulating] = useState(false);
+  const [lastSimulationAt, setLastSimulationAt] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
   const isDirty = config.some(c => values[c.label] !== c.default);
   const toggle = (label: string) => { setValues(p => ({ ...p, [label]: !p[label] })); setSaved(false); };
   const save = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
-  const reset = () => { setValues(defaultValues); setSaved(false); };
+  const reset = () => {
+    setValues(defaultValues);
+    setRules(defaultRules);
+    setNewRule('');
+    setSimulating(false);
+    setLastSimulationAt(null);
+    setSaved(false);
+  };
+
+  const addRule = () => {
+    const next = newRule.trim();
+    if (!next) return;
+    setRules(prev => [...prev, next]);
+    setNewRule('');
+  };
+
+  const removeRule = (index: number) => {
+    setRules(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const runSimulation = () => {
+    if (simulating) return;
+    setSimulating(true);
+    setTimeout(() => {
+      setSimulating(false);
+      setLastSimulationAt(new Date().toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }));
+    }, 950);
+  };
 
   const cardBg = t('bg-[#1A1A1A] border-white/[0.04]', 'bg-white border-black/[0.06]');
   const textMain = t('text-white', 'text-[#111]');
@@ -55,6 +92,9 @@ export function SettingsView({ module }: SettingsViewProps) {
             <p className={`text-[11px] md:text-[12px] ${textSub} mt-1`}>{module.description}</p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <button onClick={runSimulation} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] md:text-[12px] ${btnText} transition-colors border ${btnBorder}`}>
+              <Play size={13} /> {simulating ? 'Simulazione...' : 'Simula run'}
+            </button>
             <button onClick={reset} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] md:text-[12px] ${btnText} transition-colors border ${btnBorder}`}>
               <RotateCcw size={13} /> Ripristina
             </button>
@@ -85,13 +125,37 @@ export function SettingsView({ module }: SettingsViewProps) {
         <div className="mt-10">
           <h3 className={`text-[15px] font-bold ${textMain} mb-4`}>Regole di smistamento</h3>
           <div className="flex flex-col gap-3">
-            {['Se contiene "urgente" → Priorità Alta', 'Se contiene "fattura" → Categoria Billing', 'Se nessuna regola → Assegna a coda generale'].map((rule, i) => (
-              <div key={i} className={`flex items-center gap-3 ${ruleBg} border ${borderCls} rounded-lg px-4 py-3`}>
+            {rules.map((rule, i) => (
+              <div key={`${rule}-${i}`} className={`flex items-center gap-3 ${ruleBg} border ${borderCls} rounded-lg px-4 py-3`}>
                 <div className="w-5 h-5 rounded bg-[#F73C1C]/10 flex items-center justify-center text-[#F73C1C] text-[11px] font-bold shrink-0">{i + 1}</div>
                 <span className={`text-[13px] ${ruleText}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>{rule}</span>
+                {rules.length > 1 && (
+                  <button onClick={() => removeRule(i)} className={`ml-auto p-1.5 ${t('text-[#666] hover:text-[#F73C1C]', 'text-[#999] hover:text-[#F73C1C]')} transition-colors`}>
+                    <Trash2 size={12} />
+                  </button>
+                )}
               </div>
             ))}
-            <button className="text-[12px] text-[#F73C1C] hover:text-[#ff5638] font-medium mt-1 text-left transition-colors">+ Aggiungi regola</button>
+
+            <div className="flex items-center gap-2 mt-1">
+              <input
+                value={newRule}
+                onChange={e => setNewRule(e.target.value)}
+                placeholder="Nuova regola dimostrativa..."
+                className={`flex-1 rounded-lg px-3 py-2 text-[12px] border ${t('bg-[#151515] text-[#ddd] border-white/[0.08] placeholder:text-[#555]', 'bg-[#F8F8F8] text-[#222] border-black/[0.08] placeholder:text-[#aaa]')} outline-none`}
+              />
+              <button onClick={addRule} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[12px] font-semibold bg-[#F73C1C] hover:bg-[#e63518] text-white transition-colors">
+                <Plus size={12} /> Aggiungi
+              </button>
+            </div>
+
+            <div className={`rounded-lg border ${borderCls} ${t('bg-[#151515]', 'bg-[#F8F8F8]')} px-3 py-2 text-[11px] ${textSub}`}>
+              {simulating
+                ? 'Simulazione in corso: il modulo valida regole e priorità senza eseguire azioni reali.'
+                : lastSimulationAt
+                  ? `Ultima simulazione completata alle ${lastSimulationAt}. Modalità dimostrativa attiva.`
+                  : 'Nessuna simulazione avviata. Esegui un run demo per mostrare il comportamento del modulo.'}
+            </div>
           </div>
         </div>
       </div>

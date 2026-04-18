@@ -15,6 +15,7 @@ import { AppSettingsPage } from "./components/AppSettingsPage";
 import { WelcomeScreen } from "./components/WelcomeScreen";
 import { LoginPage } from "./components/LoginPage";
 import { ThirdPartyHubView } from "./components/ThirdPartyHubView";
+import { InterfaceOnboarding } from './components/InterfaceOnboarding';
 import { ambiti as initialAmbiti } from "./components/data";
 import type { Module } from "./components/data";
 import type { ThirdPartySection } from "./components/thirdPartyProviders";
@@ -22,6 +23,7 @@ import { Sliders } from 'lucide-react';
 import { Toaster } from './components/ui/sonner';
 
 const LOCALHOST_APP_LOGIN_KEY = 'interfaccia.localhost.appLogin';
+const INTERFACE_ONBOARDING_COMPLETED_KEY = 'interfaccia.onboarding.completed.v1';
 
 function isLocalhostEnvironment(): boolean {
   if (typeof window === 'undefined') return false;
@@ -35,6 +37,15 @@ function getInitialAppLoginState(): boolean {
     return window.localStorage.getItem(LOCALHOST_APP_LOGIN_KEY) === '1';
   } catch {
     return false;
+  }
+}
+
+function getInitialOnboardingVisibility(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(INTERFACE_ONBOARDING_COMPLETED_KEY) !== '1';
+  } catch {
+    return true;
   }
 }
 
@@ -52,6 +63,7 @@ function AppInner() {
   const [mobileParamsOpen, setMobileParamsOpen] = useState(false);
   const [activeSection, setActiveSection] = useState<ThirdPartySection>('internal');
   const [thirdPartyToolId, setThirdPartyToolId] = useState<string | null>('seed-chatgpt');
+  const [showOnboarding, setShowOnboarding] = useState(getInitialOnboardingVisibility);
 
   useEffect(() => {
     if (!isLocalhost || typeof window === 'undefined') return;
@@ -63,6 +75,12 @@ function AppInner() {
   }, [isLocalhost, isLoggedIn]);
 
   const selectedAmbito = ambitiState.find(a => a.id === selectedAmbitoId);
+  const allInternalModules = ambitiState.flatMap(a => a.funzioni.flatMap(f => f.modules));
+  const activeInternalModulesCount = allInternalModules.filter(m => m.purchased && m.active).length;
+  const purchasedInternalModulesCount = allInternalModules.filter(m => m.purchased).length;
+  const operativityPercent = purchasedInternalModulesCount === 0
+    ? 0
+    : Math.round((activeInternalModulesCount / purchasedInternalModulesCount) * 100);
 
   const goHome = useCallback(() => {
     setActiveSection('internal');
@@ -88,7 +106,19 @@ function AppInner() {
     setShowSettings(false);
     setLockedModule(null);
     if (section === 'third-party') {
+      setSelectedModule(null);
+      setSelectedAmbitoId('');
       setMobileParamsOpen(false);
+    }
+  }, []);
+
+  const completeOnboarding = useCallback(() => {
+    setShowOnboarding(false);
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(INTERFACE_ONBOARDING_COMPLETED_KEY, '1');
+    } catch {
+      // Ignore storage failures in private mode or restricted environments.
     }
   }, []);
 
@@ -97,6 +127,8 @@ function AppInner() {
     setThirdPartyToolId(toolId ?? 'seed-chatgpt');
     setShowSettings(false);
     setLockedModule(null);
+    setSelectedModule(null);
+    setSelectedAmbitoId('');
     setMobileParamsOpen(false);
   }, []);
 
@@ -105,10 +137,11 @@ function AppInner() {
       ...a,
       funzioni: a.funzioni.map(f => ({
         ...f,
-        modules: f.modules.map(m => m.id === moduleId ? { ...m, active: !m.active } : m)
-      }))
+        modules: f.modules.map(m => (m.id === moduleId ? { ...m, active: !m.active } : m)),
+      })),
     })));
-    setSelectedModule(prev => prev?.id === moduleId ? { ...prev, active: !prev.active } : prev);
+
+    setSelectedModule(prev => (prev?.id === moduleId ? { ...prev, active: !prev.active } : prev));
   }, []);
 
   const currentModule = selectedModule
@@ -133,6 +166,9 @@ function AppInner() {
         sidebarOpen={mobileSidebarOpen}
         onGoHome={goHome}
         onLogout={() => setIsLoggedIn(false)}
+        greetingName="Luciano"
+        operativityPercent={operativityPercent}
+        activeModulesCount={activeInternalModulesCount}
       />
       <PromoBanner ambiti={ambitiState} onDiscoverModules={goHome} />
 
@@ -146,7 +182,6 @@ function AppInner() {
             onShowLocked={setLockedModule}
             activeSection={activeSection}
             onChangeSection={onChangeSection}
-            onOpenThirdPartyAssistant={openThirdPartyAssistant}
             isMobileOpen={mobileSidebarOpen}
             onCloseMobile={() => setMobileSidebarOpen(false)}
           />
@@ -166,6 +201,7 @@ function AppInner() {
                   transition={{ duration: 0.15 }}
                 >
                   <ModuleTopBar
+                    ambitoId={selectedAmbito.id}
                     ambitoName={selectedAmbito.name}
                     ambitoColor={selectedAmbito.color}
                     ambitoIcon={selectedAmbito.iconName}
@@ -295,6 +331,17 @@ function AppInner() {
       <AnimatePresence>
         {lockedModule && !showSettings && (
           <LockedCard module={lockedModule} onClose={() => setLockedModule(null)} />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showOnboarding && (
+          <InterfaceOnboarding
+            onComplete={completeOnboarding}
+            onSkip={completeOnboarding}
+            onOpenEcosystem={goHome}
+            onOpenSubscriptions={() => openThirdPartyAssistant()}
+          />
         )}
       </AnimatePresence>
     </div>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { TrendingUp, TrendingDown, BarChart3, Clock, Users, CheckCircle2, FileText, Plus, Eye, Download, Trash2, X, ArrowLeft, Printer, Share2, Calendar, ChevronRight } from 'lucide-react';
 import { AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import type { Module } from './data';
@@ -13,6 +13,12 @@ type Report = {
   createdAt: string;
   status: 'completato' | 'in_generazione';
   period: string;
+};
+
+type ActivityItem = {
+  action: string;
+  detail: string;
+  time: string;
 };
 
 // ---- Metrics per module ----
@@ -95,17 +101,61 @@ const initialReports: Report[] = [
   { id: 'r3', title: 'Report Trimestrale — Q1 2026', type: 'trimestrale', createdAt: '01 Apr 2026, 10:00', status: 'completato', period: '01 Gen – 31 Mar 2026' },
 ];
 
+const initialMainChartData = [35, 52, 48, 61, 55, 72, 68, 84, 78, 91, 85, 95];
+
+const initialActivityItems: ActivityItem[] = [
+  { action: 'Report generato', detail: 'Performance mensile Marzo 2026', time: '2 ore fa' },
+  { action: 'Soglia superata', detail: 'Tasso conversione > 30% raggiunto', time: '5 ore fa' },
+  { action: 'Nuovo dato', detail: 'Aggiornamento metriche in tempo reale', time: '1 giorno fa' },
+];
+
 export function DashboardView({ module, ambitoName }: DashboardViewProps) {
   const { t } = useTheme();
   const metrics = metricsMap[module.id] || metricsMap.default;
-  const mainChartData = [35, 52, 48, 61, 55, 72, 68, 84, 78, 91, 85, 95];
-  const maxVal = Math.max(...mainChartData);
+  const [chartData, setChartData] = useState<number[]>(initialMainChartData);
+  const [activityFeed, setActivityFeed] = useState<ActivityItem[]>(initialActivityItems);
+  const [demoLive, setDemoLive] = useState(false);
+  const maxVal = Math.max(...chartData, 1);
 
   const [reports, setReports] = useState<Report[]>(initialReports);
   const [viewingReport, setViewingReport] = useState<Report | null>(null);
   const [showNewReportModal, setShowNewReportModal] = useState(false);
   const [newReportType, setNewReportType] = useState<Report['type']>('settimanale');
   const [activeChartPeriod, setActiveChartPeriod] = useState('12M');
+
+  useEffect(() => {
+    setDemoLive(false);
+    setChartData(initialMainChartData);
+    setActivityFeed(initialActivityItems);
+  }, [module.id]);
+
+  useEffect(() => {
+    if (!demoLive) return;
+
+    const demoActivityPool: Omit<ActivityItem, 'time'>[] = [
+      { action: 'Sync completata', detail: 'Flusso dati consolidato su dashboard dimostrativa' },
+      { action: 'Anomalia rilevata', detail: 'Scostamento lieve intercettato e segnalato in tempo reale' },
+      { action: 'Regola applicata', detail: 'Priorità dinamica aggiornata sul cluster operativo' },
+      { action: 'Insight AI', detail: 'Trend settimanale confermato con confidenza alta' },
+    ];
+
+    const intervalId = window.setInterval(() => {
+      setChartData(prev => {
+        const last = prev[prev.length - 1] ?? 60;
+        const delta = Math.round((Math.random() - 0.5) * 14);
+        const nextPoint = Math.min(98, Math.max(18, last + delta));
+        return [...prev.slice(1), nextPoint];
+      });
+
+      const randomActivity = demoActivityPool[Math.floor(Math.random() * demoActivityPool.length)];
+      setActivityFeed(prev => [
+        { ...randomActivity, time: 'adesso' },
+        ...prev.slice(0, 5),
+      ]);
+    }, 2600);
+
+    return () => window.clearInterval(intervalId);
+  }, [demoLive]);
 
   const cardBg = t('bg-[#1A1A1A] border-white/[0.04]', 'bg-white border-black/[0.06]');
   const textMain = t('text-white', 'text-[#111]');
@@ -392,14 +442,20 @@ export function DashboardView({ module, ambitoName }: DashboardViewProps) {
         <div className={`${cardBg} border rounded-xl p-4 md:p-6 mb-6 md:mb-8`}>
           <div className="flex items-center justify-between mb-6">
             <h3 className={`text-[14px] font-bold ${textMain}`}>Andamento ultimi 12 mesi</h3>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                onClick={() => setDemoLive(v => !v)}
+                className={`text-[11px] px-2.5 py-1 rounded-md transition-colors font-semibold ${demoLive ? 'bg-[#10B981]/15 text-[#10B981]' : t('bg-white/[0.04] text-[#888] hover:text-white', 'bg-black/[0.06] text-[#777] hover:text-[#111]')}`}
+              >
+                {demoLive ? 'Demo live ON' : 'Avvia demo live'}
+              </button>
               {['7G', '30G', '12M'].map(p => (
                 <button key={p} onClick={() => setActiveChartPeriod(p)} className={`text-[11px] px-2.5 py-1 rounded-md transition-colors ${p === activeChartPeriod ? `${tabActive} font-semibold` : tabInactive}`}>{p}</button>
               ))}
             </div>
           </div>
           <div className="flex items-end gap-[6px] h-[160px]">
-            {mainChartData.map((val, i) => {
+            {chartData.map((val, i) => {
               const monthLabels = ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'];
               return (
                 <div key={i} className="flex-1 flex flex-col items-center gap-2">
@@ -474,11 +530,7 @@ export function DashboardView({ module, ambitoName }: DashboardViewProps) {
         <div className={`${cardBg} border rounded-xl p-4 md:p-6`}>
           <h3 className={`text-[14px] font-bold ${textMain} mb-4`}>Attività recenti</h3>
           <div className="flex flex-col gap-3">
-            {[
-              { action: 'Report generato', detail: 'Performance mensile Marzo 2026', time: '2 ore fa' },
-              { action: 'Soglia superata', detail: 'Tasso conversione > 30% raggiunto', time: '5 ore fa' },
-              { action: 'Nuovo dato', detail: 'Aggiornamento metriche in tempo reale', time: '1 giorno fa' },
-            ].map((item, i) => (
+            {activityFeed.map((item, i) => (
               <div key={i} className={`flex items-center gap-3 py-2 border-b ${borderCls} last:border-0`}>
                 <div className="w-2 h-2 rounded-full bg-[#F73C1C] shrink-0" />
                 <div className="flex-1">
