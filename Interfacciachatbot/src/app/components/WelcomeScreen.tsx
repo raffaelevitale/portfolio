@@ -142,8 +142,8 @@ export function WelcomeScreen({ ambiti, onSelectModule, onShowLocked }: WelcomeS
                   whileTap={isClickable ? { scale: 0.98 } : undefined}
                   onClick={() => isClickable && handleAmbitoClick(a)}
                   className={`flex items-center gap-3 p-3.5 rounded-xl border text-left transition-colors ${t('border-white/[0.05]', 'border-black/[0.06]')} ${isClickable
-                      ? `cursor-pointer ${t('hover:bg-white/[0.04]', 'hover:bg-black/[0.04]')}`
-                      : 'cursor-default'
+                    ? `cursor-pointer ${t('hover:bg-white/[0.04]', 'hover:bg-black/[0.04]')}`
+                    : 'cursor-default'
                     }`}
                 >
                   <div className="flex items-center justify-center w-[32px] h-[32px] rounded-lg shrink-0" style={{ backgroundColor: a.color + '18' }}>

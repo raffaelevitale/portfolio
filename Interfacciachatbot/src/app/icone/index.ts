@@ -9,18 +9,18 @@ import talosIcon from './TALOS.svg';
 import sentraIcon from './SENTRA.svg';
 
 const defaultIconByAmbitoId: Record<string, string> = {
-  aegis: aegisIcon,
-  orion: orionIcon,
-  goji: gojiIcon,
-  enso: ensoIcon,
-  luma: lumaIcon,
-  sophia: sonnyIcon,
-  sonny: sonnyIcon,
-  talos: talosIcon,
-  sentra: sentraIcon,
-  kora: koraIcon,
+    aegis: aegisIcon,
+    orion: orionIcon,
+    goji: gojiIcon,
+    enso: ensoIcon,
+    luma: lumaIcon,
+    sophia: sonnyIcon,
+    sonny: sonnyIcon,
+    talos: talosIcon,
+    sentra: sentraIcon,
+    kora: koraIcon,
 };
 
 export function getAmbitoIconSrc(ambitoId: string): string | null {
-  return defaultIconByAmbitoId[ambitoId] ?? null;
+    return defaultIconByAmbitoId[ambitoId] ?? null;
 }

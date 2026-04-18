@@ -244,145 +244,145 @@ export function Sidebar({
         {isInternalSection && (
           <motion.div variants={ambitoListVariants} initial="hidden" animate="show">
             {filteredAmbiti.map(ambito => {
-          const isExpanded = hasSearch || expandedAmbitoId === ambito.id;
-          const AmbitoIcon = iconMap[ambito.iconName] || Compass;
-          const ambitoIconSrc = getAmbitoIconSrc(ambito.id);
-          const hasSelectedModule = ambito.funzioni.some(f =>
-            f.modules.some(m => m.id === selectedModule?.id)
-          );
-          const activeModuleCount = ambito.funzioni.reduce((sum, f) =>
-            sum + f.modules.filter(m => m.purchased && m.active).length, 0
-          );
+              const isExpanded = hasSearch || expandedAmbitoId === ambito.id;
+              const AmbitoIcon = iconMap[ambito.iconName] || Compass;
+              const ambitoIconSrc = getAmbitoIconSrc(ambito.id);
+              const hasSelectedModule = ambito.funzioni.some(f =>
+                f.modules.some(m => m.id === selectedModule?.id)
+              );
+              const activeModuleCount = ambito.funzioni.reduce((sum, f) =>
+                sum + f.modules.filter(m => m.purchased && m.active).length, 0
+              );
 
-          return (
-            <motion.div key={ambito.id} variants={ambitoItemVariants}>
-              <motion.button
-                onClick={() => !hasSearch && toggleAmbito(ambito.id)}
-                whileHover={{ x: 1.5 }}
-                whileTap={{ scale: 0.995 }}
-                className={`flex items-start gap-2.5 w-full px-3 py-2 text-left transition-colors group ${hoverBg} ${hasSelectedModule && !hasSearch ? activeBg : ''}`}
-              >
-                <div
-                  className="flex h-7 w-7 items-center justify-center rounded-md shrink-0"
-                  style={{ backgroundColor: ambito.color + '20' }}
-                >
-                  {ambitoIconSrc ? (
-                    <img src={ambitoIconSrc} alt={ambito.name} className="h-4 w-4 rounded-[4px] object-contain" />
-                  ) : (
-                    <AmbitoIcon size={14} style={{ color: ambito.color }} />
-                  )}
-                </div>
-                <div className="flex flex-col flex-1 min-w-0 gap-0.5">
-                  <span className={`text-[13px] font-semibold ${textMain} leading-tight line-clamp-1`}>{ambito.name}</span>
-                  <span className={`text-[11px] ${textSub} leading-tight line-clamp-2`}>{ambito.subtitle}</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  {activeModuleCount > 0 && !isExpanded && (
-                    <span className="text-[11px] font-bold px-1.5 py-px rounded-full" style={{ backgroundColor: ambito.color + '18', color: ambito.color }}>
-                      {activeModuleCount}
-                    </span>
-                  )}
-                  {!hasSearch && (
-                    <motion.div
-                      animate={{ rotate: isExpanded ? 0 : -90 }}
-                      transition={{ duration: 0.2 }}
-                      className={`flex h-5 w-5 items-center justify-center rounded-md ${treeToggleBg}`}
-                    >
-                      <ChevronDown size={13} className={textMuted} />
-                    </motion.div>
-                  )}
-                </div>
-              </motion.button>
-
-              <AnimatePresence initial={false}>
-                {isExpanded && (
-                  <motion.div
-                    key={`content-${ambito.id}`}
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                    className="overflow-hidden"
+              return (
+                <motion.div key={ambito.id} variants={ambitoItemVariants}>
+                  <motion.button
+                    onClick={() => !hasSearch && toggleAmbito(ambito.id)}
+                    whileHover={{ x: 1.5 }}
+                    whileTap={{ scale: 0.995 }}
+                    className={`flex items-start gap-2.5 w-full px-3 py-2 text-left transition-colors group ${hoverBg} ${hasSelectedModule && !hasSearch ? activeBg : ''}`}
                   >
-                    <div className="pb-1 pt-0.5">
-                      {ambito.funzioni.map(funzione => (
-                        <div key={funzione.id} className={`ml-5 mb-1 border-l ${treeLine}`}>
-                          <div className="relative py-0.5 pr-2 pl-4">
-                            <span className={`pointer-events-none absolute left-0 top-1/2 h-0 w-3 -translate-y-1/2 border-t ${treeLine}`} />
-                            <span className={`text-[10px] font-semibold ${textMuted} normal-case tracking-[0.6px]`}>
-                              {funzione.name}
-                            </span>
-                          </div>
-                          <div className="pb-0.5">
-                            {funzione.modules.map(mod => {
-                              const isSelected = selectedModule?.id === mod.id;
-                              const ModIcon = resolveModuleIcon(mod);
-                              const isLocked = !mod.purchased;
-
-                              return (
-                                <motion.div
-                                  key={mod.id}
-                                  ref={isSelected ? selectedRef : undefined}
-                                  className={`relative flex items-center gap-2 w-full pl-5 pr-2 py-1.5 text-left transition-all text-[12px] rounded-r-md ${isSelected
-                                    ? `${activeBg} font-semibold`
-                                    : hoverBg
-                                    } ${isLocked ? 'opacity-50' : ''}`}
-                                  whileHover={{ x: 1 }}
-                                  transition={{ duration: 0.14 }}
-                                >
-                                  <span className={`pointer-events-none absolute left-0 top-1/2 h-0 w-3 -translate-y-1/2 border-t ${treeLine}`} />
-                                  {isSelected && (
-                                    <motion.div
-                                      layoutId="sidebar-active-indicator"
-                                      className="absolute left-0 top-[3px] bottom-[3px] w-[2px] rounded-r-full bg-[#F73C1C]"
-                                      transition={{ type: 'spring', stiffness: 350, damping: 30 }}
-                                    />
-                                  )}
-                                  <motion.button
-                                    onClick={() => {
-                                      if (isLocked) onShowLocked(mod);
-                                      else handleSelectModule(mod, ambito.id);
-                                    }}
-                                    whileTap={{ scale: 0.99 }}
-                                    className="flex items-start gap-2 flex-1 min-w-0 text-[11px] leading-tight"
-                                  >
-                                    <ModIcon
-                                      size={13}
-                                      className={`shrink-0 mt-[2px] transition-colors ${isSelected ? 'text-[#F73C1C]' : textSub}`}
-                                    />
-                                    <span className={`flex-1 transition-colors text-left text-[11px] leading-tight line-clamp-2 ${isSelected ? 'text-[#F73C1C]' : textSub} ${isSelected ? 'font-semibold' : 'font-medium'}`}>
-                                      {mod.name}
-                                    </span>
-                                  </motion.button>
-                                  {isLocked && <Lock size={12} className={textMuted} />}
-                                  {!isLocked && (
-                                    <motion.button
-                                      onClick={e => {
-                                        e.stopPropagation();
-                                        onToggleModule(mod.id);
-                                      }}
-                                      whileTap={{ scale: 0.92 }}
-                                      className={`relative w-[34px] h-[18px] rounded-full transition-colors shrink-0 ${mod.active ? 'bg-[#10B981]' : t('bg-[#333]', 'bg-[#ccc]')
-                                        }`}
-                                      title={mod.active ? 'Disattiva' : 'Attiva'}
-                                    >
-                                      <div className={`absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform ${mod.active ? 'left-[18px]' : 'left-[2px]'
-                                        }`} />
-                                    </motion.button>
-                                  )}
-                                </motion.div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ))}
+                    <div
+                      className="flex h-7 w-7 items-center justify-center rounded-md shrink-0"
+                      style={{ backgroundColor: ambito.color + '20' }}
+                    >
+                      {ambitoIconSrc ? (
+                        <img src={ambitoIconSrc} alt={ambito.name} className="h-4 w-4 rounded-[4px] object-contain" />
+                      ) : (
+                        <AmbitoIcon size={14} style={{ color: ambito.color }} />
+                      )}
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </motion.div>
-          );
-        })}
+                    <div className="flex flex-col flex-1 min-w-0 gap-0.5">
+                      <span className={`text-[13px] font-semibold ${textMain} leading-tight line-clamp-1`}>{ambito.name}</span>
+                      <span className={`text-[11px] ${textSub} leading-tight line-clamp-2`}>{ambito.subtitle}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      {activeModuleCount > 0 && !isExpanded && (
+                        <span className="text-[11px] font-bold px-1.5 py-px rounded-full" style={{ backgroundColor: ambito.color + '18', color: ambito.color }}>
+                          {activeModuleCount}
+                        </span>
+                      )}
+                      {!hasSearch && (
+                        <motion.div
+                          animate={{ rotate: isExpanded ? 0 : -90 }}
+                          transition={{ duration: 0.2 }}
+                          className={`flex h-5 w-5 items-center justify-center rounded-md ${treeToggleBg}`}
+                        >
+                          <ChevronDown size={13} className={textMuted} />
+                        </motion.div>
+                      )}
+                    </div>
+                  </motion.button>
+
+                  <AnimatePresence initial={false}>
+                    {isExpanded && (
+                      <motion.div
+                        key={`content-${ambito.id}`}
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="pb-1 pt-0.5">
+                          {ambito.funzioni.map(funzione => (
+                            <div key={funzione.id} className={`ml-5 mb-1 border-l ${treeLine}`}>
+                              <div className="relative py-0.5 pr-2 pl-4">
+                                <span className={`pointer-events-none absolute left-0 top-1/2 h-0 w-3 -translate-y-1/2 border-t ${treeLine}`} />
+                                <span className={`text-[10px] font-semibold ${textMuted} normal-case tracking-[0.6px]`}>
+                                  {funzione.name}
+                                </span>
+                              </div>
+                              <div className="pb-0.5">
+                                {funzione.modules.map(mod => {
+                                  const isSelected = selectedModule?.id === mod.id;
+                                  const ModIcon = resolveModuleIcon(mod);
+                                  const isLocked = !mod.purchased;
+
+                                  return (
+                                    <motion.div
+                                      key={mod.id}
+                                      ref={isSelected ? selectedRef : undefined}
+                                      className={`relative flex items-center gap-2 w-full pl-5 pr-2 py-1.5 text-left transition-all text-[12px] rounded-r-md ${isSelected
+                                        ? `${activeBg} font-semibold`
+                                        : hoverBg
+                                        } ${isLocked ? 'opacity-50' : ''}`}
+                                      whileHover={{ x: 1 }}
+                                      transition={{ duration: 0.14 }}
+                                    >
+                                      <span className={`pointer-events-none absolute left-0 top-1/2 h-0 w-3 -translate-y-1/2 border-t ${treeLine}`} />
+                                      {isSelected && (
+                                        <motion.div
+                                          layoutId="sidebar-active-indicator"
+                                          className="absolute left-0 top-[3px] bottom-[3px] w-[2px] rounded-r-full bg-[#F73C1C]"
+                                          transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                                        />
+                                      )}
+                                      <motion.button
+                                        onClick={() => {
+                                          if (isLocked) onShowLocked(mod);
+                                          else handleSelectModule(mod, ambito.id);
+                                        }}
+                                        whileTap={{ scale: 0.99 }}
+                                        className="flex items-start gap-2 flex-1 min-w-0 text-[11px] leading-tight"
+                                      >
+                                        <ModIcon
+                                          size={13}
+                                          className={`shrink-0 mt-[2px] transition-colors ${isSelected ? 'text-[#F73C1C]' : textSub}`}
+                                        />
+                                        <span className={`flex-1 transition-colors text-left text-[11px] leading-tight line-clamp-2 ${isSelected ? 'text-[#F73C1C]' : textSub} ${isSelected ? 'font-semibold' : 'font-medium'}`}>
+                                          {mod.name}
+                                        </span>
+                                      </motion.button>
+                                      {isLocked && <Lock size={12} className={textMuted} />}
+                                      {!isLocked && (
+                                        <motion.button
+                                          onClick={e => {
+                                            e.stopPropagation();
+                                            onToggleModule(mod.id);
+                                          }}
+                                          whileTap={{ scale: 0.92 }}
+                                          className={`relative w-[34px] h-[18px] rounded-full transition-colors shrink-0 ${mod.active ? 'bg-[#10B981]' : t('bg-[#333]', 'bg-[#ccc]')
+                                            }`}
+                                          title={mod.active ? 'Disattiva' : 'Attiva'}
+                                        >
+                                          <div className={`absolute top-[2px] w-[14px] h-[14px] rounded-full bg-white shadow-sm transition-transform ${mod.active ? 'left-[18px]' : 'left-[2px]'
+                                            }`} />
+                                        </motion.button>
+                                      )}
+                                    </motion.div>
+                                  );
+                                })}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.div>
+              );
+            })}
           </motion.div>
         )}
 

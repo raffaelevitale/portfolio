@@ -365,8 +365,8 @@ export function DashboardView({ module, ambitoName }: DashboardViewProps) {
                         <td className={`px-6 py-3.5 text-[13px] ${textSub}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>{row.tempo}</td>
                         <td className="px-6 py-3.5">
                           <span className={`text-[12px] font-medium px-2 py-0.5 rounded-full ${parseFloat(row.rating) >= 4.6 ? 'bg-[#10B981]/10 text-[#10B981]' :
-                              parseFloat(row.rating) >= 4.4 ? 'bg-[#F59E0B]/10 text-[#F59E0B]' :
-                                'bg-[#F73C1C]/10 text-[#F73C1C]'
+                            parseFloat(row.rating) >= 4.4 ? 'bg-[#F59E0B]/10 text-[#F59E0B]' :
+                              'bg-[#F73C1C]/10 text-[#F73C1C]'
                             }`}>{row.rating}</span>
                         </td>
                       </tr>
@@ -488,9 +488,9 @@ export function DashboardView({ module, ambitoName }: DashboardViewProps) {
                       <Calendar size={10} className="inline mr-1" />{report.createdAt}
                     </span>
                     <span className={`text-[9px] md:text-[10px] font-medium px-2 py-0.5 rounded-full ${report.type === 'settimanale' ? 'bg-[#EC4899]/10 text-[#EC4899]' :
-                        report.type === 'mensile' ? 'bg-[#8B5CF6]/10 text-[#8B5CF6]' :
-                          report.type === 'trimestrale' ? 'bg-[#F59E0B]/10 text-[#F59E0B]' :
-                            'bg-[#10B981]/10 text-[#10B981]'
+                      report.type === 'mensile' ? 'bg-[#8B5CF6]/10 text-[#8B5CF6]' :
+                        report.type === 'trimestrale' ? 'bg-[#F59E0B]/10 text-[#F59E0B]' :
+                          'bg-[#10B981]/10 text-[#10B981]'
                       }`}>{report.type}</span>
                     {report.status === 'in_generazione' && (
                       <span className="text-[10px] font-medium text-[#F59E0B] flex items-center gap-1">
@@ -570,8 +570,8 @@ export function DashboardView({ module, ambitoName }: DashboardViewProps) {
                     key={opt.value}
                     onClick={() => setNewReportType(opt.value)}
                     className={`flex items-center gap-3 p-4 rounded-xl border transition-all text-left ${newReportType === opt.value
-                        ? `border-[#F73C1C] ${t('bg-[#F73C1C]/[0.04]', 'bg-[#F73C1C]/[0.03]')}`
-                        : `${t('border-white/[0.06] hover:border-white/[0.12]', 'border-black/[0.06] hover:border-black/[0.12]')}`
+                      ? `border-[#F73C1C] ${t('bg-[#F73C1C]/[0.04]', 'bg-[#F73C1C]/[0.03]')}`
+                      : `${t('border-white/[0.06] hover:border-white/[0.12]', 'border-black/[0.06] hover:border-black/[0.12]')}`
                       }`}
                   >
                     <div className="w-3 h-3 rounded-full border-2 shrink-0" style={{ borderColor: newReportType === opt.value ? '#F73C1C' : t('#444', '#ccc'), backgroundColor: newReportType === opt.value ? '#F73C1C' : 'transparent' }} />
