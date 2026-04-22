@@ -235,6 +235,25 @@ export function Sidebar({
       className={`flex flex-col h-full w-[var(--layout-sidebar-w)] shrink-0 border-r ${borderCls} overflow-hidden`}
       style={{ backgroundColor: sidebarBg }}
     >
+      {/* Branding header */}
+      <div className={`flex items-center justify-between px-3.5 py-2.5 border-b ${borderCls}`}>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <span className={`text-[11px] font-bold tracking-[0.08em] ${t('text-white', 'text-[#111]')}`}>CRYBU</span>
+            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${t('bg-white/[0.07] text-[#888]', 'bg-black/[0.06] text-[#777]')}`}>CC</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className={`text-[10px] font-medium ${textMuted}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+            {activeInternalModules} attivi
+          </span>
+          <span className="relative flex h-1.5 w-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#10B981] opacity-50" />
+            <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#10B981]" />
+          </span>
+        </div>
+      </div>
+
       {/* Search */}
       <div className={`px-3 py-2.5 border-b ${borderCls}`}>
         <div className={`flex items-center gap-2 ${inputBg} rounded-md px-2.5 py-1.5 border ${borderCls} focus-within:border-[#F73C1C]/30 transition-colors`}>
@@ -286,11 +305,23 @@ export function Sidebar({
                     onClick={() => !hasSearch && toggleAmbito(ambito.id)}
                     whileHover={{ x: 1.5 }}
                     whileTap={{ scale: 0.995 }}
-                    className={`flex items-start gap-2.5 w-full px-3 py-2 text-left transition-colors group ${hoverBg} ${hasSelectedModule && !hasSearch ? activeBg : ''}`}
+                    className={`relative flex items-start gap-2.5 w-full px-3 py-2 text-left transition-all group ${hoverBg}`}
+                    style={hasSelectedModule && !hasSearch ? { backgroundColor: ambito.color + '0C' } : undefined}
                   >
+                    {hasSelectedModule && !hasSearch && (
+                      <motion.div
+                        layoutId="sidebar-ambito-accent"
+                        className="absolute left-0 top-[4px] bottom-[4px] w-[2.5px] rounded-r-full"
+                        style={{ backgroundColor: ambito.color }}
+                        transition={{ type: 'spring', stiffness: 350, damping: 30 }}
+                      />
+                    )}
                     <div
-                      className="flex h-7 w-7 items-center justify-center rounded-md shrink-0"
-                      style={{ backgroundColor: ambito.color + '20' }}
+                      className="flex h-7 w-7 items-center justify-center rounded-md shrink-0 transition-all"
+                      style={{
+                        backgroundColor: ambito.color + (isExpanded || hasSelectedModule ? '28' : '1A'),
+                        boxShadow: isExpanded || hasSelectedModule ? `0 0 0 1px ${ambito.color}25` : 'none',
+                      }}
                     >
                       {ambitoIconSrc ? (
                         <img src={ambitoIconSrc} alt={ambito.name} className="h-4 w-4 rounded-[4px] object-contain" />
@@ -299,7 +330,12 @@ export function Sidebar({
                       )}
                     </div>
                     <div className="flex flex-col flex-1 min-w-0 gap-0.5">
-                      <span className={`text-[13px] font-semibold ${textMain} leading-tight line-clamp-1`}>{ambito.name}</span>
+                      <span
+                        className={`text-[13px] font-semibold leading-tight line-clamp-1 transition-colors ${hasSelectedModule && !hasSearch ? '' : textMain}`}
+                        style={hasSelectedModule && !hasSearch ? { color: ambito.color } : undefined}
+                      >
+                        {ambito.name}
+                      </span>
                       <span className={`text-[11px] ${textSub} leading-tight line-clamp-2`}>{ambito.subtitle}</span>
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -349,10 +385,8 @@ export function Sidebar({
                                     <motion.div
                                       key={mod.id}
                                       ref={isSelected ? selectedRef : undefined}
-                                      className={`relative flex items-center gap-2 w-full pl-5 pr-2 py-1.5 text-left transition-all text-[12px] rounded-r-md ${isSelected
-                                        ? `${activeBg} font-semibold`
-                                        : hoverBg
-                                        } ${isLocked ? 'opacity-50' : ''}`}
+                                      className={`relative flex items-center gap-2 w-full pl-5 pr-2 py-1.5 text-left transition-all text-[12px] rounded-r-md ${isSelected ? 'font-semibold' : hoverBg} ${isLocked ? 'opacity-50' : ''}`}
+                                      style={isSelected ? { backgroundColor: ambito.color + '10' } : undefined}
                                       whileHover={{ x: 1 }}
                                       transition={{ duration: 0.14 }}
                                     >
@@ -360,7 +394,8 @@ export function Sidebar({
                                       {isSelected && (
                                         <motion.div
                                           layoutId="sidebar-active-indicator"
-                                          className="absolute left-0 top-[3px] bottom-[3px] w-[2px] rounded-r-full bg-[#F73C1C]"
+                                          className="absolute left-0 top-[3px] bottom-[3px] w-[2px] rounded-r-full"
+                                          style={{ backgroundColor: ambito.color }}
                                           transition={{ type: 'spring', stiffness: 350, damping: 30 }}
                                         />
                                       )}
@@ -374,9 +409,13 @@ export function Sidebar({
                                       >
                                         <ModIcon
                                           size={13}
-                                          className={`shrink-0 mt-[2px] transition-colors ${isSelected ? 'text-[#F73C1C]' : textSub}`}
+                                          className={`shrink-0 mt-[2px] transition-colors ${isSelected ? '' : textSub}`}
+                                          style={isSelected ? { color: ambito.color } : undefined}
                                         />
-                                        <span className={`flex-1 transition-colors text-left text-[11px] leading-tight line-clamp-2 ${isSelected ? 'text-[#F73C1C]' : textSub} ${isSelected ? 'font-semibold' : 'font-medium'}`}>
+                                        <span
+                                          className={`flex-1 transition-colors text-left text-[11px] leading-tight line-clamp-2 ${isSelected ? 'font-semibold' : `font-medium ${textSub}`}`}
+                                          style={isSelected ? { color: ambito.color } : undefined}
+                                        >
                                           {mod.name}
                                         </span>
                                       </motion.button>
@@ -472,35 +511,49 @@ export function Sidebar({
       </div>
 
       {/* Footer */}
-      <div className={`px-3 py-2 border-t ${borderCls}`}>
-        <div className={`grid grid-cols-2 gap-1 p-1 rounded-lg ${subtleBg}`}>
-          <motion.button
-            onClick={() => {
-              setSearch('');
-              onChangeSection('internal');
-            }}
-            whileTap={{ scale: 0.97 }}
-            className={`text-[11px] py-1.5 rounded-md font-semibold transition-colors ${isInternalSection ? t('bg-white/[0.12] text-white', 'bg-black/[0.1] text-[#111]') : textMuted}`}
-          >
-            Ecosistema
-          </motion.button>
-          <motion.button
-            onClick={() => {
-              setSearch('');
-              onChangeSection('third-party');
-            }}
-            whileTap={{ scale: 0.97 }}
-            className={`text-[11px] py-1.5 rounded-md font-semibold transition-colors ${!isInternalSection ? t('bg-white/[0.12] text-white', 'bg-black/[0.1] text-[#111]') : textMuted}`}
-          >
-            Sottoscrizioni
-          </motion.button>
+      <div className={`px-3 pb-3 pt-2 border-t ${borderCls} space-y-2`}>
+        <div className={`relative flex items-center p-0.5 rounded-lg ${subtleBg}`}>
+          {/* Sliding indicator */}
+          <motion.div
+            className={`absolute top-0.5 bottom-0.5 w-[calc(50%-2px)] rounded-md ${t('bg-white/[0.10]', 'bg-black/[0.08]')}`}
+            animate={{ x: isInternalSection ? 2 : 'calc(100% + 2px)' }}
+            transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+          />
+          {(['internal', 'third-party'] as const).map((sec, idx) => (
+            <motion.button
+              key={sec}
+              onClick={() => { setSearch(''); onChangeSection(sec); }}
+              whileTap={{ scale: 0.97 }}
+              className={`relative flex-1 z-10 text-[11px] py-1.5 rounded-md font-semibold transition-colors ${
+                (sec === 'internal') === isInternalSection
+                  ? t('text-white', 'text-[#111]')
+                  : textMuted
+              }`}
+            >
+              {idx === 0 ? 'Ecosistema' : 'Sottoscrizioni'}
+            </motion.button>
+          ))}
         </div>
 
-        <div className="mt-2 px-0.5">
-          {isInternalSection ? (
-            <span className={`text-[11px] font-medium ${textMuted}`}>Ecosistema: {activeInternalModules} moduli attivi</span>
-          ) : (
-            <span className={`text-[11px] font-medium ${textMuted}`}>Terze parti: {activeThirdPartySubscriptions} abbonamenti, {connectedThirdPartyProviders} operativi</span>
+        <div className={`flex items-center justify-between px-0.5`}>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={isInternalSection ? 'internal' : 'external'}
+              initial={{ opacity: 0, y: 3 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -3 }}
+              transition={{ duration: 0.18 }}
+              className={`text-[10.5px] font-medium ${textMuted}`}
+            >
+              {isInternalSection
+                ? `${activeInternalModules} moduli attivi`
+                : `${activeThirdPartySubscriptions} abb · ${connectedThirdPartyProviders} operativi`}
+            </motion.span>
+          </AnimatePresence>
+          {!isInternalSection && thirdPartySetupPending > 0 && (
+            <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-[#F59E0B]/15 text-[#F59E0B]">
+              {thirdPartySetupPending} setup
+            </span>
           )}
         </div>
       </div>

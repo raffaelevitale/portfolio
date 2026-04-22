@@ -261,6 +261,7 @@ export function WelcomeScreen({ ambiti, onSelectModule, onShowLocked }: WelcomeS
       }));
   }, [activities, ambitoById]);
 
+  const [expandedKpi, setExpandedKpi] = useState<number | null>(null);
   const [tickerIdx, setTickerIdx] = useState(0);
   useEffect(() => {
     if (tickerPool.length < 2 || reduced) return;
@@ -271,6 +272,26 @@ export function WelcomeScreen({ ambiti, onSelectModule, onShowLocked }: WelcomeS
   }, [tickerPool.length, reduced]);
 
   const currentTicker = tickerPool[tickerIdx % Math.max(1, tickerPool.length)];
+
+  const kpiDetailRows = (kpiIdx: number) => {
+    const base = activities
+      .filter(a => Number.isFinite(Number(a.activity.metric)) && Number(a.activity.metric) > 0)
+      .map(a => ({
+        name: a.module.name,
+        ambitoName: ambitoById.get(a.ambitoId)?.name ?? '',
+        color: ambitoById.get(a.ambitoId)?.color ?? '#F73C1C',
+        rawMetric: Number(a.activity.metric),
+        metricLabel: a.activity.metricLabel,
+        lastEvent: a.activity.lastEvent,
+        delta: a.activity.deltaPercent,
+        moduleId: a.module.id,
+        ambitoId: a.ambitoId,
+        module: a.module,
+      }));
+    if (kpiIdx === 1) return base.map(r => ({ ...r, displayValue: `${(Math.round(r.rawMetric * 2.5 / 6) / 10).toFixed(1).replace('.', ',')}h`, metricLabel: 'ore risparmiate' }));
+    if (kpiIdx === 2) return base.map(r => ({ ...r, displayValue: String(Math.max(1, Math.round(r.rawMetric / 7))), metricLabel: 'insight' }));
+    return base.map(r => ({ ...r, displayValue: String(r.rawMetric) }));
+  };
 
   const handleModuleClick = (module: Module, ambitoId: string) => {
     if (!module.purchased) {
@@ -438,7 +459,9 @@ export function WelcomeScreen({ ambiti, onSelectModule, onShowLocked }: WelcomeS
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: 0.08 + i * 0.06 }}
                 whileHover={reduced ? undefined : { y: -2 }}
-                className={`${cardBg} border rounded-xl p-4 relative overflow-hidden group`}
+                onClick={() => setExpandedKpi(prev => prev === i ? null : i)}
+                className={`${cardBg} border rounded-xl p-4 relative overflow-hidden group cursor-pointer transition-all ${expandedKpi === i ? `ring-1` : ''}`}
+                style={expandedKpi === i ? { boxShadow: `0 0 0 1px ${kpi.color}40` } : undefined}
               >
                 <div
                   aria-hidden
@@ -481,6 +504,78 @@ export function WelcomeScreen({ ambiti, onSelectModule, onShowLocked }: WelcomeS
             );
           })}
         </div>
+
+        {/* KPI Detail Panel */}
+        <AnimatePresence>
+          {expandedKpi !== null && (() => {
+            const kpi = kpiCards[expandedKpi];
+            const rows = kpiDetailRows(expandedKpi);
+            const maxVal = Math.max(...rows.map(r => r.rawMetric), 1);
+            return (
+              <motion.div
+                key={`kpi-detail-${expandedKpi}`}
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.28, ease: [0.4, 0, 0.2, 1] }}
+                className="overflow-hidden"
+              >
+                <div className={`${cardBg} border rounded-xl overflow-hidden`} style={{ boxShadow: `0 0 0 1px ${kpi.color}30` }}>
+                  <div className={`flex items-center justify-between px-4 md:px-5 py-3 border-b ${t('border-white/[0.05]', 'border-black/[0.06]')}`} style={{ background: `linear-gradient(90deg, ${kpi.color}10, transparent)` }}>
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-md flex items-center justify-center" style={{ backgroundColor: `${kpi.color}20`, color: kpi.color }}>
+                        <kpi.icon size={11} />
+                      </div>
+                      <span className={`text-[12px] font-semibold ${textMain}`}>{kpi.label}</span>
+                    </div>
+                    <button onClick={() => setExpandedKpi(null)} className={`${textMuted} hover:text-[#F73C1C] transition-colors`}>
+                      <ChevronRight size={14} className="rotate-90" />
+                    </button>
+                  </div>
+                  {rows.length === 0 ? (
+                    <p className={`px-5 py-6 text-[12px] ${textMuted} text-center`}>Nessun modulo attivo contribuisce a questa metrica.</p>
+                  ) : (
+                    <div className="px-4 md:px-5 py-3 flex flex-col gap-2">
+                      {rows.map(row => {
+                        const pct = Math.round((row.rawMetric / maxVal) * 100);
+                        return (
+                          <div key={row.moduleId} className="grid items-center gap-x-3" style={{ gridTemplateColumns: '180px 1fr 48px 100px 46px' }}>
+                            <button
+                              onClick={() => { handleModuleClick(row.module, row.ambitoId); setExpandedKpi(null); }}
+                              className={`text-[11.5px] font-medium truncate text-left transition-colors ${textSub} hover:text-[#F73C1C]`}
+                              title={row.name}
+                            >
+                              {row.name}
+                            </button>
+                            <div className={`h-[5px] rounded-full ${t('bg-white/[0.06]', 'bg-black/[0.06]')} overflow-hidden`}>
+                              <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${pct}%` }}
+                                transition={{ duration: 0.5, delay: 0.05, ease: 'easeOut' }}
+                                className="h-full rounded-full"
+                                style={{ backgroundColor: row.color }}
+                              />
+                            </div>
+                            <span className="text-[12px] font-bold text-right" style={{ color: row.color, fontFamily: '"JetBrains Mono", monospace' }}>
+                              {row.displayValue}
+                            </span>
+                            <span className={`text-[10.5px] ${textSub} truncate`}>{row.metricLabel}</span>
+                            <span
+                              className={`text-[10.5px] font-semibold text-right ${row.delta > 0 ? 'text-[#10B981]' : row.delta < 0 ? 'text-[#EF4444]' : textMuted}`}
+                              style={{ fontFamily: '"JetBrains Mono", monospace' }}
+                            >
+                              {row.delta > 0 ? '+' : ''}{row.delta}%
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })()}
+        </AnimatePresence>
 
         {/* Moduli al lavoro */}
         <motion.section
