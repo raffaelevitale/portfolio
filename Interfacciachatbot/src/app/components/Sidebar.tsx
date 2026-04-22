@@ -236,13 +236,7 @@ export function Sidebar({
       style={{ backgroundColor: sidebarBg }}
     >
       {/* Branding header */}
-      <div className={`flex items-center justify-between px-3.5 py-2.5 border-b ${borderCls}`}>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5">
-            <span className={`text-[11px] font-bold tracking-[0.08em] ${t('text-white', 'text-[#111]')}`}>CRYBU</span>
-            <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded ${t('bg-white/[0.07] text-[#888]', 'bg-black/[0.06] text-[#777]')}`}>CC</span>
-          </div>
-        </div>
+      <div className={`flex items-center justify-end px-3.5 py-2.5 border-b ${borderCls}`}>
         <div className="flex items-center gap-2">
           <span className={`text-[10px] font-medium ${textMuted}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
             {activeInternalModules} attivi
@@ -524,11 +518,10 @@ export function Sidebar({
               key={sec}
               onClick={() => { setSearch(''); onChangeSection(sec); }}
               whileTap={{ scale: 0.97 }}
-              className={`relative flex-1 z-10 text-[11px] py-1.5 rounded-md font-semibold transition-colors ${
-                (sec === 'internal') === isInternalSection
+              className={`relative flex-1 z-10 text-[11px] py-1.5 rounded-md font-semibold transition-colors ${(sec === 'internal') === isInternalSection
                   ? t('text-white', 'text-[#111]')
                   : textMuted
-              }`}
+                }`}
             >
               {idx === 0 ? 'Ecosistema' : 'Sottoscrizioni'}
             </motion.button>

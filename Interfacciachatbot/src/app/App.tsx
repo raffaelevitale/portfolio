@@ -2,7 +2,6 @@ import { useState, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ThemeProvider, useTheme } from "./components/ThemeContext";
 import { Header } from "./components/Header";
-import { PromoBanner } from "./components/PromoBanner";
 import { Sidebar } from "./components/Sidebar";
 import { ModuleTopBar } from "./components/ModuleTopBar";
 import { ChatArea } from "./components/ChatArea";
@@ -185,7 +184,6 @@ function AppInner() {
         operativityPercent={operativityPercent}
         activeModulesCount={activeInternalModulesCount}
       />
-      <PromoBanner ambiti={ambitiState} onDiscoverModules={goHome} />
 
       <div className="flex flex-1 overflow-hidden">
         {!showSettings && (

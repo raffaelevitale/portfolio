@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Sun, Moon, Bell, X, LogOut, User, HelpCircle, Menu, Settings, Home, Activity } from 'lucide-react';
+import { Sun, Moon, Bell, X, LogOut, User, HelpCircle, Menu, Settings, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import logoLight from '../../../loghi/BiancoNero.png';
@@ -91,17 +91,6 @@ export function Header({
           className="flex items-center gap-1.5 hover:opacity-80 transition-opacity"
         >
           <img src={currentLogo} alt="CRYBU" className="h-[20px] md:h-[22px] w-auto object-contain" />
-        </motion.button>
-        <div className={`hidden md:block w-[1px] h-[20px] mx-1 ${t('bg-white/[0.08]', 'bg-black/[0.08]')}`} />
-        <motion.button
-          onClick={onGoHome}
-          whileHover={{ y: -1 }}
-          whileTap={{ scale: 0.97 }}
-          className={`hidden md:flex items-center gap-1.5 px-2 py-1.5 rounded-md ${iconCls} ${hoverItem} transition-colors text-[12px]`}
-          title="Home"
-        >
-          <Home size={15} />
-          <span className="hidden lg:inline">Home</span>
         </motion.button>
       </div>
 
