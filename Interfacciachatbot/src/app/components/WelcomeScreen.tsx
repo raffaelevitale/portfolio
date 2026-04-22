@@ -345,9 +345,34 @@ export function WelcomeScreen({ ambiti, onSelectModule, onShowLocked }: WelcomeS
     },
   ];
 
+  const ambitiOverview = useMemo(() => {
+    return ambiti.map(ambito => {
+      const flatMods = ambito.funzioni.flatMap(f => f.modules);
+      const active = flatMods.filter(m => m.purchased && m.active).length;
+      const total = flatMods.length;
+      return { id: ambito.id, name: ambito.name, color: ambito.color, iconName: ambito.iconName, active, total };
+    });
+  }, [ambiti]);
+
+  const handleAmbitoQuickOpen = (ambitoId: string) => {
+    const ambito = ambitoById.get(ambitoId);
+    if (!ambito) return;
+    const firstActive = ambito.funzioni
+      .flatMap(f => f.modules)
+      .find(m => m.purchased && m.active);
+    const fallback = ambito.funzioni.flatMap(f => f.modules).find(m => m.purchased) ?? ambito.funzioni[0]?.modules[0];
+    const target = firstActive ?? fallback;
+    if (!target) return;
+    if (!target.purchased) {
+      onShowLocked?.(target);
+      return;
+    }
+    onSelectModule?.(target, ambitoId);
+  };
+
   return (
     <div className={`flex flex-1 justify-center overflow-y-auto ${t('bg-[#101010]', 'bg-[#F5F5F5]')}`}>
-      <div className="w-full max-w-4xl px-4 md:px-10 py-8 md:py-12 space-y-6 md:space-y-7">
+      <div className="w-full max-w-[1240px] px-4 md:px-8 lg:px-10 py-6 md:py-10 space-y-5 md:space-y-6">
         {/* Hero with ambient gradient mesh */}
         <section className="relative overflow-hidden rounded-[20px] isolate">
           <div
@@ -444,6 +469,60 @@ export function WelcomeScreen({ ambiti, onSelectModule, onShowLocked }: WelcomeS
                 </span>
               </div>
             )}
+          </div>
+        </section>
+
+        {/* Ambiti quick access */}
+        <section className="relative">
+          <div className="flex items-center justify-between mb-2.5">
+            <div className="flex items-center gap-2">
+              <span className={`text-[11px] font-semibold uppercase tracking-[0.8px] ${textMuted}`}>Ecosistema</span>
+              <span className={`text-[10.5px] ${textMuted}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+                {ambitiOverview.reduce((acc, a) => acc + a.active, 0)}/{ambitiOverview.reduce((acc, a) => acc + a.total, 0)} moduli attivi
+              </span>
+            </div>
+          </div>
+          <div className="grid gap-2 grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9">
+            {ambitiOverview.map((a, i) => {
+              const AmbitoIcon = iconMap[a.iconName] || Compass;
+              const ambitoIconSrc = getAmbitoIconSrc(a.id);
+              const isActive = a.active > 0;
+              return (
+                <motion.button
+                  key={a.id}
+                  onClick={() => handleAmbitoQuickOpen(a.id)}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, delay: 0.02 * i }}
+                  whileHover={reduced ? undefined : { y: -2 }}
+                  className={`group relative flex flex-col items-center gap-1.5 p-2.5 rounded-xl border transition-all ${cardBg} ${isActive ? '' : 'opacity-70 hover:opacity-100'}`}
+                  style={{ boxShadow: isActive ? `inset 0 -2px 0 ${a.color}` : 'none' }}
+                  title={`${a.name} · ${a.active}/${a.total} attivi`}
+                >
+                  <div
+                    className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-transform group-hover:scale-105"
+                    style={{ backgroundColor: `${a.color}${isActive ? '22' : '14'}` }}
+                  >
+                    {ambitoIconSrc ? (
+                      <img src={ambitoIconSrc} alt={a.name} className="h-4 w-4 rounded-[4px] object-contain" />
+                    ) : (
+                      <AmbitoIcon size={14} style={{ color: a.color }} />
+                    )}
+                  </div>
+                  <div className="flex flex-col items-center w-full">
+                    <span className={`text-[10.5px] font-semibold leading-tight truncate w-full text-center ${textMain}`}>
+                      {a.name}
+                    </span>
+                    <span
+                      className="text-[9.5px] font-semibold mt-0.5"
+                      style={{ color: isActive ? a.color : undefined, fontFamily: '"JetBrains Mono", monospace' }}
+                    >
+                      <span className={isActive ? '' : textMuted}>{a.active}/{a.total}</span>
+                    </span>
+                  </div>
+                </motion.button>
+              );
+            })}
           </div>
         </section>
 
@@ -605,85 +684,79 @@ export function WelcomeScreen({ ambiti, onSelectModule, onShowLocked }: WelcomeS
               <p className={`text-[12px] ${textSub} mt-1`}>Attiva un modulo per vederlo operare qui in tempo reale.</p>
             </div>
           ) : (
-            activities.map(({ module, ambitoId, activity }, i) => {
-              const ambito = ambitoById.get(ambitoId);
-              const AmbitoIcon = ambito ? (iconMap[ambito.iconName] || Compass) : Compass;
-              const ambitoIconSrc = ambito ? getAmbitoIconSrc(ambito.id) : null;
-              const isLast = i === activities.length - 1;
-              const color = ambito?.color ?? '#F73C1C';
-              const seed = Array.from(module.id).reduce((a, c) => a + c.charCodeAt(0), 0);
+            <div className={`grid lg:grid-cols-2 lg:divide-x ${t('lg:divide-white/[0.05]', 'lg:divide-black/[0.06]')}`}>
+              {activities.map(({ module, ambitoId, activity }, i) => {
+                const ambito = ambitoById.get(ambitoId);
+                const AmbitoIcon = ambito ? (iconMap[ambito.iconName] || Compass) : Compass;
+                const ambitoIconSrc = ambito ? getAmbitoIconSrc(ambito.id) : null;
+                const isLast = i === activities.length - 1;
+                const isSecondLast = i === activities.length - 2;
+                const color = ambito?.color ?? '#F73C1C';
+                const seed = Array.from(module.id).reduce((a, c) => a + c.charCodeAt(0), 0);
 
-              return (
-                <motion.button
-                  key={module.id}
-                  onClick={() => handleModuleClick(module, ambitoId)}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.25, delay: 0.05 + i * 0.03 }}
-                  whileHover={reduced ? undefined : { x: 2 }}
-                  className={`w-full flex items-start md:items-center gap-3 px-4 md:px-5 py-3.5 text-left transition-colors ${rowHover} ${!isLast ? `border-b ${rowBorder}` : ''} group`}
-                >
-                  <div
-                    className="relative w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
-                    style={{ backgroundColor: `${color}1A` }}
+                return (
+                  <motion.button
+                    key={module.id}
+                    onClick={() => handleModuleClick(module, ambitoId)}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.25, delay: 0.05 + i * 0.03 }}
+                    whileHover={reduced ? undefined : { x: 2 }}
+                    className={`w-full flex items-start md:items-center gap-3 px-4 md:px-5 py-3.5 text-left transition-colors ${rowHover} ${!isLast ? `border-b ${rowBorder}` : ''} ${isSecondLast ? `lg:border-b-0` : ''} group`}
                   >
-                    <span
-                      aria-hidden
-                      className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                      style={{ boxShadow: `0 0 0 3px ${color}25` }}
-                    />
-                    {ambitoIconSrc ? (
-                      <img src={ambitoIconSrc} alt={ambito?.name ?? ''} className="h-[18px] w-[18px] rounded-[4px] object-contain" />
-                    ) : (
-                      <AmbitoIcon size={16} style={{ color }} />
-                    )}
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <p className={`text-[13px] font-semibold ${textMain} truncate`}>{module.name}</p>
-                      <span className="inline-flex items-center gap-1 text-[9px] font-semibold px-1.5 py-[1px] rounded bg-[#10B981]/15 text-[#10B981]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
-                        LIVE
-                      </span>
-                      {ambito && (
-                        <span
-                          className="text-[10px] font-medium px-1.5 py-[1px] rounded"
-                          style={{ backgroundColor: `${color}14`, color }}
-                        >
-                          {ambito.name}
-                        </span>
+                    <div
+                      className="relative w-10 h-10 rounded-lg flex items-center justify-center shrink-0"
+                      style={{ backgroundColor: `${color}1A` }}
+                    >
+                      <span
+                        aria-hidden
+                        className="absolute inset-0 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                        style={{ boxShadow: `0 0 0 3px ${color}25` }}
+                      />
+                      {ambitoIconSrc ? (
+                        <img src={ambitoIconSrc} alt={ambito?.name ?? ''} className="h-[18px] w-[18px] rounded-[4px] object-contain" />
+                      ) : (
+                        <AmbitoIcon size={16} style={{ color }} />
                       )}
                     </div>
-                    <p className={`text-[12px] ${textSub} mt-0.5 leading-snug line-clamp-1`}>
-                      {activity.activity}
-                    </p>
-                  </div>
 
-                  <div className="hidden md:block opacity-80">
-                    <MiniSparkline color={color} seed={seed} dark={isDark} />
-                  </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className={`text-[13px] font-semibold ${textMain} truncate`}>{module.name}</p>
+                        <span className="inline-flex items-center gap-1 text-[9px] font-semibold px-1.5 py-[1px] rounded bg-[#10B981]/15 text-[#10B981]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse" />
+                          LIVE
+                        </span>
+                        {ambito && (
+                          <span
+                            className="text-[10px] font-medium px-1.5 py-[1px] rounded"
+                            style={{ backgroundColor: `${color}14`, color }}
+                          >
+                            {ambito.name}
+                          </span>
+                        )}
+                      </div>
+                      <p className={`text-[12px] ${textSub} mt-0.5 leading-snug line-clamp-1`}>
+                        {activity.activity}
+                      </p>
+                    </div>
 
-                  <div className="hidden md:flex flex-col items-end shrink-0 min-w-[70px]">
-                    <span className={`text-[13px] font-bold ${textMain}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
-                      {activity.metric}
-                    </span>
-                    <span className={`text-[10px] ${textMuted}`}>{activity.metricLabel}</span>
-                  </div>
+                    <div className="hidden md:block opacity-80">
+                      <MiniSparkline color={color} seed={seed} dark={isDark} />
+                    </div>
 
-                  <div className="hidden lg:flex items-center shrink-0 min-w-[56px] justify-end">
-                    <span
-                      className={`text-[10px] ${textMuted}`}
-                      style={{ fontFamily: '"JetBrains Mono", monospace' }}
-                    >
-                      {activity.lastEvent}
-                    </span>
-                  </div>
+                    <div className="hidden md:flex flex-col items-end shrink-0 min-w-[70px]">
+                      <span className={`text-[13px] font-bold ${textMain}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+                        {activity.metric}
+                      </span>
+                      <span className={`text-[10px] ${textMuted}`}>{activity.metricLabel}</span>
+                    </div>
 
-                  <ChevronRight size={14} className={`${textMuted} shrink-0 group-hover:translate-x-0.5 transition-transform`} />
-                </motion.button>
-              );
-            })
+                    <ChevronRight size={14} className={`${textMuted} shrink-0 group-hover:translate-x-0.5 transition-transform`} />
+                  </motion.button>
+                );
+              })}
+            </div>
           )}
         </motion.section>
 

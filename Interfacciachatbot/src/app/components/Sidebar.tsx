@@ -1,4 +1,4 @@
-import { Compass, Settings2, ShieldCheck, Wrench, Sun, Target, Heart, ChevronDown, Lock, Search, MessageCircle, LayoutDashboard, FileText, Cog, X, Activity, Mail, Database, Globe, Bot, Server, BarChart3, GitBranch } from 'lucide-react';
+import { Compass, Settings2, ShieldCheck, Wrench, Sun, Target, Heart, ChevronDown, Lock, Search, MessageCircle, LayoutDashboard, FileText, Cog, X, Activity, Mail, Database, Globe, Bot, Server, BarChart3, GitBranch, Filter } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import React, { useState, useEffect, useRef } from 'react';
 import type { Ambito, Module } from './data';
@@ -99,6 +99,7 @@ export function Sidebar({
 
   const [expandedAmbitoId, setExpandedAmbitoId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [onlyActive, setOnlyActive] = useState(false);
   const [thirdPartyRows, setThirdPartyRows] = useState<ThirdPartyToolRow[]>(loadThirdPartyRows);
   const searchInputRef = useRef<HTMLInputElement>(null);
   const selectedRef = useRef<HTMLDivElement>(null);
@@ -167,9 +168,11 @@ export function Sidebar({
     ...a,
     funzioni: a.funzioni.map(f => ({
       ...f,
-      modules: f.modules.filter(m =>
-        m.name.toLowerCase().includes(normalizedSearch)
-      ),
+      modules: f.modules.filter(m => {
+        if (!m.name.toLowerCase().includes(normalizedSearch)) return false;
+        if (onlyActive && !(m.purchased && m.active)) return false;
+        return true;
+      }),
     })).filter(f => f.modules.length > 0),
   })).filter(a => a.funzioni.length > 0);
 
@@ -236,10 +239,19 @@ export function Sidebar({
       style={{ backgroundColor: sidebarBg }}
     >
       {/* Branding header */}
-      <div className={`flex items-center justify-end px-3.5 py-2.5 border-b ${borderCls}`}>
+      <div className={`flex items-center justify-between px-3.5 py-2.5 border-b ${borderCls}`}>
         <div className="flex items-center gap-2">
+          <div className="relative w-6 h-6 rounded-md flex items-center justify-center bg-gradient-to-br from-[#F73C1C] to-[#c82a0e] shadow-[0_0_0_1px_rgba(247,60,28,0.25),0_4px_12px_-4px_rgba(247,60,28,0.4)]">
+            <span className="text-[10px] font-black text-white tracking-tighter leading-none" style={{ fontFamily: '"JetBrains Mono", monospace' }}>CC</span>
+          </div>
+          <div className="flex flex-col leading-tight">
+            <span className={`text-[10.5px] font-bold tracking-[0.4px] ${textMain}`}>CRYBU CC</span>
+            <span className={`text-[8.5px] font-medium ${textMuted} uppercase tracking-[0.6px] leading-none`}>Control Center</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1.5">
           <span className={`text-[10px] font-medium ${textMuted}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
-            {activeInternalModules} attivi
+            {activeInternalModules}
           </span>
           <span className="relative flex h-1.5 w-1.5">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#10B981] opacity-50" />
@@ -248,8 +260,8 @@ export function Sidebar({
         </div>
       </div>
 
-      {/* Search */}
-      <div className={`px-3 py-2.5 border-b ${borderCls}`}>
+      {/* Search + filter */}
+      <div className={`px-3 py-2.5 border-b ${borderCls} space-y-1.5`}>
         <div className={`flex items-center gap-2 ${inputBg} rounded-md px-2.5 py-1.5 border ${borderCls} focus-within:border-[#F73C1C]/30 transition-colors`}>
           <Search size={13} className={textMuted} />
           <input
@@ -266,6 +278,28 @@ export function Sidebar({
             </button>
           )}
         </div>
+        {isInternalSection && (
+          <div className="flex items-center gap-1.5">
+            <motion.button
+              onClick={() => setOnlyActive(prev => !prev)}
+              whileTap={{ scale: 0.97 }}
+              className={`flex items-center gap-1 px-2 py-1 rounded-md text-[10px] font-semibold transition-colors ${
+                onlyActive
+                  ? 'bg-[#10B981]/15 text-[#10B981] border border-[#10B981]/25'
+                  : `${subtleBg} ${textMuted} border ${borderCls} hover:${textSub}`
+              }`}
+              title="Mostra solo moduli attivi"
+            >
+              <Filter size={10} />
+              {onlyActive ? 'Solo attivi' : 'Tutti'}
+            </motion.button>
+            {onlyActive && (
+              <span className={`text-[10px] ${textMuted}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+                {activeInternalModules} moduli
+              </span>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Ambiti list */}
