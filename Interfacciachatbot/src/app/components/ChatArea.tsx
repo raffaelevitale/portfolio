@@ -3,7 +3,7 @@ import { Copy, Paperclip, Send, Check, ThumbsUp, ThumbsDown, RotateCcw, Smile, X
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import type { Module } from './data';
-import { quickRepliesMap, botResponsesMap } from './data';
+import { quickRepliesMap, botResponsesMap, chatSeedConversations } from './data';
 import { useTheme } from './ThemeContext';
 
 type FeedbackData = {
@@ -155,8 +155,8 @@ function FeedbackModal({ onSubmit, onClose, isDark }: { onSubmit: (data: Feedbac
               if (selected) onSubmit({ category: selected, comment });
             }}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-semibold transition-all ${selected
-                ? 'bg-[#F73C1C] text-white hover:bg-[#e0341a] shadow-md shadow-[#F73C1C]/20'
-                : t('bg-[#333] text-[#666]', 'bg-[#eee] text-[#bbb]') + ' cursor-not-allowed'
+              ? 'bg-[#F73C1C] text-white hover:bg-[#e0341a] shadow-md shadow-[#F73C1C]/20'
+              : t('bg-[#333] text-[#666]', 'bg-[#eee] text-[#bbb]') + ' cursor-not-allowed'
               }`}
           >
             Invia feedback
@@ -275,8 +275,8 @@ function GeneralFeedbackModal({ onSubmit, onClose, isDark }: { onSubmit: (data: 
               if (selected) onSubmit({ category: selected, comment: comment.trim(), includeLogs });
             }}
             className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-semibold transition-all ${selected
-                ? 'bg-[#F73C1C] text-white hover:bg-[#e0341a] shadow-md shadow-[#F73C1C]/20'
-                : t('bg-[#333] text-[#666]', 'bg-[#eee] text-[#bbb]') + ' cursor-not-allowed'
+              ? 'bg-[#F73C1C] text-white hover:bg-[#e0341a] shadow-md shadow-[#F73C1C]/20'
+              : t('bg-[#333] text-[#666]', 'bg-[#eee] text-[#bbb]') + ' cursor-not-allowed'
               }`}
           >
             Invia feedback
@@ -295,16 +295,31 @@ function formatTime() {
 
 interface ChatAreaProps {
   module: Module;
+  ambitoName?: string;
+  ambitoColor?: string;
 }
 
-export function ChatArea({ module }: ChatAreaProps) {
+function buildInitialMessages(moduleId: string, moduleName: string): Message[] {
+  const seed = chatSeedConversations[moduleId];
+  if (seed && seed.length > 0) {
+    return seed.map((m, i) => ({
+      id: `seed-${moduleId}-${i}`,
+      sender: m.sender,
+      content: m.content,
+      time: m.time,
+    }));
+  }
+  return [
+    { id: '1', sender: 'bot', content: `Ciao! Sono l'assistente per **${moduleName}**. Come posso aiutarti oggi?`, time: formatTime() },
+  ];
+}
+
+export function ChatArea({ module, ambitoName, ambitoColor }: ChatAreaProps) {
   const { t } = useTheme();
   const quickReplies = quickRepliesMap[module.id] || quickRepliesMap.default;
   const responses = botResponsesMap[module.id] || botResponsesMap.default;
 
-  const [messages, setMessages] = useState<Message[]>([
-    { id: '1', sender: 'bot', content: `Ciao! Sono l'assistente per **${module.name}**. Come posso aiutarti oggi?`, time: formatTime() },
-  ]);
+  const [messages, setMessages] = useState<Message[]>(() => buildInitialMessages(module.id, module.name));
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [feedbackMessageId, setFeedbackMessageId] = useState<string | null>(null);
@@ -314,8 +329,8 @@ export function ChatArea({ module }: ChatAreaProps) {
   const isDark = t('dark', 'light') === 'dark';
 
   useEffect(() => {
-    setMessages([{ id: '1', sender: 'bot', content: `Ciao! Sono l'assistente per **${module.name}**. Come posso aiutarti oggi?`, time: formatTime() }]);
-  }, [module.id]);
+    setMessages(buildInitialMessages(module.id, module.name));
+  }, [module.id, module.name]);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
@@ -516,7 +531,7 @@ export function ChatArea({ module }: ChatAreaProps) {
       </AnimatePresence>
 
       <div ref={scrollRef} className="flex-1 overflow-y-auto p-3 md:p-6 scroll-smooth">
-        <div className="max-w-3xl mx-auto flex flex-col gap-4 md:gap-5">
+        <div className="max-w-[var(--layout-chat-max-w)] mx-auto flex flex-col gap-4 md:gap-5">
           <div className="flex items-center justify-center gap-4 my-2">
             <div className={`h-[1px] w-12 ${divider}`} />
             <span className={`text-[11px] font-medium ${dateCls} tracking-widest`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
@@ -624,7 +639,7 @@ export function ChatArea({ module }: ChatAreaProps) {
       </div>
 
       <div className="px-3 md:px-6 pb-3 md:pb-5 shrink-0">
-        <div className="max-w-3xl mx-auto flex flex-col gap-2 md:gap-3">
+        <div className="max-w-[var(--layout-chat-max-w)] mx-auto flex flex-col gap-2 md:gap-3">
           <div className="flex flex-wrap gap-1.5 md:gap-2">
             {quickReplies.map((reply, i) => (
               <motion.button

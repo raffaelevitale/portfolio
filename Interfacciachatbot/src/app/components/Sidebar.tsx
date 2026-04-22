@@ -151,7 +151,19 @@ export function Sidebar({
     setExpandedAmbitoId(prev => (prev === id ? null : id));
   };
 
-  const filteredAmbiti = ambiti.map(a => ({
+  const ambitoDisplayOrder = ['orion', 'aegis', 'enso', 'goji', 'luma', 'sophia', 'talos', 'kora', 'sentra'];
+  const ambitoOrderIndex = new Map(ambitoDisplayOrder.map((id, index) => [id, index]));
+  const orderedAmbiti = [...ambiti].sort((a, b) => {
+    const aIndex = ambitoOrderIndex.get(a.id);
+    const bIndex = ambitoOrderIndex.get(b.id);
+
+    if (aIndex !== undefined && bIndex !== undefined) return aIndex - bIndex;
+    if (aIndex !== undefined) return -1;
+    if (bIndex !== undefined) return 1;
+    return a.name.localeCompare(b.name, 'it');
+  });
+
+  const filteredAmbiti = orderedAmbiti.map(a => ({
     ...a,
     funzioni: a.funzioni.map(f => ({
       ...f,
@@ -202,11 +214,25 @@ export function Sidebar({
     return (a.serviceName || '').localeCompare(b.serviceName || '', 'it');
   });
 
-  const sidebarWidth = 276;
+  const readSidebarWidth = () => {
+    if (typeof window === 'undefined') return 276;
+    const rawValue = window.getComputedStyle(document.documentElement).getPropertyValue('--layout-sidebar-w').trim();
+    const parsed = Number.parseFloat(rawValue);
+    return Number.isFinite(parsed) ? parsed : 276;
+  };
+  const [sidebarWidth, setSidebarWidth] = useState(readSidebarWidth);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const syncSidebarWidth = () => setSidebarWidth(readSidebarWidth());
+    syncSidebarWidth();
+    window.addEventListener('resize', syncSidebarWidth);
+    return () => window.removeEventListener('resize', syncSidebarWidth);
+  }, []);
 
   const sidebarContent = (
     <div
-      className={`flex flex-col h-full w-[276px] shrink-0 border-r ${borderCls} overflow-hidden`}
+      className={`flex flex-col h-full w-[var(--layout-sidebar-w)] shrink-0 border-r ${borderCls} overflow-hidden`}
       style={{ backgroundColor: sidebarBg }}
     >
       {/* Search */}
@@ -486,7 +512,7 @@ export function Sidebar({
       <div className="hidden md:block h-full">{sidebarContent}</div>
       <AnimatePresence>
         {isMobileOpen && (
-          <div className="md:hidden fixed inset-0 z-40" style={{ top: '52px' }}>
+          <div className="md:hidden fixed inset-0 z-40" style={{ top: 'var(--layout-header-h)' }}>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}

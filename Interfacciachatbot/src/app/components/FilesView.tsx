@@ -1,20 +1,41 @@
-import { useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Upload, FileText, CheckCircle2, Clock, Trash2, Search, Plus, Play } from 'lucide-react';
 import type { Module } from './data';
+import { filesPresetsMap } from './data';
 import { useTheme } from './ThemeContext';
+import { ModuleHero } from './ModuleHero';
 
 type FileItem = { id: string; name: string; size: string; status: 'trained' | 'processing' | 'pending'; date: string; };
 
-const initialFiles: FileItem[] = [
+const defaultFiles: FileItem[] = [
   { id: '1', name: 'FAQ_Prodotto_v3.pdf', size: '2.4 MB', status: 'trained', date: '02 Apr 2026' },
   { id: '2', name: 'Manuale_Utente.pdf', size: '8.1 MB', status: 'trained', date: '28 Mar 2026' },
   { id: '3', name: 'Policy_Resi_2026.docx', size: '156 KB', status: 'processing', date: '08 Apr 2026' },
   { id: '4', name: 'Listino_Prezzi_Q2.xlsx', size: '340 KB', status: 'pending', date: '09 Apr 2026' },
 ];
 
-export function FilesView({ module }: { module: Module }) {
+interface FilesViewProps {
+  module: Module;
+  ambitoName?: string;
+  ambitoColor?: string;
+}
+
+export function FilesView({ module, ambitoName, ambitoColor }: FilesViewProps) {
   const { t } = useTheme();
-  const [files, setFiles] = useState(initialFiles);
+  const preset = filesPresetsMap[module.id];
+  const seedFiles = useMemo<FileItem[]>(() => {
+    if (preset) {
+      return preset.files.map((f, i) => ({ id: `seed-${module.id}-${i}`, ...f }));
+    }
+    return defaultFiles;
+  }, [module.id, preset]);
+
+  const [files, setFiles] = useState<FileItem[]>(seedFiles);
+
+  useEffect(() => {
+    setFiles(seedFiles);
+  }, [seedFiles]);
+
   const [dragOver, setDragOver] = useState(false);
   const [search, setSearch] = useState('');
   const [simulating, setSimulating] = useState(false);
@@ -71,23 +92,23 @@ export function FilesView({ module }: { module: Module }) {
 
   return (
     <div className="flex flex-col flex-1 h-full min-w-0 overflow-y-auto">
-      <div className="max-w-3xl mx-auto w-full p-4 md:p-8">
-        <div className="mb-4 md:mb-6 flex items-start justify-between gap-3 flex-wrap">
-          <div>
-            <h2 className={`text-[12px] md:text-[13px] font-semibold ${textMain}`}>{module.name}</h2>
-            <p className={`text-[11px] md:text-[12px] ${textSub} mt-1`}>{module.description}</p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button onClick={simulateProcessing} className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-semibold border ${t('border-white/[0.08] text-[#ccc] hover:bg-white/[0.04]', 'border-black/[0.08] text-[#444] hover:bg-black/[0.04]')} transition-colors`}>
-              <Play size={12} /> {simulating ? 'Elaborazione...' : 'Simula elaborazione'}
-            </button>
-            <button onClick={addDemoFile} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-semibold bg-[#F73C1C] hover:bg-[#e63518] text-white transition-colors">
-              <Plus size={12} /> File demo
-            </button>
-          </div>
-        </div>
+      <div className="max-w-3xl mx-auto w-full p-4 md:p-8 space-y-4 md:space-y-6">
+        <ModuleHero
+          title={preset?.summaryTitle ?? module.name}
+          subtitle={preset?.summaryBlurb ?? module.description}
+          ambitoName={ambitoName}
+          ambitoColor={ambitoColor}
+          statusLabel="Knowledge base attiva"
+        >
+          <button onClick={simulateProcessing} className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-semibold border ${t('border-white/[0.08] text-[#ccc] hover:bg-white/[0.04]', 'border-black/[0.08] text-[#444] hover:bg-black/[0.04]')} transition-colors`}>
+            <Play size={12} /> {simulating ? 'Elaborazione...' : 'Simula elaborazione'}
+          </button>
+          <button onClick={addDemoFile} className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-semibold bg-[#F73C1C] hover:bg-[#e63518] text-white transition-colors">
+            <Plus size={12} /> File demo
+          </button>
+        </ModuleHero>
 
-        <div className="grid grid-cols-3 gap-2 mb-4">
+        <div className="grid grid-cols-3 gap-2">
           <div className={`${cardBg} border ${borderCls} rounded-lg px-3 py-2`}>
             <p className={`text-[10px] ${t('text-[#666]', 'text-[#999]')}`}>Addestrati</p>
             <p className={`text-[14px] font-semibold text-[#10B981]`}>{trainedCount}</p>
@@ -103,7 +124,7 @@ export function FilesView({ module }: { module: Module }) {
         </div>
 
         <div
-          className={`border-2 border-dashed rounded-xl p-6 md:p-8 flex flex-col items-center gap-3 transition-colors mb-6 md:mb-8 cursor-pointer ${dragOver ? 'border-[#F73C1C] bg-[#F73C1C]/[0.03]' : `${t('border-white/[0.08] hover:border-white/[0.15]', 'border-black/[0.12] hover:border-black/[0.2]')}`}`}
+          className={`border-2 border-dashed rounded-xl p-6 md:p-8 flex flex-col items-center gap-3 transition-colors cursor-pointer ${dragOver ? 'border-[#F73C1C] bg-[#F73C1C]/[0.03]' : `${t('border-white/[0.08] hover:border-white/[0.15]', 'border-black/[0.12] hover:border-black/[0.2]')}`}`}
           onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
           onDragLeave={() => setDragOver(false)}
           onDrop={handleDrop}

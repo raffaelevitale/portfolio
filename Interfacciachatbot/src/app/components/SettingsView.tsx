@@ -3,8 +3,13 @@ import * as Switch from '@radix-ui/react-switch';
 import { Save, RotateCcw, Play, Plus, Trash2 } from 'lucide-react';
 import type { Module } from './data';
 import { useTheme } from './ThemeContext';
+import { ModuleHero } from './ModuleHero';
 
-interface SettingsViewProps { module: Module; }
+interface SettingsViewProps {
+  module: Module;
+  ambitoName?: string;
+  ambitoColor?: string;
+}
 
 const settingsConfigs: Record<string, { label: string; desc: string; default: boolean }[]> = {
   'ass-ticket': [
@@ -28,7 +33,7 @@ const defaultRules = [
   'Se nessuna regola -> Assegna a coda generale',
 ];
 
-export function SettingsView({ module }: SettingsViewProps) {
+export function SettingsView({ module, ambitoName, ambitoColor }: SettingsViewProps) {
   const { t } = useTheme();
   const config = settingsConfigs[module.id] || settingsConfigs.default;
   const defaultValues = Object.fromEntries(config.map(c => [c.label, c.default]));
@@ -85,24 +90,25 @@ export function SettingsView({ module }: SettingsViewProps) {
 
   return (
     <div className="flex flex-col flex-1 h-full min-w-0 overflow-y-auto">
-      <div className="max-w-2xl mx-auto w-full p-4 md:p-8">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 md:mb-8 gap-3">
-          <div>
-            <h2 className={`text-[12px] md:text-[13px] font-semibold ${textMain}`}>{module.name}</h2>
-            <p className={`text-[11px] md:text-[12px] ${textSub} mt-1`}>{module.description}</p>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <button onClick={runSimulation} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] md:text-[12px] ${btnText} transition-colors border ${btnBorder}`}>
-              <Play size={13} /> {simulating ? 'Simulazione...' : 'Simula run'}
-            </button>
-            <button onClick={reset} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] md:text-[12px] ${btnText} transition-colors border ${btnBorder}`}>
-              <RotateCcw size={13} /> Ripristina
-            </button>
-            <button onClick={save} disabled={!isDirty && !saved} className={`flex items-center gap-1.5 px-3 md:px-4 py-2 rounded-lg text-[11px] md:text-[12px] font-semibold transition-colors ${saved ? 'bg-[#10B981] text-white' : isDirty ? 'bg-[#F59E0B] hover:bg-[#e8900a] text-white' : t('bg-[#333] text-[#666]', 'bg-[#ddd] text-[#999]') + ' cursor-not-allowed'}`}>
-              {saved ? <><span>✓</span> Salvato</> : <><Save size={13} /> Salva</>}
-            </button>
-          </div>
-        </div>
+      <div className="max-w-2xl mx-auto w-full p-4 md:p-8 space-y-4 md:space-y-6">
+        <ModuleHero
+          title={module.name}
+          subtitle={module.description}
+          ambitoName={ambitoName}
+          ambitoColor={ambitoColor}
+          statusLabel={simulating ? 'Simulazione in corso' : 'Configurazione attiva'}
+          statusTone={simulating ? 'idle' : 'live'}
+        >
+          <button onClick={runSimulation} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-semibold ${btnText} transition-colors border ${btnBorder}`}>
+            <Play size={12} /> {simulating ? 'Simulazione...' : 'Simula run'}
+          </button>
+          <button onClick={reset} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-semibold ${btnText} transition-colors border ${btnBorder}`}>
+            <RotateCcw size={12} /> Ripristina
+          </button>
+          <button onClick={save} disabled={!isDirty && !saved} className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-semibold transition-colors ${saved ? 'bg-[#10B981] text-white' : isDirty ? 'bg-[#F59E0B] hover:bg-[#e8900a] text-white' : t('bg-[#333] text-[#666]', 'bg-[#ddd] text-[#999]') + ' cursor-not-allowed'}`}>
+            {saved ? <><span>✓</span> Salvato</> : <><Save size={12} /> Salva</>}
+          </button>
+        </ModuleHero>
 
         <div className="flex flex-col gap-1">
           {config.map(c => (

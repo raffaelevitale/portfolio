@@ -29,7 +29,7 @@ export function PromoBanner({ ambiti, onDiscoverModules }: PromoBannerProps) {
           animate={{ height: 'auto', opacity: 1, y: 0 }}
           exit={{ height: 0, opacity: 0, y: -8, marginTop: 0, marginBottom: 0 }}
           transition={{ duration: 0.24, ease: 'easeInOut' }}
-          className={`flex items-center justify-between h-[34px] md:h-[38px] px-3 md:px-4 border-b ${t('border-white/[0.04]', 'border-black/[0.06]')} shrink-0 overflow-hidden`}
+          className={`flex items-center justify-between h-[var(--layout-promo-h)] px-3 md:px-4 border-b ${t('border-white/[0.04]', 'border-black/[0.06]')} shrink-0 overflow-hidden`}
           style={{ background: t('linear-gradient(to right, #1A1A1A, #1E1E1E, #1A1A1A)', 'linear-gradient(to right, #F8F8F8, #FAFAFA, #F8F8F8)') }}
         >
           <div className="flex items-center gap-2 min-w-0 flex-1">

@@ -2,6 +2,12 @@
 
 :root {
   --font-size: 16px;
+  --layout-header-h: 52px;
+  --layout-promo-h: 38px;
+  --layout-subbar-h: 48px;
+  --layout-sidebar-w: 276px;
+  --layout-sidepanel-w: 260px;
+  --layout-chat-max-w: 48rem;
   --background: #ffffff;
   --foreground: oklch(0.145 0 0);
   --card: #ffffff;
@@ -39,6 +45,48 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* MacBook resolution family (13-16), incluse modalita scaling comuni */
+@media (min-width: 1280px) and (max-width: 1728px) and (max-height: 1117px) {
+  :root {
+    --layout-sidebar-w: clamp(248px, 17vw, 286px);
+    --layout-sidepanel-w: clamp(228px, 15vw, 268px);
+  }
+}
+
+/* Full HD */
+@media (min-width: 1800px) and (min-height: 980px) {
+  :root {
+    --layout-sidebar-w: 300px;
+    --layout-sidepanel-w: 292px;
+    --layout-chat-max-w: 56rem;
+  }
+}
+
+/* Laptop medium (es. 1440x900, 1512x982, 1366x768 in scaling) */
+@media (max-width: 1512px), (max-height: 860px) {
+  :root {
+    --layout-header-h: 50px;
+    --layout-promo-h: 34px;
+    --layout-subbar-h: 44px;
+    --layout-sidebar-w: 258px;
+    --layout-sidepanel-w: 244px;
+    --layout-chat-max-w: 46rem;
+  }
+}
+
+/* Target 1366x768 e viewport bassi */
+@media (max-width: 1366px), (max-height: 768px) {
+  :root {
+    --font-size: 15px;
+    --layout-header-h: 48px;
+    --layout-promo-h: 32px;
+    --layout-subbar-h: 42px;
+    --layout-sidebar-w: 244px;
+    --layout-sidepanel-w: 232px;
+    --layout-chat-max-w: 42rem;
+  }
 }
 
 .dark {

@@ -1,97 +1,130 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { ElementType } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
-import { ArrowLeft, ArrowRight, CheckCircle2, Compass, LayoutDashboard, ShieldCheck, Sparkles, Activity } from 'lucide-react';
+import { Activity, ArrowLeft, ArrowRight, CheckCircle2, Compass, LayoutDashboard, PlayCircle, ShieldCheck, Sparkles, Zap } from 'lucide-react';
 import { useTheme } from './ThemeContext';
+import type { Ambito, Module } from './data';
 
 interface InterfaceOnboardingProps {
+    ambiti: Ambito[];
+    userName?: string;
     onComplete: () => void;
     onSkip: () => void;
     onOpenEcosystem: () => void;
     onOpenSubscriptions: () => void;
 }
 
-type StepAction = 'ecosystem' | 'subscriptions' | null;
+type StepId = 'welcome' | 'your-modules' | 'how-it-works' | 'ready';
 
-interface OnboardingStep {
-    id: string;
+interface BuiltStep {
+    id: StepId;
     title: string;
     description: string;
-    bullets: string[];
     accent: string;
     Icon: ElementType;
+    bullets: string[];
     actionLabel?: string;
-    action: StepAction;
+    action?: 'ecosystem' | 'subscriptions';
+    activeModulesPreview?: Array<{ module: Module; ambitoName: string; ambitoColor: string }>;
+    heroMetric?: { label: string; value: string };
 }
 
-const onboardingSteps: OnboardingStep[] = [
-    {
-        id: 'automation-start',
-        title: 'Sta gia lavorando per la tua azienda',
-        description:
-            'Abbiamo gia preparato una base operativa per accelerare i flussi aziendali. Tu scegli le priorita, l\'interfaccia coordina i processi.',
-        bullets: [
-            'Orchestrazione centralizzata tra moduli e reparti',
-            'Meno attivita manuali ripetitive',
-            'Visibilita immediata su stato operativo e costi',
-        ],
-        accent: '#F73C1C',
-        Icon: Sparkles,
-        action: null,
-    },
-    {
-        id: 'ecosystem-focus',
-        title: 'Ecosistema chiaro e governabile',
-        description:
-            'La sidebar Ecosistema e ottimizzata per orientarti subito: sistemi, processi e moduli in una gerarchia leggibile e veloce.',
-        bullets: [
-            'Ricerca rapida per modulo o processo',
-            'Riepilogo moduli attivi in tempo reale',
-            'Navigazione per sistema con focus operativo',
-        ],
-        accent: '#F59E0B',
-        Icon: Compass,
-        actionLabel: 'Apri Ecosistema',
-        action: 'ecosystem',
-    },
-    {
-        id: 'subscriptions-focus',
-        title: 'Sottoscrizioni semplici e centrali',
-        description:
-            'La gestione delle terze parti e concentrata nel pannello principale: aggiorni servizi, costi e stato operativo senza passaggi inutili.',
-        bullets: [
-            'Registro unico per provider esterni',
-            'Controllo mensile della spesa AI',
-            'Indicatori di abbonamento e operativita',
-        ],
-        accent: '#10B981',
-        Icon: LayoutDashboard,
-        actionLabel: 'Apri Sottoscrizioni',
-        action: 'subscriptions',
-    },
-    {
-        id: 'ready',
-        title: 'Interfaccia pronta',
-        description:
-            'Ora puoi partire subito: attiva i moduli prioritari, allinea le sottoscrizioni e avvia il primo ciclo di automazione.',
-        bullets: [
-            'Riduci tempi di coordinamento',
-            'Mantieni controllo strategico per area',
-            'Scala i processi in modo progressivo',
-        ],
-        accent: '#3B82F6',
-        Icon: ShieldCheck,
-        action: null,
-    },
-];
+function buildSteps(
+    ambiti: Ambito[],
+    userName: string,
+): BuiltStep[] {
+    const allModules = ambiti.flatMap(a => a.funzioni.flatMap(f => f.modules.map(m => ({ module: m, ambito: a }))));
+    const activeModules = allModules.filter(({ module }) => module.purchased && module.active);
+    const purchasedCount = allModules.filter(({ module }) => module.purchased).length;
+    const totalSystems = ambiti.length;
+    const systemsInUse = new Set(activeModules.map(({ ambito }) => ambito.id)).size;
 
-const operationalSignals = [
-    'Instradamento richieste in esecuzione',
-    'Monitor costi AI sincronizzato',
-    'Controllo processi attivi completato',
-];
+    const activePreview = activeModules.slice(0, 4).map(({ module, ambito }) => ({
+        module,
+        ambitoName: ambito.name,
+        ambitoColor: ambito.color,
+    }));
+
+    const firstActiveModule = activeModules[0];
+
+    const firstStepBullets = activeModules.length > 0
+        ? [
+            `${activeModules.length} ${activeModules.length === 1 ? 'modulo attivo' : 'moduli attivi'} che gestiscono flussi in autonomia`,
+            `${purchasedCount} ${purchasedCount === 1 ? 'modulo' : 'moduli'} gia acquistati pronti da attivare`,
+            `${systemsInUse} di ${totalSystems} sistemi AI operativi per la tua azienda`,
+        ]
+        : [
+            'Piattaforma configurata sui processi della tua azienda',
+            'Base di moduli pronti per essere attivati',
+            'Orchestrazione centralizzata tra reparti',
+        ];
+
+    return [
+        {
+            id: 'welcome',
+            title: `Benvenuto ${userName}, l interfaccia e pronta`,
+            description: activeModules.length > 0
+                ? `Abbiamo gia attivato ${activeModules.length} ${activeModules.length === 1 ? 'modulo AI' : 'moduli AI'} sulla tua configurazione. Adesso ti mostriamo cosa sta lavorando per te e come usarlo.`
+                : 'Abbiamo configurato la piattaforma sui processi della tua azienda. Adesso ti mostriamo cosa puo fare per te.',
+            accent: '#F73C1C',
+            Icon: Sparkles,
+            bullets: firstStepBullets,
+            heroMetric: {
+                label: activeModules.length > 0 ? 'Moduli gia al lavoro' : 'Moduli pronti',
+                value: activeModules.length > 0 ? `${activeModules.length}` : `${purchasedCount}`,
+            },
+        },
+        {
+            id: 'your-modules',
+            title: activeModules.length > 0 ? 'Questi sono i moduli al lavoro per te' : 'La tua libreria di moduli',
+            description: activeModules.length > 0
+                ? 'Ognuno gestisce un processo specifico in modo autonomo. Puoi aprirne uno in qualsiasi momento dalla home o dalla sidebar Ecosistema.'
+                : 'Quando attivi un modulo, lo vedrai comparire subito in home con lo stato operativo live.',
+            accent: '#10B981',
+            Icon: Activity,
+            bullets: [
+                'Apri un modulo per vedere report, attivita e configurazione',
+                'Lo stato "live" indica che il modulo sta elaborando adesso',
+                firstActiveModule
+                    ? `Prova ad aprire "${firstActiveModule.module.name}" per un tour rapido`
+                    : 'Attivi un modulo e lo vedi operativo entro pochi minuti',
+            ],
+            activeModulesPreview: activePreview,
+            actionLabel: activeModules.length > 0 ? 'Vedi tutti i moduli' : 'Esplora l Ecosistema',
+            action: 'ecosystem',
+        },
+        {
+            id: 'how-it-works',
+            title: 'Come leggere la home operativa',
+            description: 'La home e un radar: in alto le azioni automatiche del giorno, sotto i moduli al lavoro in tempo reale. Non devi controllarli tu, controllano loro i processi.',
+            accent: '#F59E0B',
+            Icon: LayoutDashboard,
+            bullets: [
+                'I KPI in alto sommano le azioni automatiche completate oggi',
+                'Il badge LIVE segnala i moduli che stanno elaborando ora',
+                'Click su un modulo per entrare e vedere report e dettagli',
+            ],
+        },
+        {
+            id: 'ready',
+            title: 'Tutto pronto, puoi iniziare',
+            description: 'Hai la tua interfaccia configurata sulla tua azienda. Puoi anche annotare qui i servizi AI esterni che paghi (ChatGPT, Claude, Gemini...) per tenere tutto in un posto solo.',
+            accent: '#3B82F6',
+            Icon: ShieldCheck,
+            bullets: [
+                'La home e il tuo punto di controllo operativo',
+                'L Ecosistema nella sidebar contiene tutti i moduli',
+                'In Impostazioni trovi Fatturazione e i tuoi dati',
+            ],
+            actionLabel: 'Apri il blocco note sottoscrizioni',
+            action: 'subscriptions',
+        },
+    ];
+}
 
 export function InterfaceOnboarding({
+    ambiti,
+    userName = 'Luciano',
     onComplete,
     onSkip,
     onOpenEcosystem,
@@ -100,8 +133,9 @@ export function InterfaceOnboarding({
     const { t } = useTheme();
     const [stepIndex, setStepIndex] = useState(0);
 
-    const step = onboardingSteps[stepIndex];
-    const isLastStep = stepIndex === onboardingSteps.length - 1;
+    const steps = useMemo(() => buildSteps(ambiti, userName), [ambiti, userName]);
+    const step = steps[stepIndex];
+    const isLastStep = stepIndex === steps.length - 1;
 
     const panelBg = t('bg-[#121212]/95 border-white/[0.08]', 'bg-white/95 border-black/[0.1]');
     const textMain = t('text-white', 'text-[#111]');
@@ -115,11 +149,11 @@ export function InterfaceOnboarding({
             onComplete();
             return;
         }
-        setStepIndex((prev) => prev + 1);
+        setStepIndex(prev => prev + 1);
     };
 
     const goBack = () => {
-        setStepIndex((prev) => Math.max(0, prev - 1));
+        setStepIndex(prev => Math.max(0, prev - 1));
     };
 
     const runStepAction = () => {
@@ -161,7 +195,7 @@ export function InterfaceOnboarding({
                     <div className="flex items-center justify-between gap-4">
                         <div className="inline-flex items-center gap-2 rounded-full px-2.5 py-1 bg-[#F73C1C]/12 text-[#F73C1C] text-[11px] font-semibold">
                             <Sparkles size={12} />
-                            Onboarding interfaccia
+                            Benvenuto in CRYBU
                         </div>
                         <button
                             onClick={onSkip}
@@ -172,7 +206,7 @@ export function InterfaceOnboarding({
                     </div>
 
                     <div className="mt-4 grid grid-cols-4 gap-1.5">
-                        {onboardingSteps.map((item, index) => (
+                        {steps.map((item, index) => (
                             <div
                                 key={item.id}
                                 className="h-1.5 rounded-full transition-colors"
@@ -201,14 +235,22 @@ export function InterfaceOnboarding({
                                 >
                                     <step.Icon size={18} />
                                 </div>
-                                <div>
+                                <div className="flex-1">
                                     <h2 className={`text-[20px] md:text-[26px] leading-tight font-bold ${textMain}`}>{step.title}</h2>
                                     <p className={`text-[13px] md:text-[14px] mt-2 ${textSub}`}>{step.description}</p>
                                 </div>
+                                {step.heroMetric && (
+                                    <div className={`hidden md:flex flex-col items-end shrink-0 rounded-lg border px-3 py-2 ${bulletBg}`}>
+                                        <span className={`text-[24px] font-bold ${textMain}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+                                            {step.heroMetric.value}
+                                        </span>
+                                        <span className={`text-[10px] ${textMuted}`}>{step.heroMetric.label}</span>
+                                    </div>
+                                )}
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5">
-                                {step.bullets.map((bullet) => (
+                                {step.bullets.map(bullet => (
                                     <div key={bullet} className={`rounded-lg border p-3 ${bulletBg}`}>
                                         <div className="flex items-start gap-2">
                                             <CheckCircle2 size={14} style={{ color: step.accent }} className="shrink-0 mt-0.5" />
@@ -218,56 +260,55 @@ export function InterfaceOnboarding({
                                 ))}
                             </div>
 
-                            <div className={`rounded-lg border p-3 ${bulletBg}`}>
-                                <div className="flex items-center justify-between gap-2">
-                                    <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold" style={{ color: step.accent }}>
-                                        <span className="relative inline-flex h-2.5 w-2.5">
-                                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full opacity-55" style={{ backgroundColor: step.accent }} />
-                                            <span className="relative inline-flex h-2.5 w-2.5 rounded-full" style={{ backgroundColor: step.accent }} />
+                            {step.activeModulesPreview && step.activeModulesPreview.length > 0 && (
+                                <div className={`rounded-xl border p-3 md:p-4 ${bulletBg}`}>
+                                    <div className="flex items-center justify-between mb-3">
+                                        <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold" style={{ color: step.accent }}>
+                                            <Zap size={12} />
+                                            Gia al lavoro
                                         </span>
-                                        <Activity size={12} />
-                                        Stato operativo live
-                                    </span>
-                                    <span className={`text-[10px] ${textMuted}`}>{42 + stepIndex * 19}%</span>
+                                        <span className={`text-[10px] ${textMuted}`}>Top {step.activeModulesPreview.length}</span>
+                                    </div>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                                        {step.activeModulesPreview.map(item => (
+                                            <div
+                                                key={item.module.id}
+                                                className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 ${t('bg-white/[0.03]', 'bg-black/[0.03]')}`}
+                                            >
+                                                <div
+                                                    className="w-7 h-7 rounded-md flex items-center justify-center shrink-0"
+                                                    style={{ backgroundColor: `${item.ambitoColor}1F`, color: item.ambitoColor }}
+                                                >
+                                                    <Compass size={12} />
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <p className={`text-[12px] font-semibold ${textMain} truncate`}>{item.module.name}</p>
+                                                    <p className={`text-[10px] ${textMuted}`}>
+                                                        {item.ambitoName}
+                                                    </p>
+                                                </div>
+                                                <span className="inline-flex items-center gap-1 text-[9px] font-semibold px-1.5 py-0.5 rounded bg-[#10B981]/15 text-[#10B981]">
+                                                    <span className="w-1 h-1 rounded-full bg-[#10B981] animate-pulse" />
+                                                    LIVE
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
+                            )}
 
-                                <div className={`mt-2 h-[4px] w-full rounded-full ${t('bg-white/[0.08]', 'bg-black/[0.08]')}`}>
-                                    <motion.div
-                                        initial={{ width: 0 }}
-                                        animate={{ width: `${Math.min(99, 42 + stepIndex * 19)}%` }}
-                                        transition={{ duration: 0.45, ease: 'easeOut' }}
-                                        className="h-[4px] rounded-full"
-                                        style={{ backgroundColor: step.accent }}
-                                    />
-                                </div>
-
-                                <div className="mt-2.5 grid grid-cols-1 md:grid-cols-3 gap-2">
-                                    {operationalSignals.map((signal, index) => (
-                                        <motion.div
-                                            key={signal}
-                                            initial={{ opacity: 0, y: 6 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ duration: 0.2, delay: index * 0.05 }}
-                                            className={`rounded-md px-2.5 py-2 text-[11px] ${t('bg-white/[0.04]', 'bg-black/[0.04]')} ${textMain}`}
-                                        >
-                                            {signal}
-                                        </motion.div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {step.actionLabel ? (
+                            {step.actionLabel && (
                                 <div>
                                     <button
                                         onClick={runStepAction}
                                         className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-[12px] font-semibold text-white"
                                         style={{ backgroundColor: step.accent }}
                                     >
+                                        <PlayCircle size={13} />
                                         {step.actionLabel}
-                                        <ArrowRight size={13} />
                                     </button>
                                 </div>
-                            ) : null}
+                            )}
                         </motion.div>
                     </AnimatePresence>
                 </div>
@@ -284,7 +325,7 @@ export function InterfaceOnboarding({
                         </button>
 
                         <div className={`text-[11px] ${textMuted}`}>
-                            Passo {stepIndex + 1} di {onboardingSteps.length}
+                            Passo {stepIndex + 1} di {steps.length}
                         </div>
 
                         <button

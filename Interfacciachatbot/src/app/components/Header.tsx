@@ -70,7 +70,7 @@ export function Header({
       initial={{ opacity: 0, y: -8 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className={`flex h-[52px] w-full items-center justify-between px-3 md:px-4 shrink-0 relative z-50 border-b ${borderCls}`}
+      className={`flex h-[var(--layout-header-h)] w-full items-center justify-between px-3 md:px-4 shrink-0 relative z-50 border-b ${borderCls}`}
       style={{ backgroundColor: headerBg }}
     >
       <div className="flex items-center gap-1.5 md:gap-2">

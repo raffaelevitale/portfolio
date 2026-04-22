@@ -2,7 +2,7 @@ import { useState } from 'react';
 import * as Switch from '@radix-ui/react-switch';
 import { toast } from 'sonner';
 import { useTheme } from './ThemeContext';
-import { ArrowLeft, User, Bell, Shield, Globe, Palette, Key, HelpCircle } from 'lucide-react';
+import { ArrowLeft, User, Bell, Shield, Globe, Palette, Key, HelpCircle, CreditCard, Download, CheckCircle2 } from 'lucide-react';
 
 interface AppSettingsPageProps {
   onClose: () => void;
@@ -40,12 +40,48 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
   const tabs = [
     { id: 'generale', label: 'Generale', icon: Globe },
     { id: 'profilo', label: 'Profilo', icon: User },
+    { id: 'fatturazione', label: 'Fatturazione', icon: CreditCard },
     { id: 'notifiche', label: 'Notifiche', icon: Bell },
     { id: 'aspetto', label: 'Aspetto', icon: Palette },
     { id: 'sicurezza', label: 'Sicurezza e Privacy', icon: Shield },
     { id: 'api', label: 'API Keys', icon: Key },
     { id: 'aiuto', label: 'Aiuto', icon: HelpCircle },
   ];
+
+  const [spendAlertEnabled, setSpendAlertEnabled] = useState(true);
+  const [spendAlertThreshold, setSpendAlertThreshold] = useState(800);
+
+  const billingPlan = {
+    name: 'Business Pro',
+    monthlyPriceEur: 349,
+    includedModules: 12,
+    usedModules: 8,
+    renewalDate: '28 Apr 2026',
+  };
+
+  const billingMethod = {
+    brand: 'Visa',
+    last4: '4821',
+    expires: '09/28',
+    holder: 'Luciano Cavallero',
+  };
+
+  const invoices = [
+    { id: 'INV-2026-04', period: 'Aprile 2026', date: '01 Apr 2026', amount: 349.00, status: 'pagata' as const },
+    { id: 'INV-2026-03', period: 'Marzo 2026', date: '01 Mar 2026', amount: 349.00, status: 'pagata' as const },
+    { id: 'INV-2026-02', period: 'Febbraio 2026', date: '01 Feb 2026', amount: 289.00, status: 'pagata' as const },
+    { id: 'INV-2026-01', period: 'Gennaio 2026', date: '01 Gen 2026', amount: 289.00, status: 'pagata' as const },
+  ];
+
+  const moduleBreakdown = [
+    { label: 'Motore di instradamento semantico', cost: 12, unit: '€/mese' },
+    { label: 'Report ticket e performance', cost: 18, unit: '€/mese' },
+    { label: 'Gestione pipeline vendita', cost: 24, unit: '€/mese' },
+    { label: 'Forecast operativo', cost: 32, unit: '€/mese' },
+    { label: 'Controllo qualità produzione', cost: 21, unit: '€/mese' },
+  ];
+  const moduleBreakdownTotal = moduleBreakdown.reduce((sum, m) => sum + m.cost, 0);
+  const euroFormatter = new Intl.NumberFormat('it-IT', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 });
 
   const bg = t('#111111', '#F5F5F5');
   const cardBg = t('#1A1A1A', '#FFFFFF');
@@ -67,7 +103,7 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
 
   return (
     <div className="flex flex-col flex-1 h-full overflow-hidden" style={{ backgroundColor: bg }}>
-      <div className={`flex items-center gap-3 h-[48px] px-3 md:px-5 shrink-0 border-b ${borderColor}`} style={{ backgroundColor: cardBg }}>
+      <div className={`flex items-center gap-3 h-[var(--layout-subbar-h)] px-3 md:px-5 shrink-0 border-b ${borderColor}`} style={{ backgroundColor: cardBg }}>
         <button onClick={onClose} className={`p-1.5 rounded-md ${textSecondary} ${hoverBg} transition-colors`}>
           <ArrowLeft size={18} />
         </button>
@@ -76,7 +112,7 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
 
       <div className="flex flex-col md:flex-row flex-1 overflow-hidden">
         {/* Tab bar: horizontal scroll on mobile, vertical sidebar on desktop */}
-        <div className={`md:w-[260px] shrink-0 md:border-r ${borderColor} ${sidebarBg} overflow-x-auto md:overflow-x-hidden md:overflow-y-auto`}>
+        <div className={`md:w-[var(--layout-sidepanel-w)] shrink-0 md:border-r ${borderColor} ${sidebarBg} overflow-x-auto md:overflow-x-hidden md:overflow-y-auto`}>
           <div className={`flex md:flex-col md:py-2 border-b md:border-b-0 ${borderColor}`}>
             {tabs.map(tab => {
               const isActive = activeTab === tab.id;
@@ -85,8 +121,8 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 md:gap-2.5 whitespace-nowrap px-3 md:px-4 py-2.5 md:py-2 text-[13px] transition-colors shrink-0 md:w-full ${isActive
-                      ? `${textPrimary} font-semibold ${t('bg-white/[0.04]', 'bg-black/[0.04]')} border-b-2 md:border-b-0 border-[#F73C1C]`
-                      : `${textSecondary} ${hoverBg} border-b-2 md:border-b-0 border-transparent`
+                    ? `${textPrimary} font-semibold ${t('bg-white/[0.04]', 'bg-black/[0.04]')} border-b-2 md:border-b-0 border-[#F73C1C]`
+                    : `${textSecondary} ${hoverBg} border-b-2 md:border-b-0 border-transparent`
                     }`}
                 >
                   <tab.icon size={14} className={isActive ? 'text-[#F73C1C]' : ''} />
@@ -186,6 +222,152 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
               </div>
             )}
 
+            {/* FATTURAZIONE */}
+            {activeTab === 'fatturazione' && (
+              <div className="flex flex-col gap-4">
+                <div className="mb-1">
+                  <h2 className={`text-[16px] font-bold ${textPrimary}`}>Fatturazione</h2>
+                  <p className={`text-[13px] ${textSecondary} mt-0.5`}>Piano attivo, fatture e metodi di pagamento</p>
+                </div>
+
+                {/* Piano attivo */}
+                <div className={`p-5 rounded-xl border ${borderColor}`} style={{ backgroundColor: cardBg }}>
+                  <div className="flex items-start justify-between gap-3 mb-4">
+                    <div>
+                      <span className="inline-flex items-center gap-1.5 text-[10px] font-semibold px-2 py-0.5 rounded-full bg-[#10B981]/10 text-[#10B981] uppercase tracking-[1px]">
+                        Piano attivo
+                      </span>
+                      <p className={`text-[18px] font-bold ${textPrimary} mt-2`}>{billingPlan.name}</p>
+                      <p className={`text-[12px] ${textSecondary} mt-0.5`}>{billingPlan.usedModules} di {billingPlan.includedModules} moduli inclusi utilizzati</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className={`text-[22px] font-bold ${textPrimary}`}>{euroFormatter.format(billingPlan.monthlyPriceEur)}</p>
+                      <p className={`text-[11px] ${textTertiary}`}>/ mese</p>
+                    </div>
+                  </div>
+                  <div className={`h-[4px] w-full rounded-full ${t('bg-white/[0.06]', 'bg-black/[0.06]')} mb-3`}>
+                    <div className="h-[4px] rounded-full bg-[#10B981]" style={{ width: `${(billingPlan.usedModules / billingPlan.includedModules) * 100}%` }} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <p className={`text-[12px] ${textSecondary}`}>Prossimo addebito: <span className={`font-semibold ${textPrimary}`}>{billingPlan.renewalDate}</span></p>
+                    <button
+                      onClick={() => toast('Passa a un piano superiore per sbloccare piu moduli')}
+                      className="text-[12px] font-semibold text-[#F73C1C] hover:text-[#ff5638]"
+                    >
+                      Cambia piano
+                    </button>
+                  </div>
+                </div>
+
+                {/* Metodo di pagamento */}
+                <span className={`text-[10px] font-semibold ${textTertiary} uppercase tracking-[1.5px] mt-2`}>Metodo di pagamento</span>
+                <div className={`p-4 rounded-xl border ${borderColor}`} style={{ backgroundColor: cardBg }}>
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`flex items-center justify-center w-11 h-8 rounded-md ${t('bg-white/[0.06]', 'bg-black/[0.06]')}`}>
+                        <span className={`text-[11px] font-bold ${textPrimary}`}>{billingMethod.brand}</span>
+                      </div>
+                      <div>
+                        <p className={`text-[13px] font-medium ${textPrimary}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+                          •••• •••• •••• {billingMethod.last4}
+                        </p>
+                        <p className={`text-[11px] ${textSecondary}`}>{billingMethod.holder} · Scade {billingMethod.expires}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => toast('Aggiornamento metodo di pagamento in arrivo')}
+                      className={`px-3 py-1.5 rounded-lg text-[12px] font-semibold border ${borderColor} ${textPrimary} ${hoverBg} transition-colors`}
+                    >
+                      Modifica
+                    </button>
+                  </div>
+                </div>
+
+                {/* Dettaglio spesa moduli */}
+                <span className={`text-[10px] font-semibold ${textTertiary} uppercase tracking-[1.5px] mt-2`}>Consumo per modulo</span>
+                <div className={`rounded-xl border ${borderColor} overflow-hidden`} style={{ backgroundColor: cardBg }}>
+                  {moduleBreakdown.map((item, i) => (
+                    <div
+                      key={item.label}
+                      className={`flex items-center justify-between px-4 py-2.5 ${i < moduleBreakdown.length - 1 ? `border-b ${borderColor}` : ''}`}
+                    >
+                      <p className={`text-[13px] ${textPrimary}`}>{item.label}</p>
+                      <p className={`text-[12px] font-medium ${textSecondary}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+                        {euroFormatter.format(item.cost)} <span className={textTertiary}>{item.unit}</span>
+                      </p>
+                    </div>
+                  ))}
+                  <div className={`flex items-center justify-between px-4 py-3 border-t-2 ${borderColor} ${t('bg-white/[0.02]', 'bg-black/[0.02]')}`}>
+                    <p className={`text-[13px] font-semibold ${textPrimary}`}>Totale moduli</p>
+                    <p className={`text-[14px] font-bold ${textPrimary}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+                      {euroFormatter.format(moduleBreakdownTotal)} / mese
+                    </p>
+                  </div>
+                </div>
+
+                {/* Alert di spesa */}
+                <div className={`p-4 rounded-xl border ${borderColor}`} style={{ backgroundColor: cardBg }}>
+                  <div className="flex items-center justify-between mb-3">
+                    <div>
+                      <p className={`text-[13px] font-medium ${textPrimary}`}>Alert di spesa</p>
+                      <p className={`text-[12px] ${textSecondary}`}>Ricevi una notifica quando il costo mensile supera la soglia</p>
+                    </div>
+                    <SwitchToggle checked={spendAlertEnabled} onChange={v => { setSpendAlertEnabled(v); toast.success(v ? 'Alert di spesa attivato' : 'Alert di spesa disattivato'); }} />
+                  </div>
+                  {spendAlertEnabled && (
+                    <div className="flex items-center gap-3 pt-3 border-t border-dashed" style={{ borderColor: t('rgba(255,255,255,0.06)', 'rgba(0,0,0,0.08)') }}>
+                      <label className={`text-[12px] ${textSecondary} shrink-0`}>Soglia mensile</label>
+                      <div className="relative flex-1 max-w-[180px]">
+                        <input
+                          type="number"
+                          min="0"
+                          step="50"
+                          value={spendAlertThreshold}
+                          onChange={e => setSpendAlertThreshold(Math.max(0, Number(e.target.value || 0)))}
+                          className={`${inputBg} ${inputText} w-full text-[13px] px-3 py-1.5 pr-8 rounded-lg border ${borderColor} outline-none focus:border-[#F73C1C]/40`}
+                        />
+                        <span className={`absolute right-3 top-1/2 -translate-y-1/2 text-[12px] ${textTertiary}`}>€</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Storico fatture */}
+                <span className={`text-[10px] font-semibold ${textTertiary} uppercase tracking-[1.5px] mt-2`}>Storico fatture</span>
+                <div className={`rounded-xl border ${borderColor} overflow-hidden`} style={{ backgroundColor: cardBg }}>
+                  {invoices.map((invoice, i) => (
+                    <div
+                      key={invoice.id}
+                      className={`flex items-center justify-between px-4 py-3 gap-3 ${i < invoices.length - 1 ? `border-b ${borderColor}` : ''}`}
+                    >
+                      <div className="min-w-0">
+                        <p className={`text-[13px] font-medium ${textPrimary} truncate`}>{invoice.period}</p>
+                        <p className={`text-[11px] ${textTertiary}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+                          {invoice.id} · {invoice.date}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <span className={`text-[13px] font-semibold ${textPrimary}`} style={{ fontFamily: '"JetBrains Mono", monospace' }}>
+                          {euroFormatter.format(invoice.amount)}
+                        </span>
+                        <span className="hidden sm:inline-flex items-center gap-1 text-[10px] font-medium px-2 py-0.5 rounded-full bg-[#10B981]/10 text-[#10B981]">
+                          <CheckCircle2 size={10} /> {invoice.status}
+                        </span>
+                        <button
+                          onClick={() => toast.success(`Fattura ${invoice.id} scaricata`)}
+                          className={`inline-flex items-center gap-1 px-2.5 py-1.5 rounded-md text-[12px] font-medium ${t('text-[#AAA] hover:text-white hover:bg-white/[0.06]', 'text-[#666] hover:text-[#111] hover:bg-black/[0.06]')} transition-colors`}
+                          title="Scarica PDF"
+                        >
+                          <Download size={13} />
+                          <span className="hidden sm:inline">PDF</span>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* NOTIFICHE */}
             {activeTab === 'notifiche' && (
               <div className="flex flex-col gap-3">
@@ -229,8 +411,8 @@ export function AppSettingsPage({ onClose }: AppSettingsPageProps) {
                         key={mode}
                         onClick={() => { if (theme !== mode) toggleTheme(); }}
                         className={`flex flex-col items-center gap-1.5 px-3 py-2 rounded-lg border transition-all ${theme === mode
-                            ? 'border-[#F73C1C] bg-[#F73C1C]/[0.06]'
-                            : `${borderColor} ${hoverBg}`
+                          ? 'border-[#F73C1C] bg-[#F73C1C]/[0.06]'
+                          : `${borderColor} ${hoverBg}`
                           }`}
                       >
                         <div className={`w-10 h-6 rounded border ${mode === 'dark' ? 'bg-[#1A1A1A] border-white/10' : 'bg-[#F5F5F5] border-black/10'}`} />

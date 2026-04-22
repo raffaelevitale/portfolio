@@ -49,6 +49,13 @@ function getInitialOnboardingVisibility(): boolean {
   }
 }
 
+function getLayoutWidthVar(variableName: string, fallback: number): number {
+  if (typeof window === 'undefined') return fallback;
+  const rawValue = window.getComputedStyle(document.documentElement).getPropertyValue(variableName).trim();
+  const parsed = Number.parseFloat(rawValue);
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
 function AppInner() {
   const { t } = useTheme();
   const isLocalhost = isLocalhostEnvironment();
@@ -64,6 +71,7 @@ function AppInner() {
   const [activeSection, setActiveSection] = useState<ThirdPartySection>('internal');
   const [thirdPartyToolId, setThirdPartyToolId] = useState<string | null>('seed-chatgpt');
   const [showOnboarding, setShowOnboarding] = useState(getInitialOnboardingVisibility);
+  const [sidePanelWidth, setSidePanelWidth] = useState(() => getLayoutWidthVar('--layout-sidepanel-w', 260));
 
   useEffect(() => {
     if (!isLocalhost || typeof window === 'undefined') return;
@@ -73,6 +81,14 @@ function AppInner() {
       // Ignore storage failures in private mode or restricted environments.
     }
   }, [isLocalhost, isLoggedIn]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const syncSidePanelWidth = () => setSidePanelWidth(getLayoutWidthVar('--layout-sidepanel-w', 260));
+    syncSidePanelWidth();
+    window.addEventListener('resize', syncSidePanelWidth);
+    return () => window.removeEventListener('resize', syncSidePanelWidth);
+  }, []);
 
   const selectedAmbito = ambitiState.find(a => a.id === selectedAmbitoId);
   const allInternalModules = ambitiState.flatMap(a => a.funzioni.flatMap(f => f.modules));
@@ -149,7 +165,6 @@ function AppInner() {
     : null;
 
   const isChat = activeSection === 'internal' && currentModule?.type === 'chat';
-  const sidePanelWidth = 260;
 
   if (!isLoggedIn) {
     return <LoginPage onLogin={() => setIsLoggedIn(true)} />;
@@ -238,10 +253,10 @@ function AppInner() {
                     transition={{ duration: 0.2, ease: 'easeOut' }}
                     className="flex flex-1 overflow-hidden"
                   >
-                    {currentModule.type === 'chat' && <ChatArea module={currentModule} />}
-                    {currentModule.type === 'settings' && <SettingsView module={currentModule} />}
-                    {currentModule.type === 'files' && <FilesView module={currentModule} />}
-                    {currentModule.type === 'dashboard' && <DashboardView module={currentModule} ambitoName={selectedAmbito?.name} />}
+                    {currentModule.type === 'chat' && <ChatArea module={currentModule} ambitoName={selectedAmbito?.name} ambitoColor={selectedAmbito?.color} />}
+                    {currentModule.type === 'settings' && <SettingsView module={currentModule} ambitoName={selectedAmbito?.name} ambitoColor={selectedAmbito?.color} />}
+                    {currentModule.type === 'files' && <FilesView module={currentModule} ambitoName={selectedAmbito?.name} ambitoColor={selectedAmbito?.color} />}
+                    {currentModule.type === 'dashboard' && <DashboardView module={currentModule} ambitoName={selectedAmbito?.name} ambitoColor={selectedAmbito?.color} />}
                   </motion.div>
                 ) : (
                   <motion.div
@@ -302,7 +317,7 @@ function AppInner() {
               {/* Mobile params overlay */}
               <AnimatePresence>
                 {isChat && mobileParamsOpen && (
-                  <div className="md:hidden fixed inset-0 z-40" style={{ top: '52px' }}>
+                  <div className="md:hidden fixed inset-0 z-40" style={{ top: 'var(--layout-header-h)' }}>
                     <motion.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
@@ -337,6 +352,7 @@ function AppInner() {
       <AnimatePresence>
         {showOnboarding && (
           <InterfaceOnboarding
+            ambiti={ambitiState}
             onComplete={completeOnboarding}
             onSkip={completeOnboarding}
             onOpenEcosystem={goHome}

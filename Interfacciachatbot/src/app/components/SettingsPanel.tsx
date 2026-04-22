@@ -38,8 +38,8 @@ export function SettingsPanel({ onClose, onTogglePanel }: { onClose?: () => void
   const iconColor = t('text-[#666] hover:text-white hover:bg-white/[0.04]', 'text-[#999] hover:text-[#333] hover:bg-black/[0.04]');
 
   return (
-    <aside className={`w-[260px] border-l ${borderCls} flex flex-col h-full shrink-0 transition-colors`} style={{ backgroundColor: panelBg }}>
-      <div className={`flex items-center justify-between h-[48px] px-5 border-b ${borderCls} shrink-0`} style={{ backgroundColor: headerBg }}>
+    <aside className={`w-[var(--layout-sidepanel-w)] border-l ${borderCls} flex flex-col h-full shrink-0 transition-colors`} style={{ backgroundColor: panelBg }}>
+      <div className={`flex items-center justify-between h-[var(--layout-subbar-h)] px-5 border-b ${borderCls} shrink-0`} style={{ backgroundColor: headerBg }}>
         <span className={`text-[13px] font-bold ${t('text-white', 'text-[#111]')}`}>Parametri</span>
         <div className="flex items-center gap-0.5">
           <button onClick={resetAll} className={`p-1.5 rounded-md ${iconColor} transition-colors`} title="Ripristina">

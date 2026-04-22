@@ -45,7 +45,7 @@ export const ambiti: Ambito[] = [
     name: 'Amministrazione',
     subtitle: 'Sistema AEGIS - Data Governance & Secure AI Layer',
     declaredModuleCount: 8,
-    color: '#E8920C',
+    color: '#5823AE',
     iconName: 'shield',
     funzioni: [
       {
@@ -217,7 +217,7 @@ export const ambiti: Ambito[] = [
     name: 'Direzione',
     subtitle: 'Sistema ORION - Predictive Strategy Engine',
     declaredModuleCount: 11,
-    color: '#5B4E8A',
+    color: '#B422B4',
     iconName: 'compass',
     funzioni: [
       {
@@ -320,7 +320,7 @@ export const ambiti: Ambito[] = [
     name: 'Vendite',
     subtitle: 'Sistema GOJI - Conversational Sales Agent',
     declaredModuleCount: 7,
-    color: '#3A6B8A',
+    color: '#0F73D6',
     iconName: 'target',
     funzioni: [
       {
@@ -353,7 +353,7 @@ export const ambiti: Ambito[] = [
     name: 'Organizzazione',
     subtitle: 'Sistema ENSO - The Circle of Continuous Learning',
     declaredModuleCount: 9,
-    color: '#D94F6B',
+    color: '#D01A66',
     iconName: 'cog',
     funzioni: [
       {
@@ -386,7 +386,7 @@ export const ambiti: Ambito[] = [
     name: 'Marketing',
     subtitle: 'Sistema LUMA - Multimodal Lead Generator',
     declaredModuleCount: 8,
-    color: '#9B6B7A',
+    color: '#E93465',
     iconName: 'sun',
     funzioni: [
       {
@@ -411,7 +411,7 @@ export const ambiti: Ambito[] = [
     name: 'Produzione',
     subtitle: 'Sistema SOPHIA - Vertical Knowledge AI',
     declaredModuleCount: 9,
-    color: '#2B77AE',
+    color: '#15C199',
     iconName: 'wrench',
     funzioni: [
       {
@@ -452,7 +452,7 @@ export const ambiti: Ambito[] = [
     name: 'Organizzazione',
     subtitle: 'Sistema TALOS - Operational Execution & Process Compliance Engine',
     declaredModuleCount: 10,
-    color: '#1FA89A',
+    color: '#1A29B7',
     iconName: 'shield',
     funzioni: [
       {
@@ -493,7 +493,7 @@ export const ambiti: Ambito[] = [
     name: 'Trasversale',
     subtitle: 'Sistema SENTRA - Cybersecurity & Access Governance',
     declaredModuleCount: 3,
-    color: '#5C79EA',
+    color: '#0BB8DB',
     iconName: 'compass',
     funzioni: [
       {
@@ -534,7 +534,7 @@ export const ambiti: Ambito[] = [
     name: 'Assistenza',
     subtitle: 'Sistema KORA - Post-Sales Knowledge Assistant',
     declaredModuleCount: 9,
-    color: '#9B8A2E',
+    color: '#33CA25',
     iconName: 'heart',
     funzioni: [
       {
@@ -564,6 +564,9 @@ export const quickRepliesMap: Record<string, string[]> = {
   M012: ['Ordina per urgenza', 'Mostra score priorita', 'Attiva regole SLA'],
   M041: ['Genera preventivo base', 'Template preventivo enterprise', 'Ricalcola margine'],
   M062: ['Scoring lead', 'Lead ad alta priorita', 'Prossime azioni consigliate'],
+  M071: ['Post LinkedIn lancio prodotto', 'Newsletter aprile', 'Bozza ad copy Facebook'],
+  M061: ['Top 3 feedback della settimana', 'Riassunto sentiment ultime 48h', 'Categorie dominanti'],
+  M014: ['Verifica contratto ultimo caricato', 'Trova clausole mancanti', 'Confronto versioni documento'],
   default: ['Come posso aiutarti?', 'Mostra esempi reali', 'Panoramica funzionalità'],
 };
 
@@ -600,7 +603,165 @@ export const botResponsesMap: Record<string, string[]> = {
     'Lead qualificato automaticamente: score assegnato in base a fit, interesse e urgenza commerciale.',
     'Se vuoi, ordino la coda lead per priorita e suggerisco le prossime azioni operative.',
   ],
+  M071: [
+    'Bozza pronta: ho generato il pezzo rispettando tono di voce, target e limiti di lunghezza del canale.',
+    'Posso proporre 3 varianti A/B con differenti hook e call-to-action, pronte per la validazione editoriale.',
+  ],
+  M061: [
+    'Ho sintetizzato le conversazioni degli ultimi 7 giorni evidenziando temi ricorrenti, sentiment e richieste non soddisfatte.',
+    'Trend positivo su qualita servizio (+12%), attenzione su tempi di risposta (segnalati 9 volte questa settimana).',
+  ],
+  M014: [
+    'Analisi completata: ho confrontato il documento con il template di riferimento e segnalato le clausole mancanti o anomale.',
+    'Posso produrre un report PDF con le differenze evidenziate e una proposta di riscrittura delle sezioni critiche.',
+  ],
   default: [
     'Ho elaborato la tua richiesta. Ecco cosa posso suggerirti basandomi sui dati disponibili. Vuoi approfondire qualche aspetto?',
   ],
+};
+
+export type ChatSeedMessage = { sender: 'bot' | 'user'; content: string; time: string };
+
+export const chatSeedConversations: Record<string, ChatSeedMessage[]> = {
+  M093: [
+    { sender: 'bot', content: 'Sono il **Motore di instradamento semantico**. Classifico ogni richiesta in ingresso e la inoltro al modulo AI piu competente.', time: '09:02' },
+    { sender: 'user', content: 'Mostrami lo stato del routing oggi', time: '09:03' },
+    { sender: 'bot', content: '**247 richieste** smistate oggi. Distribuzione: 38% Assistenza, 26% Vendite, 19% Marketing, 17% Direzione. Confidenza media **94.2%** — nessun fallback verso operatore.', time: '09:03' },
+    { sender: 'user', content: 'Quali domini sono attualmente disponibili?', time: '09:05' },
+    { sender: 'bot', content: 'Sto orchestrando: Assistenza, Vendite, Marketing, Organizzazione, Produzione, Direzione. Posso attivare nuovi domini o regole custom a caldo senza riavvio.', time: '09:05' },
+  ],
+  M041: [
+    { sender: 'bot', content: 'Sono il **Generatore automatico di preventivi**. Basta un brief sintetico e produco una proposta commerciale coerente con i tuoi listini.', time: '10:14' },
+    { sender: 'user', content: 'Preventivo per un cliente enterprise, 250 postazioni, supporto 24/7, onboarding incluso.', time: '10:14' },
+    { sender: 'bot', content: '**Preventivo BU-2026-417 generato.**\n\n- Licenze enterprise × 250: € 37.500 / anno\n- Supporto 24/7 premium: € 8.400\n- Onboarding + training: € 2.900\n\n**Totale: € 48.800 / anno** — margine stimato **34%**. Posso esportare in PDF brandizzato o inviarlo al CRM.', time: '10:14' },
+  ],
+  M062: [
+    { sender: 'bot', content: 'Sono il **Qualificatore automatico dei lead**. Analizzo ogni contatto in ingresso e gli assegno uno score da 0 a 100.', time: '08:47' },
+    { sender: 'user', content: 'Lead top della settimana', time: '08:48' },
+    { sender: 'bot', content: 'Oggi **34 lead qualificati**. Top 3:\n\n1. **Studio Marelli SRL** — score **92** (PMI, budget confermato, timing Q2)\n2. **Ferrari Components** — score **88** (sector fit, multi-stakeholder engaged)\n3. **Bianchi Retail** — score **84** (warm referral, decision maker diretto)\n\nVuoi che ordini la coda per scadenza o per fit commerciale?', time: '08:48' },
+  ],
+  M002: [
+    { sender: 'bot', content: 'Sono l\' **Assistente informativo specialistico**. Rispondo basandomi solo su fonti aziendali verificate, con riferimenti tracciabili.', time: '11:22' },
+    { sender: 'user', content: 'Qual e la nostra policy di reso per ordini B2B oltre 10.000€?', time: '11:22' },
+    { sender: 'bot', content: 'Secondo la policy interna **POL-RESI-2026 v3.2** (sez. 4.2):\n\n- Reso consentito entro **30 giorni** dalla consegna\n- Obbligo di RMA formale per ordini > € 10.000\n- Penale logistica del **3%** sul valore reso\n- Riaccredito entro **14 gg lavorativi**\n\n**Fonti consultate:** POL-RESI-2026.pdf · Manuale_Commerciale_Q1.pdf', time: '11:23' },
+  ],
+  M071: [
+    { sender: 'bot', content: 'Sono il **Creatore di contenuti assistito**. Scrivo post, newsletter e ad copy coerenti con il tono di voce del brand.', time: '14:08' },
+    { sender: 'user', content: 'Post LinkedIn per lancio del nuovo modulo Crybu Agents', time: '14:08' },
+    { sender: 'bot', content: '**Bozza LinkedIn — Lancio Crybu Agents**\n\n> Abbiamo chiesto ai nostri clienti: cosa ti manca per automatizzare davvero i processi?\n>\n> La risposta era chiara: non chatbot, ma **agenti AI** che eseguono.\n>\n> Oggi presentiamo **Crybu Agents** — moduli AI che agiscono sui tuoi sistemi, non solo rispondono.\n>\n> Scopri la demo: crybu.io/agents\n\n**Tono:** diretto, professionale. **CTA:** chiara. **Lunghezza ottimale:** 540 caratteri. Posso generarne 2 varianti alternative.', time: '14:09' },
+  ],
+};
+
+export type DashboardMetric = {
+  label: string;
+  value: string;
+  change: string;
+  up: boolean;
+  iconName: 'trending-up' | 'trending-down' | 'bar-chart' | 'clock' | 'users' | 'check' | 'activity' | 'sparkles' | 'target' | 'zap';
+};
+
+export type DashboardPreset = {
+  summaryTitle: string;
+  summaryBlurb: string;
+  metrics: DashboardMetric[];
+  chartTitle: string;
+  chartData: number[];
+  chartLabels?: string[];
+  accentColor: string;
+  activityFeed: { action: string; detail: string; time: string }[];
+};
+
+export const dashboardPresetsMap: Record<string, DashboardPreset> = {
+  M001: {
+    summaryTitle: 'Reputazione aziendale sotto controllo',
+    summaryBlurb: 'Monitoraggio continuo di 12 fonti tra social, press e review. Sentiment medio positivo, nessun picco critico rilevato nelle ultime 48h.',
+    metrics: [
+      { label: 'Sentiment medio', value: '+68', change: '+6 pt', up: true, iconName: 'trending-up' },
+      { label: 'Menzioni 7gg', value: '312', change: '+18%', up: true, iconName: 'activity' },
+      { label: 'Review positive', value: '89%', change: '+3%', up: true, iconName: 'check' },
+      { label: 'Alert critici', value: '0', change: '-2', up: true, iconName: 'target' },
+    ],
+    chartTitle: 'Sentiment ultimi 12 mesi',
+    chartData: [52, 58, 55, 61, 64, 60, 67, 65, 71, 68, 74, 72],
+    accentColor: '#8B5CF6',
+    activityFeed: [
+      { action: 'Menzione rilevante', detail: 'Articolo positivo su IlSole24Ore — sentiment alto', time: 'adesso' },
+      { action: 'Review chiusa', detail: 'Recensione Trustpilot 5★ pubblicata con risposta AI', time: '14 min fa' },
+      { action: 'Trend settimanale', detail: 'Hashtag #CrybuAI cresciuto del 22% su LinkedIn', time: '2 ore fa' },
+    ],
+  },
+  M061: {
+    summaryTitle: 'Cosa dicono davvero i tuoi clienti',
+    summaryBlurb: 'Analisi automatica di 1.284 conversazioni della settimana: temi ricorrenti, soddisfazione, richieste non coperte. Pronto da condividere con marketing e direzione.',
+    metrics: [
+      { label: 'Conversazioni analizzate', value: '1.284', change: '+9%', up: true, iconName: 'activity' },
+      { label: 'CSAT estratto', value: '4.6/5', change: '+0.2', up: true, iconName: 'trending-up' },
+      { label: 'Temi emergenti', value: '7', change: '+2', up: true, iconName: 'sparkles' },
+      { label: 'Richieste non coperte', value: '19', change: '-4', up: true, iconName: 'target' },
+    ],
+    chartTitle: 'Volume conversazioni ultime 12 settimane',
+    chartData: [820, 910, 870, 950, 1020, 1080, 1140, 1190, 1210, 1235, 1260, 1284],
+    accentColor: '#EC4899',
+    activityFeed: [
+      { action: 'Insight estratto', detail: '32 conversazioni menzionano tempi di consegna — cluster emergente', time: 'adesso' },
+      { action: 'Tema ricorrente', detail: '"Integrazione fatturazione" citata 18 volte questa settimana', time: '22 min fa' },
+      { action: 'Sentiment positivo', detail: 'Picco +12% sul tema "assistenza via chat"', time: '3 ore fa' },
+    ],
+  },
+  M041: {
+    summaryTitle: 'Pipeline preventivi in autonomia',
+    summaryBlurb: 'Il modulo produce proposte commerciali coerenti con i listini e le policy di margine. Taglia il tempo di preparazione da ore a minuti.',
+    metrics: [
+      { label: 'Preventivi generati oggi', value: '9', change: '+3', up: true, iconName: 'check' },
+      { label: 'Valore totale', value: '€ 287K', change: '+22%', up: true, iconName: 'bar-chart' },
+      { label: 'Tempo medio stesura', value: '2.4 min', change: '-18 min', up: true, iconName: 'clock' },
+      { label: 'Margine medio', value: '34%', change: '+1.8%', up: true, iconName: 'trending-up' },
+    ],
+    chartTitle: 'Preventivi per mese',
+    chartData: [42, 48, 55, 51, 67, 72, 78, 85, 91, 88, 96, 104],
+    accentColor: '#F59E0B',
+    activityFeed: [
+      { action: 'Preventivo inviato', detail: 'BU-2026-417 — Studio Marelli · € 48.800', time: 'adesso' },
+      { action: 'Margine ricalcolato', detail: 'Listino Q2 applicato a 12 offerte in bozza', time: '18 min fa' },
+      { action: 'Proposta accettata', detail: 'BU-2026-401 firmata dal cliente — € 22.500', time: '1 ora fa' },
+    ],
+  },
+  M062: {
+    summaryTitle: 'Lead qualificati in tempo reale',
+    summaryBlurb: 'Ogni lead in ingresso riceve automaticamente uno score commerciale da 0 a 100, con prossima azione consigliata per il sales.',
+    metrics: [
+      { label: 'Lead qualificati oggi', value: '34', change: '+12', up: true, iconName: 'users' },
+      { label: 'Score medio', value: '72', change: '+4 pt', up: true, iconName: 'target' },
+      { label: 'Conversione prevista', value: '28%', change: '+5%', up: true, iconName: 'trending-up' },
+      { label: 'Tempo risposta medio', value: '1.8 min', change: '-42 min', up: true, iconName: 'clock' },
+    ],
+    chartTitle: 'Lead qualificati ultimi 12 giorni',
+    chartData: [18, 22, 25, 21, 28, 32, 29, 34, 31, 36, 38, 34],
+    accentColor: '#3B82F6',
+    activityFeed: [
+      { action: 'Lead top', detail: 'Studio Marelli SRL qualificato con score 92', time: 'adesso' },
+      { action: 'Escalation', detail: 'Ferrari Components assegnato a sales senior', time: '25 min fa' },
+      { action: 'Coda riordinata', detail: '12 lead ripriorizzati in base a urgenza commerciale', time: '1 ora fa' },
+    ],
+  },
+};
+
+export type FilesPreset = {
+  summaryTitle: string;
+  summaryBlurb: string;
+  files: { name: string; size: string; status: 'trained' | 'processing' | 'pending'; date: string }[];
+};
+
+export const filesPresetsMap: Record<string, FilesPreset> = {
+  M014: {
+    summaryTitle: 'Documenti analizzati in autonomia',
+    summaryBlurb: 'Ogni contratto, policy o allegato viene confrontato con i template di riferimento. Il modulo evidenzia clausole mancanti e anomalie.',
+    files: [
+      { name: 'Contratto_FornituraB2B_MarelliSRL_v4.pdf', size: '1.8 MB', status: 'trained', date: '20 Apr 2026' },
+      { name: 'NDA_Progetto_Atlas_firmato.pdf', size: '640 KB', status: 'trained', date: '18 Apr 2026' },
+      { name: 'Policy_Resi_2026_v3.docx', size: '212 KB', status: 'trained', date: '15 Apr 2026' },
+      { name: 'Accordo_Distribuzione_FerrariComponents.pdf', size: '2.3 MB', status: 'processing', date: '22 Apr 2026' },
+      { name: 'Clausole_Privacy_GDPR_aggiornate.docx', size: '148 KB', status: 'pending', date: '22 Apr 2026' },
+    ],
+  },
 };

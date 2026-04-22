@@ -1,10 +1,25 @@
 import { useEffect, useState } from 'react';
-import { TrendingUp, TrendingDown, BarChart3, Clock, Users, CheckCircle2, FileText, Plus, Eye, Download, Trash2, X, ArrowLeft, Printer, Share2, Calendar, ChevronRight } from 'lucide-react';
+import { TrendingUp, TrendingDown, BarChart3, Clock, Users, CheckCircle2, FileText, Plus, Eye, Download, Trash2, X, ArrowLeft, Share2, Calendar, ChevronRight, Activity as ActivityIcon, Sparkles, Target, Zap } from 'lucide-react';
 import { AreaChart, Area, PieChart, Pie, Cell, BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import type { Module } from './data';
+import { dashboardPresetsMap } from './data';
 import { useTheme } from './ThemeContext';
+import { ModuleHero } from './ModuleHero';
 
-interface DashboardViewProps { module: Module; ambitoName?: string; }
+interface DashboardViewProps { module: Module; ambitoName?: string; ambitoColor?: string; }
+
+const metricIconMap = {
+  'trending-up': TrendingUp,
+  'trending-down': TrendingDown,
+  'bar-chart': BarChart3,
+  'clock': Clock,
+  'users': Users,
+  'check': CheckCircle2,
+  'activity': ActivityIcon,
+  'sparkles': Sparkles,
+  'target': Target,
+  'zap': Zap,
+} as const;
 
 type Report = {
   id: string;
@@ -109,11 +124,24 @@ const initialActivityItems: ActivityItem[] = [
   { action: 'Nuovo dato', detail: 'Aggiornamento metriche in tempo reale', time: '1 giorno fa' },
 ];
 
-export function DashboardView({ module, ambitoName }: DashboardViewProps) {
+export function DashboardView({ module, ambitoName, ambitoColor }: DashboardViewProps) {
   const { t } = useTheme();
-  const metrics = metricsMap[module.id] || metricsMap.default;
-  const [chartData, setChartData] = useState<number[]>(initialMainChartData);
-  const [activityFeed, setActivityFeed] = useState<ActivityItem[]>(initialActivityItems);
+  const preset = dashboardPresetsMap[module.id];
+  const metrics = preset
+    ? preset.metrics.map(m => ({
+      label: m.label,
+      value: m.value,
+      change: m.change,
+      up: m.up,
+      icon: metricIconMap[m.iconName] ?? BarChart3,
+    }))
+    : metricsMap[module.id] || metricsMap.default;
+
+  const seedChartData = preset?.chartData ?? initialMainChartData;
+  const seedActivityFeed: ActivityItem[] = preset?.activityFeed ?? initialActivityItems;
+
+  const [chartData, setChartData] = useState<number[]>(seedChartData);
+  const [activityFeed, setActivityFeed] = useState<ActivityItem[]>(seedActivityFeed);
   const [demoLive, setDemoLive] = useState(false);
   const maxVal = Math.max(...chartData, 1);
 
@@ -125,8 +153,9 @@ export function DashboardView({ module, ambitoName }: DashboardViewProps) {
 
   useEffect(() => {
     setDemoLive(false);
-    setChartData(initialMainChartData);
-    setActivityFeed(initialActivityItems);
+    setChartData(seedChartData);
+    setActivityFeed(seedActivityFeed);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [module.id]);
 
   useEffect(() => {
@@ -405,22 +434,24 @@ export function DashboardView({ module, ambitoName }: DashboardViewProps) {
   // ---- MAIN DASHBOARD VIEW ----
   return (
     <div className="flex flex-col flex-1 h-full min-w-0 overflow-y-auto">
-      <div className="max-w-5xl mx-auto w-full p-4 md:p-8">
-        <div className="flex items-center justify-between mb-6 md:mb-8 gap-3">
-          <div className="min-w-0">
-            <h2 className={`text-[12px] md:text-[13px] font-semibold ${textMain}`}>{module.name}</h2>
-            <p className={`text-[11px] md:text-[12px] ${textSub} mt-1 truncate`}>{module.description}</p>
-          </div>
+      <div className="max-w-5xl mx-auto w-full p-4 md:p-8 space-y-4 md:space-y-6">
+        <ModuleHero
+          title={preset?.summaryTitle ?? module.name}
+          subtitle={preset?.summaryBlurb ?? module.description}
+          ambitoName={ambitoName}
+          ambitoColor={ambitoColor ?? preset?.accentColor}
+          statusLabel="Dashboard live"
+        >
           <button
             onClick={() => setShowNewReportModal(true)}
             className="flex items-center gap-1.5 px-3 md:px-4 py-2 md:py-2.5 bg-[#F73C1C] hover:bg-[#e63518] text-white text-[12px] md:text-[13px] font-semibold rounded-lg transition-colors shadow-lg shadow-[#F73C1C]/20 shrink-0 whitespace-nowrap"
           >
             <Plus size={15} /> <span className="hidden sm:inline">Genera</span> Report
           </button>
-        </div>
+        </ModuleHero>
 
         {/* Metric Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4 mb-6 md:mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
           {metrics.map(m => {
             const Icon = m.icon;
             return (
@@ -439,9 +470,9 @@ export function DashboardView({ module, ambitoName }: DashboardViewProps) {
         </div>
 
         {/* Main chart */}
-        <div className={`${cardBg} border rounded-xl p-4 md:p-6 mb-6 md:mb-8`}>
+        <div className={`${cardBg} border rounded-xl p-4 md:p-6`}>
           <div className="flex items-center justify-between mb-6">
-            <h3 className={`text-[14px] font-bold ${textMain}`}>Andamento ultimi 12 mesi</h3>
+            <h3 className={`text-[14px] font-bold ${textMain}`}>{preset?.chartTitle ?? 'Andamento ultimi 12 mesi'}</h3>
             <div className="flex items-center gap-2 sm:gap-3">
               <button
                 onClick={() => setDemoLive(v => !v)}
@@ -470,7 +501,7 @@ export function DashboardView({ module, ambitoName }: DashboardViewProps) {
         </div>
 
         {/* Generated Reports */}
-        <div className={`${cardBg} border rounded-xl p-4 md:p-6 mb-6 md:mb-8`}>
+        <div className={`${cardBg} border rounded-xl p-4 md:p-6`}>
           <div className="flex items-center justify-between mb-5">
             <h3 className={`text-[14px] font-bold ${textMain}`}>Report Generati</h3>
             <span className={`text-[12px] ${textMuted}`}>{reports.length} report</span>

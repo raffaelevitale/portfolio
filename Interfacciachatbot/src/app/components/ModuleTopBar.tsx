@@ -32,7 +32,7 @@ export function ModuleTopBar({ ambitoId, ambitoName, ambitoColor, ambitoIcon, mo
       initial={{ opacity: 0, y: -6 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.24, ease: 'easeOut' }}
-      className={`flex items-center justify-between h-[44px] md:h-[48px] px-3 md:px-5 border-b ${t('border-white/[0.06]', 'border-black/[0.08]')} shrink-0`}
+      className={`flex items-center justify-between h-[var(--layout-subbar-h)] px-3 md:px-5 border-b ${t('border-white/[0.06]', 'border-black/[0.08]')} shrink-0`}
       style={{ backgroundColor: t('#1A1A1A', '#FFFFFF') }}
     >
       <div className="flex items-center gap-1.5 md:gap-2 min-w-0 flex-1">

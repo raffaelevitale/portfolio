@@ -1,12 +1,12 @@
 import aegisIcon from '../../assets/icone/AEGIS.svg';
 import orionIcon from '../../assets/icone/ORION.svg';
 import gojiIcon from '../../assets/icone/GOJI.svg';
-import ensoIcon from '../../assets/icone/ENSOnuovo.svg';
+import ensoIcon from '../../assets/icone/ENSO.svg';
 import lumaIcon from '../../assets/icone/LUMA.svg';
 import koraIcon from '../../assets/icone/KORA.svg';
-import sonnyIcon from './SONNY.svg';
-import talosIcon from './TALOS.svg';
-import sentraIcon from './SENTRA.svg';
+import sophiaIcon from '../../assets/icone/SOPHIA.svg';
+import talosIcon from '../../assets/icone/TALOS.svg';
+import sentraIcon from '../../assets/icone/SENTRA.svg';
 
 const defaultIconByAmbitoId: Record<string, string> = {
     aegis: aegisIcon,
@@ -14,8 +14,8 @@ const defaultIconByAmbitoId: Record<string, string> = {
     goji: gojiIcon,
     enso: ensoIcon,
     luma: lumaIcon,
-    sophia: sonnyIcon,
-    sonny: sonnyIcon,
+    sophia: sophiaIcon,
+    sonny: sophiaIcon,
     talos: talosIcon,
     sentra: sentraIcon,
     kora: koraIcon,
