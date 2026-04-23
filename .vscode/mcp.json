@@ -1,0 +1,12 @@
+{
+	"servers": {
+		"Baserow MCP": {
+			"command": "npx",
+			"args": [
+				"mcp-remote",
+				"https://api.baserow.io/mcp/Ob9lSFAS2oiPIcKK3YIM20bwRi54tFpX/sse"
+			]
+		}
+	},
+	"inputs": []
+}

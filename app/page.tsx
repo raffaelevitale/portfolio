@@ -131,7 +131,7 @@ export default function Home() {
                 <ArrowRight className="w-4 h-4 relative z-10 transition-transform group-hover:translate-x-1" />
               </motion.a>
               <motion.a
-                href="/Profile.pdf"
+                href="/CV_Raffaele_Vitale.pdf"
                 download
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
