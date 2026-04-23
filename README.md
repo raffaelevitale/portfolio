@@ -1,15 +1,5 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Environment Variables
-
-To enable the embedded ChatGPT chat inside the interface, configure the server key:
-
-```bash
-OPENAI_API_KEY=your_openai_api_key
-```
-
-You can place it in `.env.local` at the project root.
-
 ## Getting Started
 
 First, run the development server:

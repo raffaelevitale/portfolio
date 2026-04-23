@@ -163,7 +163,7 @@ spacing:
   layout-subbar-height: 48px
   layout-sidebar-width: 276px
   layout-sidepanel-width: 260px
-  layout-chat-max-width: 48rem
+  layout-sidepanel-width: 260px
 
 rounded:
   none: 0px
@@ -292,26 +292,6 @@ components:
     padding: "{spacing.chat-compose-padding}"
     height: 56px
 
-  chat-bubble-bot-dark:
-    backgroundColor: "{colors.enterprise-surface-dark-elevated}"
-    textColor: "{colors.enterprise-text-dark-secondary}"
-    typography: "{typography.enterprise-body-md}"
-    rounded: "{rounded.xl}"
-    padding: "{spacing.lg}"
-
-  chat-bubble-user-dark:
-    backgroundColor: "{colors.enterprise-surface-dark-soft}"
-    textColor: "{colors.white}"
-    typography: "{typography.enterprise-body-md}"
-    rounded: "{rounded.xl}"
-    padding: "{spacing.lg}"
-
-  chat-bubble-user-light:
-    backgroundColor: "{colors.danger}"
-    textColor: "{colors.white}"
-    typography: "{typography.enterprise-body-md}"
-    rounded: "{rounded.xl}"
-    padding: "{spacing.lg}"
 
   panel-params-enterprise-dark:
     backgroundColor: "{colors.enterprise-surface-dark}"
@@ -403,7 +383,7 @@ Component behavior should follow these intent rules.
 
 - Portfolio CTAs are high-contrast and cinematic, with clear hover inversion.
 - Enterprise primary actions use orange-red with short, crisp transitions.
-- Sidebar rows, module chips, and chat bubbles rely on subtle border and tone shifts, not heavy color fills.
+- Sidebar rows and module chips rely on subtle border and tone shifts, not heavy color fills.
 - Parameter panels and shell headers are structural anchors and must retain strict alignment.
 - Live badges and operational indicators should stay small, bright, and consistently green.
 
