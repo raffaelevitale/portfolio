@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Instrument_Serif, DM_Sans, DM_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
-import Script from "next/script";
 import "./globals.css";
 import ConditionalNavigation from "./components/ConditionalNavigation";
 import ConditionalPadding from "./components/ConditionalPadding";
@@ -96,18 +95,6 @@ export default function RootLayout({
         data-cursor="disabled"
         className={`${instrumentSerif.variable} ${dmSans.variable} ${dmMono.variable} antialiased`}
       >
-        <Script id="theme-init" strategy="beforeInteractive">{`
-          try {
-            const stored = localStorage.getItem('orario-theme-storage');
-            let theme = 'system';
-            if (stored) { try { theme = JSON.parse(stored).state.theme || 'system'; } catch {}
-            }
-            const root = document.documentElement;
-            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            const isDark = theme === 'dark' || (theme === 'system' && prefersDark);
-            if (isDark) root.classList.add('dark'); else root.classList.remove('dark');
-          } catch {}
-        `}</Script>
         {/* Client-only enhancements (dynamic with ssr:false) */}
         <ClientEnhancements />
         {/* Subtle ambient background */}

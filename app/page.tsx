@@ -337,7 +337,7 @@ export default function Home() {
                 type: "Full-Stack Web App — PWA",
                 num: "02",
                 desc: "Applicazione web per la gestione e visualizzazione dell'orario scolastico dell'IIS Vallauri. Progressive Web App con supporto offline, ricerca intelligente e interfaccia ottimizzata per mobile.",
-                url: "https://orario.raffaelevitale.it/orario",
+                url: "https://orario.raffaelevitale.it",
                 tags: ["Next.js", "TypeScript", "PWA", "Zustand", "Vercel"],
                 year: "2025",
               },
