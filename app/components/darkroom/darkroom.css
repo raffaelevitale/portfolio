@@ -1,0 +1,466 @@
+/* ═══════════════════════════════════════════════════
+   CAMERA OSCURA — interfaccia HTML sopra la scena 3D
+   ═══════════════════════════════════════════════════ */
+
+@property --hole {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 0px;
+}
+
+.dr-root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: var(--ink);
+  color: var(--on-dark);
+}
+
+.dr-canvas {
+  position: absolute !important;
+  inset: 0;
+  /* Il trascinamento serve a guardarsi intorno, non a scorrere la pagina. */
+  touch-action: none;
+}
+
+.dr-eyebrow {
+  margin: 0 0 0.4rem;
+  font-family: var(--font-mono), monospace;
+  font-size: var(--text-xs);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--safe-text);
+}
+
+.dr-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ───────────── Bottoni e link ───────────── */
+
+.dr-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1.45rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font: 500 var(--text-sm) / 1 var(--font-body), sans-serif;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform var(--duration-fast) var(--ease-out-expo),
+    background-color var(--duration-normal) ease,
+    box-shadow var(--duration-normal) ease,
+    border-color var(--duration-normal) ease,
+    opacity var(--duration-normal) ease;
+}
+
+.dr-button:active {
+  transform: scale(0.97);
+}
+
+.dr-button--primary {
+  background: var(--safe);
+  color: #fff;
+}
+
+.dr-button--primary:hover:not(:disabled) {
+  background: #e43d29;
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 6px rgb(215 49 31 / 0.16),
+    0 14px 40px rgb(215 49 31 / 0.35);
+}
+
+.dr-button--primary:disabled {
+  opacity: 0.45;
+  cursor: progress;
+}
+
+.dr-button--ghost {
+  background: transparent;
+  color: var(--on-dark);
+  border-color: var(--line-dark);
+}
+
+.dr-button--ghost:hover {
+  border-color: var(--on-dark-muted);
+  background: rgb(255 255 255 / 0.04);
+}
+
+.dr-button__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #fff;
+  animation: dr-pulse 2.2s ease-in-out infinite;
+}
+
+.dr-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 500 var(--text-sm) var(--font-body), sans-serif;
+  color: var(--safe-text);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  cursor: pointer;
+}
+
+.dr-link:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* ───────────── Otturatore (intro) ───────────── */
+
+.dr-shutter {
+  --iris: min(46vmin, 380px);
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: 72px 24px 64px;
+  overflow-y: auto;
+}
+
+.dr-shutter__veil {
+  --hole: 0px;
+  /* fixed: se l'intro scorre su schermi bassi, il velo deve restare sopra tutta la scena. */
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 40%, rgb(120 20 12 / 0.18), transparent 60%),
+    var(--ink);
+  mask-image: radial-gradient(
+    circle at var(--cx, 50%) var(--cy, 40%),
+    transparent var(--hole),
+    #000 calc(var(--hole) + 1px)
+  );
+  transition: --hole 1.5s var(--ease-shutter);
+}
+
+.dr-shutter.is-peeking .dr-shutter__veil {
+  --hole: calc(var(--iris) * 0.06);
+  transition-duration: 0.6s;
+}
+
+.dr-shutter.is-opening .dr-shutter__veil {
+  --hole: 150vmax;
+}
+
+.dr-shutter.is-opening {
+  pointer-events: none;
+}
+
+.dr-shutter__top,
+.dr-shutter__lcd {
+  position: absolute;
+  left: 32px;
+  right: 32px;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-family: var(--font-mono), monospace;
+  font-size: var(--text-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--on-dark-muted);
+  transition: opacity 0.5s ease;
+}
+
+.dr-shutter__top {
+  top: 32px;
+}
+
+.dr-shutter__lcd {
+  bottom: 28px;
+  justify-content: center;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.dr-shutter__led {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--safe-text);
+  animation: dr-blink 1s steps(2, jump-none) infinite;
+}
+
+.dr-shutter__led.is-ready {
+  background: #9bf28a;
+  animation: none;
+  box-shadow: 0 0 10px #9bf28a;
+}
+
+.dr-viewfinder {
+  position: absolute;
+  inset: 18px;
+  pointer-events: none;
+  transition: opacity 0.5s ease;
+}
+
+.dr-viewfinder__corner {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border: 0 solid var(--on-dark-faint);
+}
+
+.dr-viewfinder__corner--tl { top: 0; left: 0; border-top-width: 1px; border-left-width: 1px; }
+.dr-viewfinder__corner--tr { top: 0; right: 0; border-top-width: 1px; border-right-width: 1px; }
+.dr-viewfinder__corner--bl { bottom: 0; left: 0; border-bottom-width: 1px; border-left-width: 1px; }
+.dr-viewfinder__corner--br { bottom: 0; right: 0; border-bottom-width: 1px; border-right-width: 1px; }
+
+.dr-shutter__poster {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  transition: opacity 0.5s ease, transform 1.2s var(--ease-shutter);
+}
+
+.dr-shutter__poster--left {
+  left: clamp(24px, 5vw, 80px);
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-display), serif;
+  font-size: clamp(2.6rem, 1rem + 4.4vw, 6.4rem);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+}
+
+.dr-shutter__poster--left span:last-child {
+  color: var(--safe-text);
+  font-style: italic;
+}
+
+.dr-shutter__poster--right {
+  right: clamp(24px, 5vw, 80px);
+  display: grid;
+  gap: 1.4rem;
+  text-align: right;
+}
+
+.dr-shutter__poster--right dt {
+  font-family: var(--font-mono), monospace;
+  font-size: var(--text-xs);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--on-dark-faint);
+}
+
+.dr-shutter__poster--right dd {
+  margin: 0.1rem 0 0;
+  font-family: var(--font-display), serif;
+  font-size: clamp(1.8rem, 1rem + 1.8vw, 3rem);
+  line-height: 1;
+}
+
+.dr-shutter__center {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  text-align: center;
+}
+
+.dr-shutter__iris-wrap {
+  width: var(--iris);
+  height: var(--iris);
+}
+
+.dr-iris {
+  --open: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transition:
+    transform 1.5s var(--ease-shutter),
+    opacity 0.8s ease 0.7s;
+}
+
+.dr-shutter.is-peeking .dr-iris {
+  --open: 0.16;
+}
+
+.dr-shutter.is-opening .dr-iris {
+  --open: 1.2;
+  transform: scale(1.8);
+  opacity: 0;
+}
+
+.dr-iris__blade-wrap {
+  transform-origin: 100px 100px;
+  transform: rotate(calc(var(--i) * 45deg));
+}
+
+.dr-iris__blade {
+  transform-origin: 100px 100px;
+  transform: translate(calc(var(--open) * 22px), calc(var(--open) * -78px)) rotate(calc(var(--open) * -12deg));
+  transition: transform 1.3s var(--ease-shutter);
+  stroke: rgb(255 255 255 / 0.07);
+  stroke-width: 0.6;
+}
+
+.dr-shutter.is-peeking .dr-iris__blade {
+  transition-duration: 0.6s;
+}
+
+.dr-iris__rim {
+  fill: none;
+  stroke: var(--line-dark);
+  stroke-width: 1;
+}
+
+.dr-iris__stops {
+  font-family: var(--font-mono), monospace;
+  font-size: 5.4px;
+  letter-spacing: 0.08em;
+  fill: var(--on-dark-faint);
+}
+
+.dr-shutter__copy {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  max-width: 34rem;
+  transition: opacity 0.45s ease, transform 0.8s var(--ease-out-expo);
+}
+
+.dr-shutter__title {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: clamp(2.6rem, 1.6rem + 3.4vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+.dr-shutter__roles {
+  margin: 0;
+  font-family: var(--font-mono), monospace;
+  font-size: var(--text-xs);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--safe-text);
+}
+
+.dr-shutter__tagline {
+  margin: 0 0 0.6rem;
+  max-width: 44ch;
+  font-size: var(--text-sm);
+  color: var(--on-dark-muted);
+}
+
+.dr-shutter__alt {
+  font-size: var(--text-xs);
+  color: var(--on-dark-faint);
+  text-underline-offset: 3px;
+}
+
+.dr-shutter__alt:hover {
+  color: var(--on-dark);
+}
+
+.dr-shutter.is-opening .dr-shutter__copy {
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.dr-shutter.is-opening .dr-shutter__top,
+.dr-shutter.is-opening .dr-shutter__lcd,
+.dr-shutter.is-opening .dr-viewfinder,
+.dr-shutter.is-opening .dr-shutter__poster {
+  opacity: 0;
+}
+
+.dr-shutter.is-opening .dr-shutter__poster--left {
+  transform: translate(-40px, -50%);
+}
+
+.dr-shutter.is-opening .dr-shutter__poster--right {
+  transform: translate(40px, -50%);
+}
+
+@media (max-width: 1080px) {
+  .dr-shutter__poster {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .dr-shutter {
+    --iris: min(58vw, 260px);
+    padding-top: 84px;
+  }
+
+  .dr-shutter__top {
+    top: 26px;
+    left: 26px;
+    right: 26px;
+    letter-spacing: 0.14em;
+  }
+
+  .dr-shutter__top span:last-child {
+    display: none;
+  }
+}
+
+/* ───────────── Animazioni ───────────── */
+
+@keyframes dr-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes dr-rise {
+  from { opacity: 0; transform: translateY(24px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes dr-slide-in {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes dr-sheet-in {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes dr-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+@keyframes dr-blink {
+  0% { opacity: 1; }
+  100% { opacity: 0.15; }
+}
+
+@keyframes dr-ring {
+  from { transform: scale(1); opacity: 0.7; }
+  to { transform: scale(2.8); opacity: 0; }
+}
+
+@keyframes dr-bars {
+  from { height: 2px; }
+  to { height: 10px; }
+}

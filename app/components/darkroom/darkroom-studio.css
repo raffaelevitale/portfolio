@@ -1,0 +1,544 @@
+/* ═══════════════════════════════════════════════════
+   STUDIO — porta girevole, seconda stanza e pannelli live
+   ═══════════════════════════════════════════════════ */
+
+/* Dissolvenza al nero tra le stanze (durate allineate a DOOR_FADE_MS in store.ts) */
+
+.dr-fade {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 450ms var(--ease-shutter);
+}
+
+.dr-fade.is-on {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.dr-hud.is-switching {
+  pointer-events: none;
+}
+
+/* Nello studio la luce è calda: l'accento passa dal rosso all'ambra */
+
+.dr-root[data-room="studio"] .dr-hud__room,
+.dr-root[data-room="studio"] .dr-eyebrow {
+  color: #f2b56b;
+}
+
+.dr-root[data-room="studio"] .dr-hint__frame {
+  color: #f2b56b;
+}
+
+/* Porta: puntino e fotogramma dedicati */
+
+.dr-hint--door .dr-hint__dot {
+  background: #f2b56b;
+  box-shadow: 0 0 0 4px rgb(242 181 107 / 0.18), 0 0 18px rgb(242 181 107 / 0.6);
+}
+
+.dr-film__frame--door {
+  border-style: dashed;
+  border-color: rgb(242 181 107 / 0.45);
+  background: transparent;
+}
+
+.dr-film__frame--door .dr-film__num {
+  color: #f2b56b;
+}
+
+.dr-film__frame--door:disabled {
+  opacity: 0.5;
+  cursor: progress;
+}
+
+/* Bozze e stato dei servizi */
+
+.dr-draft {
+  display: inline-block;
+  margin-top: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border: 1px dashed rgb(242 181 107 / 0.6);
+  border-radius: 3px;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #f2b56b;
+}
+
+.dr-live-status {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-size: 1.2rem;
+  color: var(--on-dark-muted);
+}
+
+.dr-live-stamp {
+  margin: 1.4rem 0 0;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--on-dark-faint);
+}
+
+/* Libreria */
+
+.dr-shelfnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0 0 1.2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.dr-shelfnav button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line-dark);
+  border-radius: 50%;
+  background: none;
+  font-family: var(--font-mono), monospace;
+  font-size: var(--text-xs);
+  color: var(--on-dark-muted);
+  cursor: pointer;
+  transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
+}
+
+.dr-shelfnav button:hover {
+  color: var(--on-dark);
+  border-color: var(--on-dark-muted);
+}
+
+.dr-shelfnav button.is-active {
+  background: var(--paper);
+  border-color: var(--paper);
+  color: var(--ink);
+}
+
+.dr-book {
+  padding: 18px 20px 20px;
+  border-left: 4px solid;
+  border-radius: 2px;
+  background: var(--paper);
+  color: var(--paper-ink);
+  animation: dr-rise 0.5s var(--ease-out-expo) both;
+}
+
+.dr-book__tag {
+  font-family: var(--font-mono), monospace;
+  font-size: var(--text-xs);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--safe-deep);
+}
+
+.dr-book--illustrated { display: flex; align-items: flex-start; flex-wrap: wrap; gap: 16px; }
+.dr-book--illustrated > div { flex: 1 1 130px; min-width: 0; }
+.dr-book__cover { width: min(160px, 100%); height: auto; object-fit: contain; }
+
+.dr-book__title {
+  margin: 0.3rem 0 0.1rem;
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.dr-book__author {
+  margin: 0 0 0.9rem;
+  font-size: var(--text-sm);
+  color: var(--paper-muted);
+}
+
+.dr-book__comment {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  line-height: 1.35;
+}
+
+.dr-book .dr-draft {
+  border-color: var(--safe-deep);
+  color: var(--safe-deep);
+}
+
+.dr-booklist {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dr-booklist button {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  padding: 0.6rem 0;
+  border: 0;
+  border-bottom: 1px solid var(--line-dark);
+  background: none;
+  color: var(--on-dark);
+  text-align: left;
+  cursor: pointer;
+}
+
+.dr-booklist button:hover .dr-booklist__title {
+  color: #f2b56b;
+}
+
+.dr-booklist__title {
+  font-family: var(--font-display), serif;
+  font-size: 1.15rem;
+  transition: color var(--duration-fast) ease;
+}
+
+.dr-booklist__author {
+  font-size: var(--text-sm);
+  color: var(--on-dark-faint);
+}
+
+/* Vetrina */
+
+.dr-clock {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 0.6rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--line-dark);
+  border-radius: 6px;
+}
+
+.dr-clock__label {
+  font-size: var(--text-sm);
+  color: var(--on-dark-muted);
+}
+
+.dr-clock__time {
+  font-family: var(--font-display), serif;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.dr-showcase {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dr-showcase__item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+}
+
+.dr-showcase .studio-photo { width: 100px; margin: 0; }
+.dr-showcase__photo { display: block; width: 100%; height: auto; object-fit: contain; }
+.dr-showcase .studio-credit { display: block; margin-top: 0.4rem; color: var(--on-dark-muted); font-size: 0.7rem; overflow-wrap: anywhere; }
+.dr-showcase .studio-credit a { color: inherit; }
+
+.dr-showcase__swatch {
+  width: 14px;
+  height: 14px;
+  margin-top: 0.3rem;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.2);
+}
+
+.dr-showcase__name {
+  margin: 0;
+  font-weight: 600;
+}
+
+.dr-showcase__detail,
+.dr-showcase__comment {
+  margin: 0.15rem 0 0;
+  font-size: var(--text-sm);
+  color: var(--on-dark-muted);
+}
+
+/* Musica */
+
+.dr-track {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 0.4rem;
+}
+
+.dr-track__cover {
+  width: 120px;
+  height: 120px;
+  border-radius: 4px;
+  box-shadow: 0 14px 34px rgb(0 0 0 / 0.5);
+}
+
+.dr-track__state {
+  font-family: var(--font-mono), monospace;
+  font-size: var(--text-xs);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--on-dark-faint);
+}
+
+.dr-track__state.is-live {
+  color: #7ee787;
+}
+
+.dr-track__title {
+  margin: 0.3rem 0 0.1rem;
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: 1.6rem;
+  line-height: 1.05;
+}
+
+.dr-track__artist {
+  margin: 0 0 0.6rem;
+  color: var(--on-dark-muted);
+}
+
+.dr-albums {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dr-albums a {
+  display: grid;
+  gap: 0.2rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.dr-albums img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 3px;
+  transition: transform var(--duration-normal) var(--ease-out-expo);
+}
+
+.dr-albums a:hover img {
+  transform: translateY(-3px);
+}
+
+.dr-albums__name {
+  overflow: hidden;
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.dr-albums__artist {
+  overflow: hidden;
+  font-size: 0.7rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--on-dark-faint);
+}
+
+/* Cinema */
+
+.dr-films {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 1.2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.dr-film-card {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 14px;
+  align-items: center;
+}
+
+.dr-film-card img {
+  width: 70px;
+  height: 105px;
+  border-radius: 2px;
+  object-fit: cover;
+}
+
+.dr-film-card__title {
+  margin: 0;
+  font-family: var(--font-display), serif;
+  font-weight: 400;
+  font-size: 1.3rem;
+  line-height: 1.1;
+}
+
+.dr-film-card__title a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.dr-film-card__title a:hover {
+  text-decoration: underline;
+}
+
+.dr-film-card__year,
+.dr-film-card__meta {
+  font-size: var(--text-sm);
+  color: var(--on-dark-faint);
+}
+
+.dr-film-card__meta {
+  margin: 0.3rem 0 0;
+}
+
+.dr-stars {
+  color: #f2b56b;
+  letter-spacing: 0.05em;
+}
+
+/* Scrivania (GitHub) */
+
+.dr-heat {
+  margin: 0 0 1rem;
+}
+
+.dr-heat__grid {
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+  gap: 3px;
+}
+
+.dr-heat__grid span {
+  aspect-ratio: 1;
+  border-radius: 2px;
+}
+
+.dr-heat figcaption {
+  margin-top: 0.6rem;
+  font-family: var(--font-mono), monospace;
+  font-size: var(--text-xs);
+  color: var(--on-dark-muted);
+}
+
+.dr-repos {
+  display: grid;
+  gap: 14px;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+}
+
+.dr-repos__name {
+  font-family: var(--font-mono), monospace;
+  font-size: var(--text-sm);
+  color: #7ee787;
+  text-decoration: none;
+}
+
+.dr-repos__name:hover {
+  text-decoration: underline;
+}
+
+.dr-repos__meta {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: var(--text-xs);
+  color: var(--on-dark-faint);
+}
+
+.dr-repos__desc {
+  margin: 0.3rem 0 0;
+  font-size: var(--text-sm);
+  color: var(--on-dark-muted);
+}
+
+.dr-repos__commit {
+  display: block;
+  margin-top: 0.3rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.72rem;
+  color: var(--on-dark-muted);
+  text-decoration: none;
+}
+
+.dr-repos__commit:hover {
+  color: var(--on-dark);
+}
+
+/* Gioco (Steam) */
+
+.dr-now {
+  margin: 0 0 1rem;
+  font-family: var(--font-mono), monospace;
+  font-size: var(--text-xs);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #7ee787;
+}
+
+.dr-games {
+  display: grid;
+  gap: 12px;
+  margin: 0 0 1.2rem;
+  padding: 0;
+  list-style: none;
+}
+
+.dr-games a {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  grid-template-rows: auto auto;
+  column-gap: 14px;
+  align-items: center;
+  color: inherit;
+  text-decoration: none;
+}
+
+.dr-games img {
+  grid-row: span 2;
+  width: 120px;
+  height: auto;
+  border-radius: 3px;
+}
+
+.dr-games__name {
+  align-self: end;
+  font-weight: 600;
+}
+
+.dr-games__hours {
+  align-self: start;
+  font-size: var(--text-xs);
+  color: var(--on-dark-faint);
+}
+
+@media (max-width: 520px) {
+  .dr-albums {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dr-track {
+    grid-template-columns: 84px 1fr;
+  }
+
+  .dr-track__cover {
+    width: 84px;
+    height: 84px;
+  }
+}
