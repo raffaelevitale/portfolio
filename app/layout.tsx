@@ -1,14 +1,10 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Instrument_Serif, DM_Sans, DM_Mono } from "next/font/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
-import ConditionalNavigation from "./components/ConditionalNavigation";
-import ConditionalPadding from "./components/ConditionalPadding";
-import ScrollProgress from "./components/ScrollProgress";
-import ClientEnhancements from "./components/ClientEnhancements";
 
-const fallbackSiteUrl = "https://raffaelevitale.com";
+const fallbackSiteUrl = "https://raffaelevitale.it";
 const siteUrl = (() => {
   const envUrl = process.env.NEXT_PUBLIC_SITE_URL;
   if (envUrl && /^https?:\/\//.test(envUrl)) {
@@ -39,23 +35,28 @@ const dmMono = DM_Mono({
   display: "swap",
 });
 
+const title = "Raffaele Vitale — Sviluppatore Web · Web, AI e automazione";
+const description =
+  "Entra nella camera oscura di Raffaele Vitale, sviluppatore web: Orario Vallauri (1.500 utenti al giorno), Crybu Control Center, AI e automazione per le aziende, fotografia.";
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Raffaele Vitale — Brand & Design Director · Fotografo",
+    default: title,
     template: "%s · Raffaele Vitale",
   },
-  description:
-    "Il portfolio di Raffaele Vitale: direzione creativa, brand identity, UI design, fotografia e visual communication.",
+  description,
   keywords: [
     "Raffaele Vitale",
-    "brand design director",
-    "art direction",
-    "brand identity",
-    "UI design",
+    "sviluppatore web",
+    "Next.js",
+    "React",
+    "AI e automazione",
+    "sales engineer",
+    "Orario Vallauri",
+    "Savigliano",
+    "Cuneo",
     "fotografo",
-    "visual communication",
-    "design portfolio",
   ],
   authors: [{ name: "Raffaele Vitale", url: "https://www.linkedin.com/in/vitaleraffaele/" }],
   creator: "Raffaele Vitale",
@@ -63,9 +64,8 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "Raffaele Vitale — Brand & Design Director · Fotografo",
-    description:
-      "Direzione creativa, brand identity, UI design e fotografia, a cura di Raffaele Vitale.",
+    title,
+    description,
     url: siteUrl,
     siteName: "Raffaele Vitale Portfolio",
     locale: "it_IT",
@@ -73,9 +73,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Raffaele Vitale — Brand & Design Director · Fotografo",
-    description:
-      "Direzione creativa, brand identity, UI design e fotografia per startup e prodotti digitali.",
+    title,
+    description,
   },
   robots: {
     index: true,
@@ -84,28 +83,19 @@ export const metadata: Metadata = {
   category: "portfolio",
 };
 
+export const viewport: Viewport = {
+  themeColor: "#0b0807",
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="it" suppressHydrationWarning>
-      <body
-        data-cursor="disabled"
-        className={`${instrumentSerif.variable} ${dmSans.variable} ${dmMono.variable} antialiased`}
-      >
-        {/* Client-only enhancements (dynamic with ssr:false) */}
-        <ClientEnhancements />
-        {/* Subtle ambient background */}
-        <div className="fixed inset-0 -z-10 pointer-events-none">
-          <div className="aurora" aria-hidden="true"></div>
-        </div>
-        <ScrollProgress />
-        <ConditionalNavigation />
-        <ConditionalPadding>
-          {children}
-        </ConditionalPadding>
+    <html lang="it">
+      <body className={`${instrumentSerif.variable} ${dmSans.variable} ${dmMono.variable} antialiased`}>
+        {children}
         <Analytics />
         <SpeedInsights />
       </body>
