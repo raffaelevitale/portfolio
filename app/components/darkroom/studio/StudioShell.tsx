@@ -4,6 +4,7 @@ import { Vector2 } from "three";
 import { ROOM } from "../objects/Room";
 import { drawPlaster, useCanvasTexture } from "../textures";
 import { drawParquet, drawRug } from "./studio-textures";
+import { useDimmedEmissive } from "./useSafelightMix";
 
 const DEPTH = ROOM.frontZ - ROOM.backZ;
 const WIDTH = ROOM.maxX - ROOM.minX;
@@ -19,6 +20,8 @@ export default function StudioShell() {
   const plaster = useCanvasTexture(512, 512, drawPlaster, [3, 1.5]);
   const parquet = useCanvasTexture(512, 512, drawParquet, [WIDTH / 1.6, DEPTH / 1.6]);
   const rug = useCanvasTexture(512, 512, drawRug);
+  // La sospensione si spegne quando si accende la luce rossa.
+  const bulb = useDimmedEmissive({ color: "#f4daba", emissive: "#ffd8ae", base: 0.78, keep: 0.02 });
 
   return (
     <group>
@@ -78,9 +81,8 @@ export default function StudioShell() {
           <torusGeometry args={[0.195, 0.0036, 8, 36]} />
           <meshStandardMaterial color="#887361" metalness={0.57} roughness={0.39} />
         </mesh>
-        <mesh position={[0, -0.617, 0]} rotation={[Math.PI / 2, 0, 0]}>
+        <mesh position={[0, -0.617, 0]} rotation={[Math.PI / 2, 0, 0]} material={bulb}>
           <circleGeometry args={[0.19, 36]} />
-          <meshStandardMaterial color="#f4daba" emissive="#ffd8ae" emissiveIntensity={0.78} />
         </mesh>
       </group>
     </group>

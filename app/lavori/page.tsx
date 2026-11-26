@@ -13,16 +13,18 @@ import {
   SKILLS,
   SOCIALS,
 } from "@/lib/content";
-import { BOOKS, CARS, visible, WATCHES } from "@/lib/studio-content";
-import { StudioImage } from "@/app/components/StudioImage";
-import { PhotoCredit } from "@/app/components/StudioCredit";
+import { NOW } from "@/lib/now";
+import { PHOTOS } from "@/lib/photos";
+import { BOOKS, visible } from "@/lib/studio-content";
 import LiveStrip from "./LiveStrip";
+import ReadingShelf from "./ReadingShelf";
 import "./lavori.css";
+import "./lavori-studio.css";
 
 export const metadata: Metadata = {
   title: "Provini",
   description:
-    "La versione stampata della camera oscura di Raffaele Vitale, sviluppatore web: progetti, servizi, percorso e contatti, senza 3D.",
+    "La versione stampata dello studio di Raffaele Vitale, sviluppatore web: progetti, servizi, percorso e contatti, senza 3D.",
   alternates: { canonical: "/lavori" },
 };
 
@@ -45,14 +47,12 @@ function SectionHead({ num, title, id }: SectionHeadProps) {
 
 export default function Provini() {
   const books = visible(BOOKS);
-  const watches = visible(WATCHES);
-  const cars = visible(CARS);
 
   return (
     <div className="pv">
       <header className="pv-top">
         <Link href="/" className="pv-top__back">
-          ← Torna in camera oscura
+          ← Torna nello studio
         </Link>
         <span className="pv-top__roll">Provini · Roll 2026</span>
       </header>
@@ -82,11 +82,24 @@ export default function Provini() {
                   <p className="pv-work__role">{p.role}</p>
                   {p.metric && <p className="pv-work__metric">{p.metric}</p>}
                   <p className="pv-work__summary">{p.summary}</p>
+                  {p.problem && (
+                    <>
+                      <h4 className="pv-case__label">Il problema</h4>
+                      <p className="pv-case__text">{p.problem}</p>
+                    </>
+                  )}
+                  {(p.problem || p.outcome) && <h4 className="pv-case__label">Cosa ho fatto</h4>}
                   <ul className="pv-work__points">
                     {p.highlights.map((h) => (
                       <li key={h}>{h}</li>
                     ))}
                   </ul>
+                  {p.outcome && (
+                    <>
+                      <h4 className="pv-case__label">Il risultato</h4>
+                      <p className="pv-case__text">{p.outcome}</p>
+                    </>
+                  )}
                   <ul className="pv-tags" aria-label="Competenze">
                     {p.tags.map((t) => (
                       <li key={t}>{t}</li>
@@ -216,57 +229,42 @@ export default function Provini() {
         <section className="pv-section" aria-labelledby="pv-fuori">
           <SectionHead num="06" title="Fuori orario" id="pv-fuori" />
           <p className="pv-fuori__lead">
-            Lo studio, in versione stampata: libri e idee che mi interessano, orologi e auto che ammiro, e cosa sto facendo in
-            questo momento.
+            Lo studio, in versione stampata: cosa sto facendo adesso, i libri che mi interessano e le mie fotografie.
           </p>
           <LiveStrip />
-          <div className="pv-fuori">
-            <div>
-              <h3 className="pv-fuori__title">Libreria</h3>
-              <ol className="pv-books">
-                {books.map((b) => (
-                  <li key={b.title} className="pv-book">
-                    <StudioImage src={b.cover} alt={`Copertina di ${b.title}`} width={40} height={60} className="pv-book__cover" fallback={<span className="pv-book__spine" style={{ background: b.color }} aria-hidden="true" />} />
-                    <div>
-                      <span className="pv-book__title">{b.title}</span>
-                      <span className="pv-book__author">
-                        {b.author} · {b.tag}
-                      </span>
-                      {b.comment && <p className="pv-book__comment">{b.comment}</p>}
-                    </div>
+          <h3 className="pv-fuori__title">Adesso</h3>
+          <dl className="pv-now">
+            {NOW.items.map((item) => (
+              <div key={item.label}>
+                <dt>{item.label}</dt>
+                <dd>{item.text}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="pv-now__stamp">Aggiornato a {NOW.updated.toLowerCase()}</p>
+          <h3 className="pv-fuori__title">Libreria</h3>
+          <ReadingShelf books={books} />
+          {PHOTOS.length > 0 && (
+            <>
+              <h3 className="pv-fuori__title">Fotografie</h3>
+              <ul className="pv-photos">
+                {PHOTOS.map((photo) => (
+                  <li key={photo.src}>
+                    <figure>
+                      <Image
+                        src={photo.src} alt={photo.title} sizes="(max-width: 760px) 50vw, 300px"
+                        width={photo.orientation === "portrait" ? 400 : 600} height={photo.orientation === "portrait" ? 600 : 400}
+                      />
+                      <figcaption>
+                        {photo.title}
+                        {photo.place && <span> · {photo.place}</span>}
+                      </figcaption>
+                    </figure>
                   </li>
                 ))}
-              </ol>
-            </div>
-            <div className="pv-fuori__side">
-              {[
-                { title: "Orologi", items: watches },
-                { title: "Auto", items: cars },
-              ]
-                .filter((group) => group.items.length > 0)
-                .map((group) => (
-                  <div key={group.title}>
-                    <h3 className="pv-fuori__title">{group.title}</h3>
-                    <ul className="pv-objects">
-                      {group.items.map((item) => (
-                        <li key={item.name}>
-                          <StudioImage
-                            src={item.photo} alt={item.name} width={96} height={68} className="pv-objects__photo"
-                            fallback={<span className="pv-objects__swatch" style={{ background: item.color }} aria-hidden="true" />}
-                            caption={<PhotoCredit item={item} />}
-                          />
-                          <div>
-                            <span className="pv-objects__name">{item.name}</span>
-                            <span className="pv-objects__detail">{item.detail}</span>
-                            {item.comment && <p className="pv-book__comment">{item.comment}</p>}
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-            </div>
-          </div>
+              </ul>
+            </>
+          )}
         </section>
 
         <section className="pv-section pv-contact" aria-labelledby="pv-contatti">

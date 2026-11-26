@@ -2,11 +2,12 @@
 
 import { X } from "lucide-react";
 import { useEffect, useRef } from "react";
-import { type HotspotId, getHotspot, hotspotsIn } from "@/lib/darkroom/hotspots";
+import { type HotspotId, getHotspot, HOTSPOTS } from "@/lib/darkroom/hotspots";
 import { useDarkroom } from "@/lib/darkroom/store";
 import { CinemaPanel, DeskPanel, GamingPanel, MusicPanel } from "./panels/LivePanels";
 import { AboutPanel, ContactPanel, CvPanel } from "./panels/PersonPanels";
-import { LibraryPanel, ShowcasePanel } from "./panels/StudioPanels";
+import { LibraryPanel } from "./panels/StudioPanels";
+import { NowPanel, PhotoPanel } from "./panels/WallPanels";
 import { ProcessPanel, ServicesPanel, WorkPanel } from "./panels/WorkPanels";
 import { playAdvance } from "./sound";
 
@@ -14,10 +15,15 @@ function PanelBody({ id, compact }: { id: HotspotId; compact: boolean }) {
   switch (id) {
     case "lavori":
       return <WorkPanel />;
-    case "processo":
-      return <ProcessPanel />;
     case "servizi":
-      return <ServicesPanel />;
+      // Sul tavolo luminoso ci sono sia i servizi sia il metodo: i quattro bagni del processo.
+      return (
+        <>
+          <ServicesPanel />
+          <h3 className="dr-panel__subtitle">Come lavoro</h3>
+          <ProcessPanel />
+        </>
+      );
     case "chi-sono":
       return <AboutPanel />;
     case "cv":
@@ -30,22 +36,20 @@ function PanelBody({ id, compact }: { id: HotspotId; compact: boolean }) {
       return <MusicPanel />;
     case "cinema":
       return <CinemaPanel />;
+    case "fotografie":
+      return <PhotoPanel />;
+    case "adesso":
+      return <NowPanel />;
     case "scrivania":
       return <DeskPanel />;
-    case "vetrina":
-      return <ShowcasePanel />;
     case "gioco":
       return <GamingPanel />;
-    case "porta-studio":
-    case "porta-camera":
-      return null;
   }
 }
 
 /** Il foglio che scorre sopra la stanza quando un oggetto è a fuoco. */
 export default function Panel({ compact }: { compact: boolean }) {
   const focus = useDarkroom((s) => s.focus);
-  const room = useDarkroom((s) => s.room);
   const soundOn = useDarkroom((s) => s.soundOn);
   const setFocus = useDarkroom((s) => s.setFocus);
   const mobileBook = useDarkroom((s) => compact ? s.selectedBook : null);
@@ -62,11 +66,10 @@ export default function Panel({ compact }: { compact: boolean }) {
     if (compact && mobileBook !== null) body.current?.scrollTo({ top: 0 });
   }, [compact, mobileBook]);
 
-  // Le porte non hanno un pannello: portano nell'altra stanza.
-  if (!focus || getHotspot(focus).leadsTo) return null;
+  if (!focus) return null;
 
   const meta = getHotspot(focus);
-  const frames = hotspotsIn(room);
+  const frames = HOTSPOTS;
   const index = frames.findIndex((h) => h.id === focus);
   const prev = frames[(index - 1 + frames.length) % frames.length];
   const next = frames[(index + 1) % frames.length];

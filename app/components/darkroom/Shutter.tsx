@@ -112,7 +112,7 @@ export default function Shutter({ webgl, compact, onEnter }: ShutterProps) {
 
       <header className="dr-shutter__top">
         <span>{PERSON.name.toUpperCase()}</span>
-        <span>ROLL 2026 · CAMERA OSCURA</span>
+        <span>ROLL 2026 · LO STUDIO</span>
       </header>
 
       <div className="dr-shutter__poster dr-shutter__poster--left" aria-hidden="true">

@@ -1,6 +1,6 @@
 # Modelli della vetrina
 
-I modelli sono facoltativi: senza file (o se il caricamento fallisce) la vetrina usa gli oggetti procedurali.
+I modelli sono facoltativi e valgono solo per gli orologi nel portaorologi: senza file (o se il caricamento fallisce) si usa l'orologio procedurale. Le auto sono stampe fotografiche appese al muro e usano il campo `photo`.
 
 1. Cerca su [Sketchfab](https://sketchfab.com/) o [Poly Pizza](https://poly.pizza/) il modello esatto. Verifica che sia scaricabile e che la licenza consenta il riutilizzo sul portfolio (CC0, CC BY o CC BY-SA). Non usare asset con licenza editoriale, NC, ND o sconosciuta.
 2. Scarica/esporta in formato GLB con texture incorporate; riduci ogni texture a un massimo di 512 × 512 px. Verifica anche eventuali marchi e diritti di terzi.

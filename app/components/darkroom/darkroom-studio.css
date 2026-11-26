@@ -1,59 +1,41 @@
 /* ═══════════════════════════════════════════════════
-   STUDIO — porta girevole, seconda stanza e pannelli live
+   STUDIO — accenti, interruttore della luce rossa e pannelli live
    ═══════════════════════════════════════════════════ */
 
-/* Dissolvenza al nero tra le stanze (durate allineate a DOOR_FADE_MS in store.ts) */
+/* Nello studio la luce è calda: l'accento è ambra.
+   Con la luce di sicurezza accesa torna il rosso della camera oscura. */
 
-.dr-fade {
-  position: fixed;
-  inset: 0;
-  z-index: 35;
-  background: #000;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 450ms var(--ease-shutter);
-}
-
-.dr-fade.is-on {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-.dr-hud.is-switching {
-  pointer-events: none;
-}
-
-/* Nello studio la luce è calda: l'accento passa dal rosso all'ambra */
-
-.dr-root[data-room="studio"] .dr-hud__room,
-.dr-root[data-room="studio"] .dr-eyebrow {
+.dr-root .dr-hud__room,
+.dr-root .dr-eyebrow,
+.dr-root .dr-hint__frame {
   color: #f2b56b;
+  transition: color var(--duration-normal) ease;
 }
 
-.dr-root[data-room="studio"] .dr-hint__frame {
-  color: #f2b56b;
+.dr-root[data-safelight] .dr-hud__room,
+.dr-root[data-safelight] .dr-eyebrow,
+.dr-root[data-safelight] .dr-hint__frame {
+  color: var(--safe-text);
 }
 
-/* Porta: puntino e fotogramma dedicati */
+/* Interruttore "Luce rossa": una lampadina che si accende */
 
-.dr-hint--door .dr-hint__dot {
-  background: #f2b56b;
-  box-shadow: 0 0 0 4px rgb(242 181 107 / 0.18), 0 0 18px rgb(242 181 107 / 0.6);
+.dr-safelight-toggle__bulb {
+  width: 9px;
+  height: 9px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  transition: background-color var(--duration-normal) ease, box-shadow var(--duration-normal) ease, border-color var(--duration-normal) ease;
 }
 
-.dr-film__frame--door {
-  border-style: dashed;
-  border-color: rgb(242 181 107 / 0.45);
-  background: transparent;
+.dr-safelight-toggle[aria-pressed="true"] {
+  color: var(--safe-text);
 }
 
-.dr-film__frame--door .dr-film__num {
-  color: #f2b56b;
-}
-
-.dr-film__frame--door:disabled {
-  opacity: 0.5;
-  cursor: progress;
+.dr-safelight-toggle[aria-pressed="true"] .dr-safelight-toggle__bulb {
+  border-color: var(--safe-text);
+  background: var(--safe);
+  box-shadow: 0 0 10px 2px rgb(255 42 16 / 0.65);
 }
 
 /* Bozze e stato dei servizi */
@@ -91,37 +73,13 @@
 
 /* Libreria */
 
-.dr-shelfnav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
+/* Lo scaffale in miniatura (app/components/bookshelf) sta sopra la scheda del libro. */
+.dr-panel__body .bs {
   margin: 0 0 1.2rem;
-  padding: 0;
-  list-style: none;
 }
 
-.dr-shelfnav button {
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--line-dark);
-  border-radius: 50%;
-  background: none;
-  font-family: var(--font-mono), monospace;
-  font-size: var(--text-xs);
-  color: var(--on-dark-muted);
-  cursor: pointer;
-  transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
-}
-
-.dr-shelfnav button:hover {
-  color: var(--on-dark);
-  border-color: var(--on-dark-muted);
-}
-
-.dr-shelfnav button.is-active {
-  background: var(--paper);
-  border-color: var(--paper);
-  color: var(--ink);
+.dr-shelf-hint {
+  color: var(--on-dark-faint);
 }
 
 .dr-book {
@@ -170,41 +128,6 @@
 .dr-book .dr-draft {
   border-color: var(--safe-deep);
   color: var(--safe-deep);
-}
-
-.dr-booklist {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.dr-booklist button {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  width: 100%;
-  padding: 0.6rem 0;
-  border: 0;
-  border-bottom: 1px solid var(--line-dark);
-  background: none;
-  color: var(--on-dark);
-  text-align: left;
-  cursor: pointer;
-}
-
-.dr-booklist button:hover .dr-booklist__title {
-  color: #f2b56b;
-}
-
-.dr-booklist__title {
-  font-family: var(--font-display), serif;
-  font-size: 1.15rem;
-  transition: color var(--duration-fast) ease;
-}
-
-.dr-booklist__author {
-  font-size: var(--text-sm);
-  color: var(--on-dark-faint);
 }
 
 /* Vetrina */
@@ -541,4 +464,121 @@
     width: 84px;
     height: 84px;
   }
+}
+
+/* Fotografie */
+
+.dr-photo {
+  margin: 0 0 1rem;
+}
+
+.dr-photo__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 6px solid #efe9dc;
+  border-radius: 2px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.45);
+}
+
+.dr-photo--portrait .dr-photo__image {
+  width: min(100%, 320px);
+}
+
+.dr-photo figcaption {
+  display: grid;
+  gap: 0.2rem;
+  margin-top: 0.8rem;
+}
+
+.dr-photo__title {
+  font-family: var(--font-display), serif;
+  font-size: 1.35rem;
+  line-height: 1.1;
+}
+
+.dr-photo__meta {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--on-dark-muted);
+}
+
+.dr-photo__caption {
+  margin: 0.3rem 0 0;
+  font-size: var(--text-sm);
+  color: var(--on-dark-muted);
+}
+
+.dr-photo-strip {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 1.2rem;
+  padding: 0 0 4px;
+  overflow-x: auto;
+  list-style: none;
+}
+
+.dr-photo-strip button {
+  display: block;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 2px;
+  background: none;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: opacity var(--duration-fast, 150ms) ease, border-color var(--duration-fast, 150ms) ease;
+}
+
+.dr-photo-strip button:hover,
+.dr-photo-strip button:focus-visible {
+  opacity: 0.9;
+}
+
+.dr-photo-strip button[aria-pressed="true"] {
+  border-color: var(--safe);
+  opacity: 1;
+}
+
+.dr-photo-strip img {
+  display: block;
+  width: 84px;
+  height: 56px;
+  object-fit: cover;
+}
+
+/* Adesso */
+
+.dr-now-list {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0 0 1.2rem;
+  padding: 1.1rem 1.2rem;
+  border-radius: 6px;
+  background: #1d2723;
+  box-shadow: inset 0 0 0 6px #4b3424, inset 0 0 40px rgb(0 0 0 / 0.4);
+}
+
+.dr-now-list dt {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgb(236 235 228 / 0.65);
+}
+
+.dr-now-list dd {
+  margin: 0.15rem 0 0;
+  font-family: var(--font-display), serif;
+  font-size: 1.3rem;
+  font-style: italic;
+  line-height: 1.2;
+  color: #ecebe4;
+}
+
+.dr-now-list__stamp {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--on-dark-muted);
 }

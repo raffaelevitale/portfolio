@@ -9,7 +9,7 @@ import Hud from "./Hud";
 import Panel from "./Panel";
 import SceneBoundary from "./SceneBoundary";
 import Shutter from "./Shutter";
-import { playDoor, playShutter, startAmbience } from "./sound";
+import { playShutter, startAmbience } from "./sound";
 import { useCompactLayout, useTouchInput } from "./useViewportMode";
 
 const Scene = dynamic(() => import("./Scene"), { ssr: false });
@@ -27,7 +27,7 @@ function hasWebGL(): boolean {
   }
 }
 
-/** Shell della camera oscura: monta la scena 3D e tutta l'interfaccia HTML sopra di essa. */
+/** Shell dello studio: monta la scena 3D e tutta l'interfaccia HTML sopra di essa. */
 export default function Darkroom() {
   const [webgl, setWebgl] = useState<boolean | null>(null);
   const compact = useCompactLayout();
@@ -35,8 +35,7 @@ export default function Darkroom() {
   const onUnavailable = useCallback(() => setWebgl(false), []);
   const phase = useDarkroom((s) => s.phase);
   const soundOn = useDarkroom((s) => s.soundOn);
-  const room = useDarkroom((s) => s.room);
-  const switching = useDarkroom((s) => s.switching);
+  const safelight = useDarkroom((s) => s.safelight);
 
   useEffect(() => {
     setWebgl(hasWebGL());
@@ -54,24 +53,17 @@ export default function Darkroom() {
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  // La guida di ogni stanza si apre da sola solo alla prima visita della sessione.
+  // La guida si apre da sola solo alla prima visita della sessione.
   useEffect(() => {
     if (phase !== "room" || compact || !webgl) return;
-    const key = `${GUIDE_KEY}-${room}`;
     try {
-      if (sessionStorage.getItem(key)) return;
-      sessionStorage.setItem(key, "1");
+      if (sessionStorage.getItem(GUIDE_KEY)) return;
+      sessionStorage.setItem(GUIDE_KEY, "1");
     } catch {
       // sessionStorage può essere bloccato (modalità privata): mostriamo comunque la guida.
     }
-    const t = setTimeout(() => useDarkroom.getState().setGuideOpen(true), room === "darkroom" ? 0 : 900);
-    return () => clearTimeout(t);
-  }, [phase, room, compact, webgl]);
-
-  // Il fruscio della porta girevole, quando lo schermo va al nero.
-  useEffect(() => {
-    if (switching && useDarkroom.getState().soundOn) playDoor();
-  }, [switching]);
+    useDarkroom.getState().setGuideOpen(true);
+  }, [phase, compact, webgl]);
 
   useEffect(() => {
     if (!soundOn || phase === "intro" || !webgl) return;
@@ -84,11 +76,10 @@ export default function Darkroom() {
   };
 
   return (
-    <main className="dr-root" data-phase={phase} data-room={room} data-compact={compact || undefined} data-touch={touch || undefined}>
+    <main className="dr-root" data-phase={phase} data-safelight={safelight || undefined} data-compact={compact || undefined} data-touch={touch || undefined}>
       {webgl && <SceneBoundary onUnavailable={onUnavailable}><Scene compact={compact} touch={touch} onUnavailable={onUnavailable} /></SceneBoundary>}
-      <div className={`dr-fade${switching ? " is-on" : ""}`} aria-hidden="true" />
       <p className="dr-sr" aria-live="polite">
-        {phase === "room" ? (room === "darkroom" ? "Sei nella camera oscura." : "Sei nello studio.") : ""}
+        {phase === "room" ? (safelight ? "Luce di sicurezza accesa: lo studio è diventato una camera oscura." : "Sei nello studio.") : ""}
       </p>
       {phase === "intro" || webgl ? <Shutter webgl={webgl} compact={compact} onEnter={handleEnter} /> : (
         <section className="dr-scene-unavailable">

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useDarkroom } from "@/lib/darkroom/store";
 import { type ClockTime, formatClock, romeTime } from "@/lib/rome-time";
 import { BOOKS, CARS, type ShowcaseItem, visible, WATCHES } from "@/lib/studio-content";
+import Bookshelf from "@/app/components/bookshelf/Bookshelf";
 import { StudioImage } from "@/app/components/StudioImage";
 import { PhotoCredit } from "@/app/components/StudioCredit";
 
@@ -13,7 +14,7 @@ function DraftBadge() {
   return <span className="dr-draft">Bozza · visibile solo in sviluppo</span>;
 }
 
-/** Come la libreria di riferimento: numeri in fila, il libro scelto esce dallo scaffale. */
+/** Lo scaffale in miniatura: si sceglie una costa e lo stesso libro esce dallo scaffale 3D. */
 export function LibraryPanel({ compact }: { compact: boolean }) {
   const books = visible(BOOKS);
   const selected = useDarkroom((s) => s.selectedBook);
@@ -27,26 +28,14 @@ export function LibraryPanel({ compact }: { compact: boolean }) {
   return (
     <>
       {!compact && <p className="dr-panel__lead">Libri e idee che mi interessano: business, design, codice, psicologia, auto e orologi. Scegline uno: esce dallo scaffale.</p>}
-      {!compact && <ol className="dr-shelfnav" aria-label="Libri">
-        {books.map((b, i) => (
-          <li key={b.title}>
-            <button
-              type="button"
-              className={selected === i ? "is-active" : undefined}
-              aria-pressed={selected === i}
-              aria-label={`${i + 1}. ${b.title}`}
-              onClick={() => selectBook(selected === i ? null : i)}
-            >
-              {i + 1}
-            </button>
-          </li>
-        ))}
-      </ol>}
+      {!compact && (
+        <Bookshelf books={books} selected={selected} onSelect={selectBook} tone="dark" scale={0.62} label="Libri sullo scaffale" />
+      )}
       {book ? (
         <>
           {compact && selected !== null && (
             <nav className="dr-book-actions" aria-label="Cambia libro">
-              <button type="button" onClick={() => selectBook(null)}>Elenco libri</button>
+              <button type="button" onClick={() => selectBook(null)}>Scaffale</button>
               <button type="button" aria-label="Libro precedente" disabled={selected === 0} onClick={() => selectBook(selected - 1)}>←</button>
               <button type="button" aria-label="Libro successivo" disabled={selected === books.length - 1} onClick={() => selectBook(selected + 1)}>→</button>
             </nav>
@@ -63,16 +52,12 @@ export function LibraryPanel({ compact }: { compact: boolean }) {
           </article>
         </>
       ) : (
-        <ul className="dr-booklist" aria-label="Libri">
-          {books.map((b, i) => (
-            <li key={b.title}>
-              <button type="button" onClick={() => selectBook(i)}>
-                <span className="dr-booklist__title">{b.title}</span>
-                <span className="dr-booklist__author">{b.author}</span>
-              </button>
-            </li>
-          ))}
-        </ul>
+        // Su desktop lo scaffale è già sopra; su mobile è lui il modo di scegliere un libro.
+        compact ? (
+          <Bookshelf books={books} selected={selected} onSelect={selectBook} tone="dark" scale={0.66} label="Libri sullo scaffale" />
+        ) : (
+          <p className="dr-panel__text dr-shelf-hint">Tocca una costa o una copertina per tirare fuori il libro.</p>
+        )
       )}
     </>
   );

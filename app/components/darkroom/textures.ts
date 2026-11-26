@@ -123,20 +123,6 @@ export const text = { setFont };
 
 /* ───────────────────────── superfici della stanza ───────────────────────── */
 
-export const drawFloor: Draw = (ctx, w, h) => {
-  const half = w / 2;
-  ctx.fillStyle = "#1c0d0b";
-  ctx.fillRect(0, 0, w, h);
-  ctx.fillStyle = "#0c0908";
-  ctx.fillRect(0, 0, half, half);
-  ctx.fillRect(half, half, half, half);
-  ctx.strokeStyle = "rgba(0,0,0,0.55)";
-  ctx.lineWidth = 3;
-  ctx.strokeRect(0, 0, half, half);
-  ctx.strokeRect(half, half, half, half);
-  grain(ctx, 0, 0, w, h, 14, 3);
-};
-
 export const drawPlaster: Draw = (ctx, w, h) => {
   ctx.fillStyle = "#3b3533";
   ctx.fillRect(0, 0, w, h);
@@ -197,52 +183,6 @@ export const drawEnvelope: Draw = (ctx, w, h) => {
   ctx.fillText("UNA COPIA", 0, 30);
   ctx.restore();
   grain(ctx, 0, 0, w, h, 16, 29);
-};
-
-export const drawTimerFace: Draw = (ctx, w, h) => {
-  const f = fonts();
-  const cx = w / 2;
-  const cy = h / 2;
-  ctx.fillStyle = "#0b0b0a";
-  ctx.fillRect(0, 0, w, h);
-  ctx.strokeStyle = "#a6f28f";
-  ctx.fillStyle = "#a6f28f";
-  for (let i = 0; i < 60; i++) {
-    const a = (i / 60) * Math.PI * 2 - Math.PI / 2;
-    const long = i % 5 === 0;
-    const r1 = w * (long ? 0.36 : 0.4);
-    const r2 = w * 0.44;
-    ctx.lineWidth = long ? 6 : 2;
-    ctx.beginPath();
-    ctx.moveTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
-    ctx.lineTo(cx + Math.cos(a) * r2, cy + Math.sin(a) * r2);
-    ctx.stroke();
-    if (long) {
-      setFont(ctx, 400, 34, f.mono);
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      const r3 = w * 0.29;
-      ctx.fillText(String(i), cx + Math.cos(a) * r3, cy + Math.sin(a) * r3);
-    }
-  }
-  setFont(ctx, 400, 20, f.mono, 4);
-  ctx.fillText("SECONDI", cx, cy + w * 0.13);
-};
-
-export const drawPaperBox: Draw = (ctx, w, h) => {
-  const f = fonts();
-  ctx.fillStyle = "#151312";
-  ctx.fillRect(0, 0, w, h);
-  ctx.fillStyle = "#c8281e";
-  ctx.fillRect(0, h * 0.62, w, h * 0.12);
-  ctx.fillStyle = "#e9e2d3";
-  setFont(ctx, 400, 34, f.mono, 5);
-  ctx.fillText("CARTA FOTOGRAFICA", 30, 70);
-  setFont(ctx, 400, 24, f.mono, 3);
-  ctx.fillText("BARITATA · 24×30 · 100 FOGLI", 30, 112);
-  ctx.fillStyle = "#151312";
-  setFont(ctx, 700, 24, f.body, 4);
-  ctx.fillText("APRIRE SOLO CON LUCE DI SICUREZZA", 30, h * 0.705);
 };
 
 export function drawCaption(line: string, sub: string): Draw {

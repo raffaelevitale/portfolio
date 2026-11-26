@@ -26,12 +26,10 @@ export default function Hotspot({ id, children, dotOffset = [0, 0.2, 0] }: Hotsp
   const isHovered = useDarkroom((s) => s.hovered === id);
   const setHovered = useDarkroom((s) => s.setHovered);
   const setFocus = useDarkroom((s) => s.setFocus);
-  const goToRoom = useDarkroom((s) => s.goToRoom);
   const touch = useThree((state) => state.frameloop === "demand");
 
-  const switching = useDarkroom((s) => s.switching);
   const guideOpen = useDarkroom((s) => s.guideOpen);
-  const interactive = phase === "room" && !switching && !guideOpen;
+  const interactive = phase === "room" && !guideOpen;
   const showHint = interactive && focus === null;
 
   const onOver = (e: ThreeEvent<PointerEvent>) => {
@@ -43,10 +41,8 @@ export default function Hotspot({ id, children, dotOffset = [0, 0.2, 0] }: Hotsp
     e.stopPropagation();
     if (useDarkroom.getState().hovered === id) setHovered(null);
   };
-  // Le porte cambiano stanza; tutti gli altri oggetti aprono il loro pannello.
   const activate = () => {
-    if (meta.leadsTo) goToRoom(meta.leadsTo, id);
-    else if (focus !== id) setFocus(id);
+    if (focus !== id) setFocus(id);
   };
 
   const onClick = (e: ThreeEvent<MouseEvent>) => {
@@ -70,7 +66,7 @@ export default function Hotspot({ id, children, dotOffset = [0, 0.2, 0] }: Hotsp
             type="button"
             tabIndex={-1}
             aria-hidden="true"
-            className={`dr-hint${isHovered ? " is-hovered" : ""}${meta.leadsTo ? " dr-hint--door" : ""}`}
+            className={`dr-hint${isHovered ? " is-hovered" : ""}`}
             onClick={activate}
             onPointerEnter={touch ? undefined : () => setHovered(id)}
             onPointerLeave={touch ? undefined : () => setHovered(null)}
@@ -85,4 +81,18 @@ export default function Hotspot({ id, children, dotOffset = [0, 0.2, 0] }: Hotsp
       )}
     </>
   );
+}
+
+/**
+ * Clic su un singolo oggetto dentro un hotspot (una stampa, una foto): apre l'hotspot
+ * e poi segnala quale oggetto è stato scelto, così il pannello si posiziona su di lui.
+ */
+export function useItemClick(id: HotspotId, onSelect: () => void): (e: ThreeEvent<MouseEvent>) => void {
+  return (e) => {
+    const { phase, guideOpen, focus, setFocus } = useDarkroom.getState();
+    if (phase !== "room" || guideOpen || e.delta > DRAG_THRESHOLD_PX) return;
+    e.stopPropagation();
+    if (focus !== id) setFocus(id);
+    onSelect();
+  };
 }

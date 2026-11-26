@@ -36,7 +36,12 @@ export type Project = {
   /** Il numero che conta, in evidenza. */
   metric?: string;
   summary: string;
+  /** Caso di studio: il problema di partenza. Se manca, il progetto mostra solo il riassunto. */
+  problem?: string;
+  /** "Cosa ho fatto": le scelte concrete. */
   highlights: readonly string[];
+  /** Caso di studio: com'è andata a finire, con un numero quando c'è. */
+  outcome?: string;
   url: string;
   urlLabel: string;
   tags: readonly string[];
@@ -58,6 +63,10 @@ export const PROJECTS: readonly Project[] = [
       "PWA offline con Service Worker, notifiche push, onboarding e import CSV",
       "Accesso Google limitato al dominio dell'istituto, dark mode e accessibilità",
     ],
+    problem:
+      "Studenti e docenti dell'istituto consultano l'orario ogni giorno, quasi sempre dal telefono: serviva qualcosa di rapido da aprire, da leggere e utilizzabile anche senza rete.",
+    outcome:
+      "Consegnato all'IIS Vallauri come progetto d'esame e usato ogni giorno: circa 1.500 utenti attivi al giorno, area amministrativa esclusa.",
     url: "https://orario.vallauri.edu",
     urlLabel: "orario.vallauri.edu",
     tags: ["PWA", "Node.js", "Fastify", "MySQL", "Service Worker", "PM2", "Sentry"],
@@ -76,6 +85,10 @@ export const PROJECTS: readonly Project[] = [
       "Onboarding guidato: Quickstart con avanzamento persistente e attivazione di un servizio in 3 step",
       "Ambiente demo usato nelle presentazioni commerciali",
     ],
+    problem:
+      "I clienti di Crybu.io dovevano poter attivare e seguire i moduli AI da soli, e il team commerciale aveva bisogno di un prodotto da mostrare dal vivo.",
+    outcome:
+      "Dal prototipo in Figma Make all'implementazione in Next.js: la piattaforma dei clienti, con l'attivazione di un servizio in 3 step e un ambiente demo usato nelle presentazioni commerciali.",
     url: "https://crybu.io",
     urlLabel: "crybu.io",
     tags: ["Next.js", "TypeScript", "Figma Make", "Design system", "Onboarding"],
@@ -99,6 +112,8 @@ export const PROJECTS: readonly Project[] = [
 
 /** Il fotogramma della stampa ancora "latente", subito dopo l'ultimo progetto. */
 export const NEXT_FRAME = `${String(PROJECTS.length + 1).padStart(2, "0")}A`;
+/** Slug della stampa latente sul filo: il "prossimo progetto". */
+export const LATENT_SLUG = "next";
 
 export type Service = { num: string; title: string; desc: string; tools: readonly string[] };
 
