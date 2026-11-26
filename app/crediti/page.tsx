@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ALBUMS, BOOKS, CARS, WATCHES, visible } from "@/lib/studio-content";
+import { ALBUMS, BOOKS, visible } from "@/lib/studio-content";
 import "../lavori/lavori.css";
 
 export const metadata: Metadata = { title: "Crediti", description: "Fonti e attribuzioni delle immagini e dei modelli dello studio.", alternates: { canonical: "/crediti" } };
@@ -16,21 +16,12 @@ interface Credit {
 }
 
 export default function Credits() {
-  const objects = [...visible(WATCHES), ...visible(CARS)];
   const entries: Credit[] = [
     ...visible(BOOKS).filter((book) => book.cover).map((book) => ({
       title: book.title, type: "Copertina", credit: book.coverCredit, license: "Diritti dei rispettivi titolari · licenza non dichiarata", source: book.coverSource,
     })),
     ...ALBUMS.filter((album) => album.cover).map((album) => ({
       title: album.title, type: "Copertina album", credit: `${album.artist} (artista) · Spotify (fonte)`, license: "Diritti dei rispettivi titolari · licenza non dichiarata", source: album.spotifyUrl,
-    })),
-    ...objects.filter((item) => item.photo).map((item) => ({
-      title: item.name, type: "Fotografia", credit: item.photoCredit, license: item.photoLicense,
-      licenseUrl: item.photoLicenseUrl, source: item.photoSource, changes: "Immagine ridimensionata",
-    })),
-    ...objects.filter((item) => item.model).map((item) => ({
-      title: item.name, type: "Modello 3D", credit: item.modelCredit, license: item.modelLicense,
-      licenseUrl: item.modelLicenseUrl, source: item.modelSource,
     })),
   ];
   return (

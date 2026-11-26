@@ -1,0 +1,82 @@
+/* Casi di studio, lavagnetta "Adesso" e fotografie nella versione stampata. */
+/* Casi di studio nei lavori */
+
+.pv-case__label {
+  margin: 1.1rem 0 0.3rem;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--paper-muted);
+}
+
+.pv-case__text {
+  margin: 0;
+  max-width: 62ch;
+}
+
+.pv-case__label + .pv-work__points {
+  margin-top: 0.3rem;
+}
+
+/* Adesso: la lavagnetta in versione stampata */
+
+.pv-now {
+  display: grid;
+  gap: 0.7rem;
+  margin: 0 0 0.4rem;
+  padding: 1.1rem 1.3rem;
+  border-radius: 4px;
+  background: #1d2723;
+  color: #ecebe4;
+}
+
+.pv-now dt {
+  font-family: var(--font-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.pv-now dd {
+  margin: 0.1rem 0 0;
+  font-family: var(--font-display), serif;
+  font-size: 1.25rem;
+  font-style: italic;
+}
+
+.pv-now__stamp {
+  margin: 0 0 1.6rem;
+  font-size: 0.8rem;
+  opacity: 0.65;
+}
+
+/* Fotografie */
+
+.pv-photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.2rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pv-photos figure {
+  margin: 0;
+}
+
+.pv-photos img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 6px solid #fff;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+}
+
+.pv-photos figcaption {
+  margin-top: 0.5rem;
+  font-size: 0.85rem;
+}

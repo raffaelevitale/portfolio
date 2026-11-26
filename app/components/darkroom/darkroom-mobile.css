@@ -260,16 +260,6 @@
   line-height: 1.4;
 }
 
-[data-compact] .dr-booklist button {
-  display: grid;
-  gap: 3px;
-  align-content: center;
-  min-height: 52px;
-  padding: 9px 2px;
-}
-
-[data-compact] .dr-booklist__author { color: var(--on-dark-muted); }
-
 .dr-book-actions {
   display: flex;
   gap: 6px;

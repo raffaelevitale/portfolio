@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import * as THREE from "three";
 
 const loader = new THREE.TextureLoader();
@@ -84,4 +84,25 @@ export function useImage(url: string | null): HTMLImageElement | null {
   }, [url]);
 
   return image;
+}
+
+/** Ritaglia la foto al formato della stampa, come object-fit: cover. */
+export function useCoverFit(texture: THREE.Texture | null, aspect: number): THREE.Texture | null {
+  const fitted = useMemo(() => {
+    if (!texture) return null;
+    const image = texture.image as { width?: number; height?: number } | undefined;
+    const ratio = (image?.width ?? 1) / Math.max(1, image?.height ?? 1);
+    const copy = texture.clone();
+    if (ratio > aspect) {
+      copy.repeat.set(aspect / ratio, 1);
+      copy.offset.set((1 - aspect / ratio) / 2, 0);
+    } else {
+      copy.repeat.set(1, ratio / aspect);
+      copy.offset.set(0, (1 - ratio / aspect) / 2);
+    }
+    copy.needsUpdate = true;
+    return copy;
+  }, [texture, aspect]);
+  useEffect(() => () => fitted?.dispose(), [fitted]);
+  return fitted;
 }

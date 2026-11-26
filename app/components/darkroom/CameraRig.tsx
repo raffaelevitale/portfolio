@@ -4,7 +4,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { easing } from "maath";
 import { type RefObject, useEffect, useMemo, useRef } from "react";
 import * as THREE from "three";
-import { getHotspot, INTRO_POSE, poseFor, ROOM_POSES } from "@/lib/darkroom/hotspots";
+import { INTRO_POSE, poseFor } from "@/lib/darkroom/hotspots";
 import { useDarkroom } from "@/lib/darkroom/store";
 import { useReducedMotion } from "./useReducedMotion";
 
@@ -43,8 +43,8 @@ function useDragLook(): RefObject<number> {
     let startYaw = 0;
     const down = (e: PointerEvent) => {
       if (!e.isPrimary || e.button !== 0) return;
-      const { phase, focus, guideOpen, switching } = useDarkroom.getState();
-      if (phase !== "room" || focus || guideOpen || switching) return;
+      const { phase, focus, guideOpen } = useDarkroom.getState();
+      if (phase !== "room" || focus || guideOpen) return;
       pointerId = e.pointerId;
       startX = e.clientX;
       startYaw = yaw.current;
@@ -83,31 +83,20 @@ export default function CameraRig({ compact, touch }: { compact: boolean; touch:
   const yaw = useDragLook();
   const lookDir = useMemo(() => new THREE.Vector3(), []);
 
-  const room = useDarkroom((s) => s.room);
   const look = useRef(new THREE.Vector3(...INTRO_POSE.target));
   const goalPos = useMemo(() => new THREE.Vector3(), []);
   const goalLook = useMemo(() => new THREE.Vector3(), []);
   const offset = useRef({ x: 0, y: 0 });
-  const lastRoom = useRef(room);
 
   useFrame((state, delta) => {
     const { camera, size, pointer } = state;
     if (size.height === 0 || size.width === 0) return;
     const dt = touch ? Math.min(delta, 0.05) : delta;
 
-    // Appena attraversata la porta (a schermo nero) si riparte dalla soglia della nuova stanza.
-    if (lastRoom.current !== room) {
-      lastRoom.current = room;
-      const entry = ROOM_POSES[room].entry;
-      camera.position.set(...entry.position);
-      look.current.set(...entry.target);
-      yaw.current = 0;
-    }
-
     const aspect = size.width / size.height;
     const narrow = aspect < NARROW_ASPECT;
     const sheet = compact && size.height >= size.width;
-    const pose = phase === "intro" ? INTRO_POSE : poseFor(room, focus, narrow);
+    const pose = phase === "intro" ? INTRO_POSE : poseFor(focus, narrow);
     goalPos.set(...pose.position);
     goalLook.set(...pose.target);
 
@@ -151,7 +140,7 @@ export default function CameraRig({ compact, touch }: { compact: boolean; touch:
 
     // Con il pannello aperto spostiamo il centro ottico, invece della camera,
     // così l'oggetto a fuoco resta nella parte di schermo libera.
-    const panelOpen = phase === "room" && focus !== null && !getHotspot(focus).leadsTo;
+    const panelOpen = phase === "room" && focus !== null;
     const panelWidth = compact
       ? Math.min(COMPACT_PANEL_MAX_WIDTH, size.width * COMPACT_PANEL_WIDTH_RATIO)
       : Math.min(PANEL_MAX_WIDTH, size.width * PANEL_WIDTH_RATIO);

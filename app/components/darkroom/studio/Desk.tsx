@@ -4,10 +4,11 @@ import { useMemo } from "react";
 import { Quaternion, Vector3 } from "three";
 import type { Vec3 } from "@/lib/darkroom/hotspots";
 import { useLive } from "@/lib/live/useLive";
-import { type Draw, useCanvasTexture } from "../textures";
 import { BoxInstances, type BoxInstance } from "./BoxInstances";
+import { drawEditorScreen } from "./desk-textures";
+import { ContributionPrint, FilmCamera, Laptop, PostIts } from "./DeskGear";
 import { SoftBox, useStudioFinishes } from "./StudioFinishes";
-import { drawGithubScreen, useLiveCanvasTexture } from "./studio-textures";
+import { useLiveCanvasTexture } from "./studio-textures";
 
 const DESK = { x: -2.25, z: -0.35, w: 0.7, len: 1.3, h: 0.74 } as const;
 const CHARCOAL = "#24282b";
@@ -27,18 +28,6 @@ const KEYS: readonly BoxInstance[] = [
     position: [0.054, 0.013, z], size: [0.021, 0.010, 0.034], color: "#46545a",
   })),
 ];
-
-const ruledPaper: Draw = (ctx, w, h) => {
-  ctx.fillStyle = "#ded0ac";
-  ctx.fillRect(0, 0, w, h);
-  ctx.strokeStyle = "#b1a88f";
-  for (let y = 30; y < h - 10; y += 17) {
-    ctx.beginPath();
-    ctx.moveTo(15, y);
-    ctx.lineTo(w - 15, y);
-    ctx.stroke();
-  }
-};
 
 function Rod({ from, to, radius }: { from: Vec3; to: Vec3; radius: number }) {
   const { midpoint, rotation, length } = useMemo(() => {
@@ -120,7 +109,6 @@ function Chair() {
 }
 
 function DesktopProps() {
-  const paper = useCanvasTexture(256, 192, ruledPaper);
   return (
     <>
       <SoftBox position={[-2.16, DESK.h + 0.002, -0.43]} size={[0.33, 0.005, 0.64]} radius={0.002} color="#3b4a40" />
@@ -131,15 +119,6 @@ function DesktopProps() {
       <group position={[-2.13, DESK.h + 0.012, -0.66]} rotation={[0, -0.12, 0]}>
         <SoftBox size={[0.102, 0.027, 0.058]} radius={0.012} color="#353c3d" />
         <SoftBox position={[-0.018, 0.015, 0]} size={[0.019, 0.007, 0.008]} color="#b8a38b" radius={0.003} />
-      </group>
-      <group position={[-2.115, DESK.h, 0.18]} rotation={[0, 0.21, 0]}>
-        <SoftBox position={[0, 0.008, 0]} size={[0.205, 0.016, 0.144]} color="#753b30" />
-        <SoftBox position={[-0.002, 0.018, 0]} size={[0.19, 0.013, 0.136]} color="#dac6a5" />
-        <mesh position={[-0.002, 0.025, 0]} rotation={[-Math.PI / 2, 0, -Math.PI / 2]}>
-          <planeGeometry args={[0.136, 0.19]} />
-          <meshStandardMaterial map={paper} roughness={0.95} />
-        </mesh>
-        <SoftBox position={[-0.024, 0.029, 0.03]} size={[0.135, 0.005, 0.007]} rotation={[0, -0.2, 0]} color="#2b3a38" radius={0.002} />
       </group>
       <group position={[-2.33, DESK.h, -0.78]}>
         <mesh position={[0, 0.034, 0]}>
@@ -159,12 +138,12 @@ function DesktopProps() {
   );
 }
 
-/** Il monitor usa gli stessi dati live anche con il nuovo telaio. */
+/** La scrivania dove scrivo codice: editor e provino seguono GitHub in diretta. */
 export default function Desk() {
   const github = useLive("github");
   const { wood } = useStudioFinishes();
   const status = !github ? "loading" : github.data ? "ok" : "off";
-  const screen = useLiveCanvasTexture(1024, 640, drawGithubScreen(github?.data ?? null, status), [github?.fetchedAt, status]);
+  const screen = useLiveCanvasTexture(1024, 640, drawEditorScreen(github?.data ?? null, status), [github?.fetchedAt, status]);
 
   return (
     <group>
@@ -187,9 +166,13 @@ export default function Desk() {
             <planeGeometry args={[0.624, 0.39]} />
             <meshStandardMaterial map={screen} emissiveMap={screen} emissive="#ffffff" emissiveIntensity={0.56} roughness={0.9} />
           </mesh>
+          <PostIts />
         </group>
       </group>
       <DesktopProps />
+      <Laptop />
+      <FilmCamera />
+      <ContributionPrint data={github?.data ?? null} revision={github?.fetchedAt} />
       <TaskLamp />
       <Chair />
     </group>

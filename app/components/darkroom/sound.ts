@@ -72,24 +72,24 @@ export function playAdvance(): void {
   burst(ctx, ctx.currentTime + 0.005, 3800, 0.12, 0.03);
 }
 
-/** Il tamburo della porta girevole che ruota: un fruscio basso che sale e scende. */
-export function playDoor(): void {
+/** L'interruttore della luce di sicurezza: uno scatto secco, poi il ronzio della lampada che si accende. */
+export function playSwitch(on: boolean): void {
   const ctx = audio();
   if (!ctx || ctx.state !== "running") return;
-  const t = ctx.currentTime + 0.01;
-  const src = ctx.createBufferSource();
-  src.buffer = noiseBuffer(ctx, 0.9, true);
-  const filter = ctx.createBiquadFilter();
-  filter.type = "lowpass";
-  filter.frequency.setValueAtTime(180, t);
-  filter.frequency.exponentialRampToValueAtTime(900, t + 0.35);
-  filter.frequency.exponentialRampToValueAtTime(150, t + 0.85);
+  const t = ctx.currentTime + 0.005;
+  burst(ctx, t, 2200, 0.32, 0.025);
+  burst(ctx, t + 0.03, 900, 0.18, 0.04);
+  if (!on) return;
+  const hum = ctx.createOscillator();
   const env = ctx.createGain();
-  env.gain.setValueAtTime(0.0001, t);
-  env.gain.exponentialRampToValueAtTime(0.5, t + 0.2);
-  env.gain.exponentialRampToValueAtTime(0.0001, t + 0.85);
-  src.connect(filter).connect(env).connect(ctx.destination);
-  src.start(t);
+  hum.type = "sawtooth";
+  hum.frequency.value = 100;
+  env.gain.setValueAtTime(0.0001, t + 0.05);
+  env.gain.exponentialRampToValueAtTime(0.025, t + 0.15);
+  env.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+  hum.connect(env).connect(ctx.destination);
+  hum.start(t + 0.05);
+  hum.stop(t + 0.75);
 }
 
 const DRIP_MIN_MS = 4000;

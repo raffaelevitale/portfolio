@@ -37,7 +37,7 @@ const dmMono = DM_Mono({
 
 const title = "Raffaele Vitale — Sviluppatore Web · Web, AI e automazione";
 const description =
-  "Entra nella camera oscura di Raffaele Vitale, sviluppatore web: Orario Vallauri (1.500 utenti al giorno), Crybu Control Center, AI e automazione per le aziende, fotografia.";
+  "Entra nello studio di Raffaele Vitale, sviluppatore web e fotografo: Orario Vallauri (1.500 utenti al giorno), Crybu Control Center, AI e automazione per le aziende, fotografia.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

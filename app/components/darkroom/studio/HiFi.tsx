@@ -7,10 +7,13 @@ import type { Group } from "three";
 import { useDarkroom } from "@/lib/darkroom/store";
 import { proxied } from "@/lib/live/image";
 import { useLive } from "@/lib/live/useLive";
+import { ALBUMS } from "@/lib/studio-content";
+import { ROOM } from "../objects/Room";
 import { useCanvasTexture } from "../textures";
 import { useReducedMotion } from "../useReducedMotion";
+import { drawNowPlayingCard } from "./desk-textures";
 import { SoftBox, useStudioFinishes } from "./StudioFinishes";
-import { drawGrooves } from "./studio-textures";
+import { drawGrooves, drawSleeve, useLiveCanvasTexture } from "./studio-textures";
 import { useRemoteTexture } from "./useRemoteTexture";
 
 export const CONSOLE = { x: 1.06, z: -1.775, w: 0.8, h: 0.6, d: 0.45 } as const;
@@ -76,6 +79,60 @@ function AudioCabinet() {
   );
 }
 
+const LEDGE = { x: CONSOLE.x, y: 1.06, w: 0.52 } as const;
+const SLEEVE = 0.31;
+
+interface ShownRecord {
+  label: string;
+  title: string;
+  artist: string;
+  cover: string | null;
+}
+
+/** Cosa mettere sul leggio: il disco in ascolto, altrimenti il più ascoltato del mese o un preferito. */
+function useShownRecord(): ShownRecord {
+  const spotify = useLive("spotify");
+  const track = spotify?.data?.track ?? null;
+  const top = spotify?.data?.topAlbums[0] ?? null;
+  if (track?.isPlaying) {
+    return { label: "IN ASCOLTO ORA", title: track.album || track.title, artist: track.artist, cover: track.coverUrl ? proxied(track.coverUrl, 384) : null };
+  }
+  if (top) {
+    return { label: "IN ROTAZIONE", title: top.name, artist: top.artist, cover: top.coverUrl ? proxied(top.coverUrl, 384) : null };
+  }
+  const favourite = ALBUMS[0];
+  return { label: "PREFERITO", title: favourite.title, artist: favourite.artist, cover: favourite.cover ? proxied(favourite.cover, 384) : null };
+}
+
+/** La mensola sopra il giradischi: la copertina in piedi, come si fa con il disco sul piatto. */
+function NowPlayingLedge() {
+  const shown = useShownRecord();
+  const { wood } = useStudioFinishes();
+  const cover = useRemoteTexture(shown.cover);
+  const fallback = useCanvasTexture(256, 256, drawSleeve(0));
+  const card = useLiveCanvasTexture(256, 96, drawNowPlayingCard(shown.label, shown.title, shown.artist), [shown.label, shown.title, shown.artist]);
+  const z = ROOM.backZ;
+  return (
+    <group position={[LEDGE.x, LEDGE.y, z]}>
+      <SoftBox position={[0, 0, 0.04]} size={[LEDGE.w, 0.022, 0.08]} color="#c39f7f" map={wood} shadow />
+      <SoftBox position={[0, 0.019, 0.074]} size={[LEDGE.w, 0.016, 0.01]} color="#a8845f" map={wood} />
+      <group position={[-0.07, 0.011 + SLEEVE / 2, 0.045]} rotation={[-0.09, 0, 0]}>
+        <SoftBox size={[SLEEVE, SLEEVE, 0.006]} color="#1e1b19" radius={0.0015} shadow />
+        <mesh position={[0, 0, 0.0032]}>
+          <planeGeometry args={[SLEEVE - 0.004, SLEEVE - 0.004]} />
+          <meshStandardMaterial map={cover ?? fallback} roughness={0.7} />
+        </mesh>
+      </group>
+      <group position={[0.185, 0.011 + 0.026, 0.06]} rotation={[-0.16, -0.12, 0]}>
+        <mesh>
+          <planeGeometry args={[0.13, 0.049]} />
+          <meshStandardMaterial map={card} roughness={0.9} />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
 /** Il piatto e il braccio reagiscono allo stato di riproduzione di Spotify. */
 export default function HiFi() {
   const spotify = useLive("spotify");
@@ -108,6 +165,7 @@ export default function HiFi() {
 
   return (
     <group>
+      <NowPlayingLedge />
       <AudioCabinet />
       <Speaker x={CONSOLE.x - 0.32} />
       <Speaker x={CONSOLE.x + 0.32} />
@@ -128,7 +186,8 @@ export default function HiFi() {
           </mesh>
           <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.0008, 0]}>
             <circleGeometry args={[0.047, 32]} />
-            <meshStandardMaterial map={label} color={label ? "#ffffff" : "#8a4937"} roughness={0.64} />
+            {/* La chiave rimonta il materiale: three.js non ricompila lo shader quando una mappa compare dopo. */}
+            <meshStandardMaterial key={label ? "cover" : "plain"} map={label} color={label ? "#ffffff" : "#8a4937"} roughness={0.64} />
           </mesh>
         </group>
         <mesh position={[-0.04, 0.094, 0.006]}>

@@ -15,6 +15,7 @@ import { usePullOut } from "./usePullOut";
 import { BoxInstances, type BoxInstance } from "./BoxInstances";
 import { ShelfLens, ShelfPlant, StackedBooks } from "./ShelfObjects";
 import { SoftBox, useStudioFinishes } from "./StudioFinishes";
+import { useDimmedEmissive } from "./useSafelightMix";
 
 export const BOOKCASE = { x: -0.9, z: -1.82, w: 2.9, h: 2.15, d: 0.36 } as const;
 const WOOD = "#c4a382";
@@ -195,6 +196,8 @@ function VinylShelf() {
 function Carcass() {
   const { x, z, w, h, d } = BOOKCASE;
   const { wood } = useStudioFinishes();
+  // I LED sotto i ripiani si spengono quando si accende la luce rossa.
+  const led = useDimmedEmissive({ color: "#dfc6a0", emissive: "#ffd4a0", base: 0.65 });
   const boards: Array<{ pos: [number, number, number]; size: [number, number, number]; color?: string }> = [
     { pos: [x, h / 2, z - d / 2 + 0.01], size: [w, h, 0.02], color: "#3b2a1e" },
     { pos: [x - w / 2, h / 2, z], size: [BOARD, h, d] },
@@ -229,9 +232,8 @@ function Carcass() {
       {[SHELVES[1], SHELVES[2], h - BOARD].map((y) => (
         <group key={y} position={[x, y - BOARD - 0.002, FRONT_Z - 0.055]}>
           <SoftBox size={[w - 0.08, 0.011, 0.026]} color="#3b3029" />
-          <mesh position={[0, -0.004, 0.004]}>
+          <mesh position={[0, -0.004, 0.004]} material={led}>
             <boxGeometry args={[w - 0.11, 0.004, 0.014]} />
-            <meshStandardMaterial color="#dfc6a0" emissive="#ffd4a0" emissiveIntensity={0.65} />
           </mesh>
         </group>
       ))}

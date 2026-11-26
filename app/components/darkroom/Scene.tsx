@@ -2,21 +2,20 @@
 
 import { Canvas, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useState } from "react";
-import { INTRO_POSE, type RoomId } from "@/lib/darkroom/hotspots";
+import { INTRO_POSE } from "@/lib/darkroom/hotspots";
 import { useDarkroom } from "@/lib/darkroom/store";
 import CameraRig from "./CameraRig";
 import Effects from "./Effects";
 import { HoverLight } from "./Lights";
 import MobileFrames from "./MobileFrames";
-import DarkroomRoom from "./rooms/DarkroomRoom";
 import StudioRoom from "./rooms/StudioRoom";
 import { prepareFonts } from "./textures";
 
-/** Atmosfera di ogni stanza: il nero della camera oscura è rosso, quello dello studio è caldo. */
-const ATMOSPHERE: Record<RoomId, { background: string; fog: string }> = {
-  darkroom: { background: "#060304", fog: "#080405" },
-  studio: { background: "#0b0806", fog: "#0e0a07" },
-};
+/** Il nero dello studio è caldo; con la luce di sicurezza accesa diventa quello rosso della camera oscura. */
+const ATMOSPHERE = {
+  warm: { background: "#0b0806", fog: "#0e0a07" },
+  safelight: { background: "#060304", fog: "#080405" },
+} as const;
 
 /** Segnala allo shell che tutto (font, texture, ritratto) è pronto: l'otturatore può aprirsi. */
 function Ready() {
@@ -51,8 +50,8 @@ export default function Scene({ compact, touch, onUnavailable }: {
   compact: boolean; touch: boolean; onUnavailable: () => void;
 }) {
   const [fontsReady, setFontsReady] = useState(false);
-  const room = useDarkroom((s) => s.room);
-  const atmosphere = ATMOSPHERE[room];
+  const safelight = useDarkroom((s) => s.safelight);
+  const atmosphere = safelight ? ATMOSPHERE.safelight : ATMOSPHERE.warm;
 
   useEffect(() => {
     let alive = true;
@@ -78,7 +77,7 @@ export default function Scene({ compact, touch, onUnavailable }: {
       <ContextRecovery onUnavailable={onUnavailable} />
       {fontsReady && (
         <Suspense fallback={null}>
-          {room === "darkroom" ? <DarkroomRoom /> : <StudioRoom />}
+          <StudioRoom />
           <Ready />
         </Suspense>
       )}

@@ -1,14 +1,21 @@
 "use client";
 
+import type { Vec3 } from "@/lib/darkroom/hotspots";
 import { drawEnvelope, useCanvasTexture } from "../textures";
-import { BENCH_TOP_Y } from "./Room";
 
-/** Busta di carta kraft sul bancone destro, orientata verso la posa "cv". */
-export default function Envelope() {
+interface EnvelopeProps {
+  /** Punto d'appoggio, a filo del piano su cui sta la busta. */
+  position: Vec3;
+  /** Rotazione attorno a y, scelta perché il testo si legga dalla posa "cv". */
+  rotationY: number;
+}
+
+/** Busta di carta kraft con il CV, appoggiata sulla scrivania. */
+export default function Envelope({ position, rotationY }: EnvelopeProps) {
   const kraft = useCanvasTexture(768, 512, drawEnvelope);
 
   return (
-    <group position={[2.08, BENCH_TOP_Y, 0.45]} rotation={[0, -0.85, 0]}>
+    <group position={[...position]} rotation={[0, rotationY, 0]}>
       {/* Fogli del CV sotto la busta */}
       <mesh position={[0.03, 0.003, -0.03]} rotation={[0, 0.18, 0]} castShadow receiveShadow>
         <boxGeometry args={[0.21, 0.004, 0.297]} />

@@ -1,8 +1,7 @@
 import { useThree } from "@react-three/fiber";
 import { type DependencyList, useEffect, useMemo } from "react";
 import * as THREE from "three";
-import type { GithubData, SteamData } from "@/lib/live/types";
-import { relativeTime } from "@/lib/rome-time";
+import type { SteamData } from "@/lib/live/types";
 import type { Book } from "@/lib/studio-content";
 import { type Draw, fonts, grain, seeded, text } from "../textures";
 
@@ -254,88 +253,6 @@ export function drawDial(color: string, face: "round" | "square" | "chronograph"
 }
 
 /* ───────────────────────── schermi live ───────────────────────── */
-
-const GH_LEVELS = ["#161b22", "#0e4429", "#006d32", "#26a641", "#39d353"];
-
-function level(count: number, max: number): number {
-  if (count === 0) return 0;
-  return Math.min(4, Math.ceil((count / Math.max(1, max)) * 4));
-}
-
-export function drawGithubScreen(data: GithubData | null, status: "loading" | "ok" | "off"): Draw {
-  return (ctx, w, h) => {
-    const f = fonts();
-    ctx.fillStyle = "#0d1117";
-    ctx.fillRect(0, 0, w, h);
-    ctx.fillStyle = "#161b22";
-    ctx.fillRect(0, 0, w, 44);
-    ["#ff5f57", "#febc2e", "#28c840"].forEach((c, i) => {
-      ctx.fillStyle = c;
-      ctx.beginPath();
-      ctx.arc(26 + i * 22, 22, 7, 0, Math.PI * 2);
-      ctx.fill();
-    });
-    ctx.fillStyle = "#8b949e";
-    ctx.textAlign = "center";
-    text.setFont(ctx, 400, 18, f.mono);
-    ctx.fillText(`${data?.username ?? "raffaelevitale"} — git log`, w / 2, 28);
-    ctx.textAlign = "left";
-
-    if (!data) {
-      ctx.fillStyle = "#c9d1d9";
-      text.setFont(ctx, 400, 26, f.mono);
-      ctx.fillText("$ git log --oneline", 36, 110);
-      ctx.fillStyle = "#8b949e";
-      ctx.fillText(status === "loading" ? "Collegamento a GitHub…" : "GitHub in pausa. Torno subito.", 36, 156);
-      ctx.fillStyle = "#39d353";
-      ctx.fillRect(36, 180, 16, 28);
-      return;
-    }
-
-    let y = 92;
-    if (data.weeks && data.weeks.length > 0) {
-      const weeks = data.weeks.slice(-53);
-      const max = Math.max(...weeks.flat());
-      const cell = Math.min(16, (w - 72) / weeks.length - 2);
-      weeks.forEach((week, wi) => {
-        week.forEach((count, di) => {
-          ctx.fillStyle = GH_LEVELS[level(count, max)];
-          ctx.fillRect(36 + wi * (cell + 2), y + di * (cell + 2), cell, cell);
-        });
-      });
-      y += 7 * (cell + 2) + 34;
-      ctx.fillStyle = "#c9d1d9";
-      text.setFont(ctx, 400, 22, f.mono);
-      ctx.fillText(`${data.totalContributions ?? 0} contributi nell'ultimo anno`, 36, y);
-      y += 46;
-    } else {
-      ctx.fillStyle = "#c9d1d9";
-      text.setFont(ctx, 400, 24, f.mono);
-      ctx.fillText(`$ ls ~/repos   # ${data.publicRepos ?? "—"} pubblici`, 36, y);
-      y += 52;
-    }
-
-    for (const repo of data.repos.slice(0, 4)) {
-      if (y > h - 40) break;
-      ctx.fillStyle = "#39d353";
-      text.setFont(ctx, 400, 22, f.mono);
-      ctx.fillText(`● ${repo.name}`, 36, y);
-      ctx.fillStyle = "#8b949e";
-      ctx.textAlign = "right";
-      ctx.fillText(relativeTime(repo.pushedAt), w - 36, y);
-      ctx.textAlign = "left";
-      y += 30;
-      if (repo.lastCommit) {
-        ctx.fillStyle = "#c9d1d9";
-        const msg = repo.lastCommit.message.length > 64 ? `${repo.lastCommit.message.slice(0, 63)}…` : repo.lastCommit.message;
-        ctx.fillText(`  └ ${msg}`, 36, y);
-        y += 38;
-      } else {
-        y += 10;
-      }
-    }
-  };
-}
 
 export function drawTvScreen(data: SteamData | null, image: HTMLImageElement | null, status: "loading" | "ok" | "off"): Draw {
   return (ctx, w, h) => {

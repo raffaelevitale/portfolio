@@ -3,29 +3,23 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { PERSON } from "@/lib/content";
-import { doorOf, getHotspot, hotspotsIn, type HotspotId } from "@/lib/darkroom/hotspots";
+import { getHotspot, HOTSPOTS, type HotspotId } from "@/lib/darkroom/hotspots";
 import { useDarkroom } from "@/lib/darkroom/store";
-import CompactNav from "./CompactNav";
+import CompactNav, { flipSafelight } from "./CompactNav";
 import { playAdvance } from "./sound";
-
-const ROOM_LABEL = { darkroom: "Camera oscura", studio: "Studio" } as const;
 
 /** Intestazione, didascalia dell'oggetto sotto il puntatore e la striscia di pellicola per navigare. */
 export default function Hud({ compact, touch }: { compact: boolean; touch: boolean }) {
-  const room = useDarkroom((s) => s.room);
   const phase = useDarkroom((s) => s.phase);
   const focus = useDarkroom((s) => s.focus);
   const hovered = useDarkroom((s) => s.hovered);
   const soundOn = useDarkroom((s) => s.soundOn);
-  const switching = useDarkroom((s) => s.switching);
+  const safelight = useDarkroom((s) => s.safelight);
   const setFocus = useDarkroom((s) => s.setFocus);
   const setGuideOpen = useDarkroom((s) => s.setGuideOpen);
   const toggleSound = useDarkroom((s) => s.toggleSound);
-  const goToRoom = useDarkroom((s) => s.goToRoom);
 
   const film = useRef<HTMLOListElement>(null);
-  const frames = hotspotsIn(room);
-  const door = doorOf(room);
 
   // Il fotogramma attivo resta sempre visibile anche quando la pellicola è stretta.
   useEffect(() => {
@@ -40,14 +34,20 @@ export default function Hud({ compact, touch }: { compact: boolean; touch: boole
   };
 
   return (
-    <div className={`dr-hud${switching ? " is-switching" : ""}`}>
+    <div className="dr-hud">
       <header className="dr-hud__top">
         <button type="button" className="dr-hud__brand" onClick={() => setFocus(null)}>
           <span className="dr-hud__name">{PERSON.name}</span>
-          <span className="dr-hud__room">{ROOM_LABEL[room]}</span>
+          <span className="dr-hud__room">{safelight ? "Camera oscura" : "Studio"}</span>
         </button>
         <nav className="dr-hud__links" aria-label="Sito">
           <Link href="/lavori">Provini</Link>
+          {!compact && (
+            <button type="button" onClick={flipSafelight} aria-pressed={safelight} className="dr-safelight-toggle">
+              <span className="dr-safelight-toggle__bulb" aria-hidden="true" />
+              Luce rossa
+            </button>
+          )}
           {!compact && <button type="button" onClick={() => setGuideOpen(true)}>
             Guida
           </button>}
@@ -77,10 +77,10 @@ export default function Hud({ compact, touch }: { compact: boolean; touch: boole
         </p>
       )}
 
-      {compact ? (!focus && phase === "room" && <CompactNav key={room} frames={frames} door={door} onSelect={go} />) : (
-      <nav className="dr-film" aria-label={`Oggetti: ${ROOM_LABEL[room]}`}>
+      {compact ? (!focus && phase === "room" && <CompactNav frames={HOTSPOTS} onSelect={go} />) : (
+      <nav className="dr-film" aria-label="Oggetti nello studio">
         <ol ref={film} className="dr-film__frames">
-          {frames.map((h) => (
+          {HOTSPOTS.map((h) => (
             <li key={h.id}>
               <button
                 type="button"
@@ -95,17 +95,6 @@ export default function Hud({ compact, touch }: { compact: boolean; touch: boole
               </button>
             </li>
           ))}
-          <li>
-            <button
-              type="button"
-              className="dr-film__frame dr-film__frame--door"
-              onClick={() => door.leadsTo && goToRoom(door.leadsTo, door.id)}
-              disabled={switching}
-            >
-              <span className="dr-film__num">Porta {door.frame}</span>
-              <span className="dr-film__label">{door.label}</span>
-            </button>
-          </li>
         </ol>
       </nav>)}
     </div>

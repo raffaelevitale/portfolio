@@ -659,16 +659,35 @@
   color: var(--paper-muted);
 }
 
+.pv-reading {
+  margin-bottom: clamp(40px, 6vw, 72px);
+}
+
+/* Campate più strette: con pochi libri per ripiano, uno scaffale troppo largo sembra vuoto. */
+.pv-reading .bs {
+  max-width: 880px;
+}
+
 .pv-fuori {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
   gap: clamp(28px, 5vw, 72px);
 }
 
+.pv-fuori--objects {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .pv-fuori__side {
   display: grid;
   align-content: start;
   gap: 2rem;
+}
+
+/* Orologi e auto affiancati sotto la libreria */
+.pv-fuori--objects .pv-fuori__side {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: clamp(24px, 4vw, 56px);
 }
 
 .pv-fuori__title {
@@ -681,38 +700,11 @@
   color: var(--safe-deep);
 }
 
-.pv-books,
 .pv-objects {
   margin: 0;
   padding: 0;
   list-style: none;
   border-top: 1px solid var(--line-paper);
-}
-
-.pv-book {
-  display: grid;
-  grid-template-columns: 40px 1fr;
-  gap: 14px;
-  padding: 0.75rem 0;
-  border-bottom: 1px solid var(--line-paper);
-}
-
-.pv-book__spine {
-  width: 10px;
-  border-radius: 2px;
-  box-shadow: inset 0 0 0 1px rgb(29 25 22 / 0.12);
-}
-
-.pv-book__title {
-  display: block;
-  font-family: var(--font-display), serif;
-  font-size: 1.3rem;
-  line-height: 1.15;
-}
-
-.pv-book__author {
-  font-size: var(--text-sm);
-  color: var(--paper-muted);
 }
 
 .pv-book__comment {
@@ -750,7 +742,7 @@
   color: var(--paper-muted);
 }
 
-.pv-book__cover, .pv-objects__photo { width: 100%; height: auto; object-fit: contain; align-self: start; }
+.pv-objects__photo { width: 100%; height: auto; object-fit: contain; align-self: start; }
 .pv-objects .studio-photo { min-width: 0; margin: 0; }
 .pv-objects__photo { display: block; }
 .pv .studio-credit { display: block; margin-top: 0.35rem; font-size: 0.72rem; color: var(--paper-muted); overflow-wrap: anywhere; }
